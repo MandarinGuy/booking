@@ -1,16 +1,16 @@
 ---
-name: Feature request
+name: Bud Fix
 about: Suggest an idea for this project
 title: "[FEAT] "
 
 
 ---
 
-name: "Feature"
+name: "Bud"
 description: ""
-labels: ["feature"]
+labels: ["bug"]
 body:
   - type: textarea
     attributes:
       label: 설명
-      description: 새로운 기능에 대한 설명을 작성해 주세요.
+      description: 수정할 버그에 대한 설명을 작성해 주세요.
