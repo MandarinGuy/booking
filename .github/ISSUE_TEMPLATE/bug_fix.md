@@ -1,12 +1,12 @@
 ---
-name: Bud Fix
+name: Bug Fix
 about: Suggest an idea for this project
 title: "[FEAT] "
 
 
 ---
 
-name: "Bud"
+name: "Bug"
 description: ""
 labels: ["bug"]
 body:
