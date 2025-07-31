@@ -16,8 +16,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    on:
+      pull_request:
+      push:
     permissions:
       contents: read
+      actions: read
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
