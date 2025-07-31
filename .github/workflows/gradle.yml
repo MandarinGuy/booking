@@ -30,7 +30,18 @@ jobs:
 
       - name: Build (no tests)
         run: ./gradlew clean build -x test
-      
+
       - name: Test
         run: ./gradlew test
 
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Result
+          path: '**/build/test-results/**/*.xml'
+          reporter: java-junit
+          fail-on-error: 'true'
+          # check_name: Custom Check Name # GitHub Checks API에 표시될 이름
+          # list_tests: 'all' # 모든 테스트 목록을 PR 코멘트에 포함
+          # list_suites: 'all' # 모든 테스트 스위트 목록을 PR 코멘트에 포함
+          # fail-on-each-error: 'false' # 각 테스트 오류마다 실패 여부 설정
