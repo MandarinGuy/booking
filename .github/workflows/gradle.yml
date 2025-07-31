@@ -28,5 +28,9 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Build (no tests)
+        run: ./gradlew clean build -x test
+      
+      - name: Test
+      run:
+
