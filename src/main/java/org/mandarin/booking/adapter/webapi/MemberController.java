@@ -1,5 +1,6 @@
 package org.mandarin.booking.adapter.webapi;
 
+import jakarta.validation.Valid;
 import org.mandarin.booking.domain.MemberRegisterRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public record MemberController(MemberRegisterer memberRegisterer) {
 
     @PostMapping
-    public void register(@RequestBody MemberRegisterRequest request){
+    public void register(@RequestBody @Valid MemberRegisterRequest request){
         memberRegisterer.register(request);
     }
 }
