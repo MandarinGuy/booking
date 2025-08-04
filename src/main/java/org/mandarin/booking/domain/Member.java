@@ -1,8 +1,22 @@
 package org.mandarin.booking.domain;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.util.Objects.requireNonNull;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import lombok.Getter;
+
+@Entity
+@Getter
 public class Member {
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name="member_id")
+    private Long id;
+
     private String nickName;
 
     private String userId;
@@ -11,7 +25,7 @@ public class Member {
 
     private String email;
 
-    private Member() {
+    protected Member() {
     }
 
     public static Member register(MemberRegisterRequest request) {
