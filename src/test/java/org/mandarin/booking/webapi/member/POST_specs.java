@@ -61,6 +61,29 @@ public class POST_specs {
         assertThat(matchingMember).isNotNull();
     }
 
+    
+    @Test
+    void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                null, // nickName
+                "testId",
+                "testPassword",
+                "test@gmail.com"
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+        
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
     private static MemberRegisterRequest generateRequest() {
         return new MemberRegisterRequest(
                 "testName",
