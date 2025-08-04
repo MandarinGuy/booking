@@ -44,7 +44,7 @@
 
 #### 속성
 - 이름(NickName): 사용자의 이름.
-- 아이디(UserId): 사용자의 고유 아이디.
+- 아이디(UserId): 사용자의 고유 아이디. - unique
 - 비밀번호(PasswordHash): 사용자의 암호화된 비밀번호.
 - Email(Email): 사용자의 이메일 주소.
 
