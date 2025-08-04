@@ -3,6 +3,7 @@ package org.mandarin.booking.webapi.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.domain.MemberRegisterRequest;
@@ -84,10 +85,47 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void 이미_존재하는_userId로_회원가입_요청을_하면_400_Bad_Request_상태(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var userId = "id";
+        var existingRequest =new MemberRegisterRequest(
+                "nickName1",
+                userId,
+                "password1",
+                "test1@gmail.com"
+        );
+        var request = new MemberRegisterRequest(
+                "nickName2",
+                userId,
+                "password2",
+                "test2@gmail.com"
+        );
+
+        testRestTemplate.postForEntity(
+                "/api/members",
+                existingRequest,
+                Void.class
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
     private static MemberRegisterRequest generateRequest() {
         return new MemberRegisterRequest(
                 "testName",
-                "testId",
+                UUID.randomUUID().toString(),
                 "testPassword",
                 "test@gmail.com"
         );
