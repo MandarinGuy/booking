@@ -1,7 +1,12 @@
 spring:
   datasource:
     hikari:
-      jdbc-url: 'jdbc:mysql://localhost:3306/booking-mysql?useSSL=false&allowPublicKeyRetrieval=true'
+      jdbc-url: jdbc:mysql://localhost:3306/booking?useSSL=false&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: user
     password: 1234@
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
