@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/members")
-public record MemberController() {
+public record MemberController(MemberRegisterer memberRegisterer) {
 
     @PostMapping
     public void register(@RequestBody MemberRegisterRequest request){
-
+        memberRegisterer.register(request);
     }
 }
