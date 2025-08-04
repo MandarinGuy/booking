@@ -1,7 +1,6 @@
 package org.mandarin.booking.domain;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static java.util.Objects.requireNonNull;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,10 +29,10 @@ public class Member {
 
     public static Member register(MemberRegisterRequest request) {
         var member = new Member();
-        member.nickName = requireNonNull(request.nickName(),"NickName cannot be null");
-        member.userId = requireNonNull(request.userId(),"UserId cannot be null");
-        member.passwordHash = requireNonNull(request.passwordHash(),"PasswordHash cannot be null");
-        member.email = requireNonNull(request.email(),"Email cannot be null");
+        member.nickName = request.nickName();
+        member.userId = request.userId();
+        member.passwordHash =request.passwordHash();
+        member.email = request.email();
         return member;
     }
 }
