@@ -1,8 +1,7 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.domain;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.domain.Member;
-import org.mandarin.booking.domain.MemberRegisterRequest;
+import org.mandarin.booking.adapter.webapi.MemberRegisterer;
 import org.mandarin.booking.persist.MemberJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService implements MemberRegisterer {
     private final MemberJpaRepository memberJpaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -20,7 +20,7 @@ public class MemberService implements MemberRegisterer {
         if(memberJpaRepository.existsByEmail(request.email()))
             throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + request.email());
 
-        var newMember = Member.register(request);
+        var newMember = Member.create(request, passwordEncoder);
         memberJpaRepository.save(newMember);
     }
 }

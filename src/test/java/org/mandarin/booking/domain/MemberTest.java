@@ -1,8 +1,11 @@
 package org.mandarin.booking.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class MemberTest {
     private static final String MAIL = "test@test.com";
@@ -12,10 +15,11 @@ class MemberTest {
     MemberRegisterRequest request;
 
     @Test
-    void testRegister() {
+    void testCreation() {
         request = new MemberRegisterRequest(TEST_NICK, TEST_USER, HASHED_PASSWORD, MAIL);
-        var register = Member.register(request);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        var member = Member.create(request, passwordEncoder);
 
-        assertThat(register).isNotNull();
+        assertThat(member).isNotNull();
     }
 }

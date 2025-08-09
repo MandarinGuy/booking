@@ -13,7 +13,7 @@ import lombok.Getter;
 public class Member {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name="member_id")
+    @Column(name = "member_id")
     private Long id;
 
     private String nickName;
@@ -27,11 +27,11 @@ public class Member {
     protected Member() {
     }
 
-    public static Member register(MemberRegisterRequest request) {
+    public static Member create(MemberRegisterRequest request, PasswordEncoder passwordEncoder) {
         var member = new Member();
         member.nickName = request.nickName();
         member.userId = request.userId();
-        member.passwordHash =request.passwordHash();
+        member.passwordHash = passwordEncoder.encode(request.password());
         member.email = request.email();
         return member;
     }

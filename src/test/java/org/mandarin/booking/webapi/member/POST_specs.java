@@ -3,17 +3,22 @@ package org.mandarin.booking.webapi.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.BookingApplication;
+import org.mandarin.booking.domain.Member;
 import org.mandarin.booking.domain.MemberRegisterRequest;
+import org.mandarin.booking.domain.PasswordEncoder;
 import org.mandarin.booking.persist.MemberJpaRepository;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(
         webEnvironment = RANDOM_PORT,
@@ -75,7 +80,7 @@ public class POST_specs {
                 null, // nickName
                 "testId",
                 "testPassword",
-                "test@gmail.com"
+                generateEMail()
         );
 
         // Act
@@ -130,7 +135,7 @@ public class POST_specs {
             @Autowired TestRestTemplate testRestTemplate
     ) {
         // Arrange
-        var email = "test@gmail.com";
+        var email = generateEMail();
         var existingRequest = new MemberRegisterRequest(
                 "nickName1",
                 "testId1",
@@ -191,13 +196,54 @@ public class POST_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
+    @Test
+    void 비밀번호가_올바르게_암호화_된다(
+            @Autowired MemberJpaRepository memberRepository,
+            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        String rawPassword = "testPassword";
+        var request = new MemberRegisterRequest(
+                "testName",
+                UUID.randomUUID().toString(), // userId
+                rawPassword,
+                generateEMail()
+        );
+
+        // Act
+        var res = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+        assertThat(res.getStatusCode().value()).isEqualTo(200);
+
+        // Assert
+        List<Member> memberList = memberRepository.findAll();
+
+        memberList.forEach(System.out::println);
+
+        var savedMember = memberList
+                .stream()
+                .filter(member -> member.getUserId().equals(request.userId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+    }
+
+    private static String generateEMail() {
+        return UUID.randomUUID().toString() + "@gmail.com";
+    }
+
 
     private static MemberRegisterRequest generateRequest() {
         return new MemberRegisterRequest(
                 "testName",
                 UUID.randomUUID().toString(),
                 "testPassword",
-                "test@gmail.com"
+                generateEMail()
         );
     }
 }

@@ -10,8 +10,8 @@ public record MemberRegisterRequest(
         @NotBlank(message = "User ID cannot be blank")
         String userId,
 
-        @NotBlank(message = "Password hash cannot be blank")
-        String passwordHash,
+        @NotBlank(message = "Password cannot be blank")
+        String password,
 
         @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
         @NotBlank(message = "Email cannot be blank")
