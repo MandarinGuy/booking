@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.domain.MemberRegisterRequest;
@@ -62,7 +63,7 @@ public class POST_specs {
         assertThat(matchingMember).isNotNull();
     }
 
-    
+
     @Test
     void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
             @Autowired TestRestTemplate testRestTemplate
@@ -81,7 +82,7 @@ public class POST_specs {
                 request,
                 Void.class
         );
-        
+
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
@@ -92,7 +93,7 @@ public class POST_specs {
     ) {
         // Arrange
         var userId = "id";
-        var existingRequest =new MemberRegisterRequest(
+        var existingRequest = new MemberRegisterRequest(
                 "nickName1",
                 userId,
                 "password1",
@@ -121,6 +122,43 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void 이미_존재하는_email로_회원가입_요청을_하면_400_Bad_Request_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var email = "test@gmail.com";
+        var existingRequest = new MemberRegisterRequest(
+                "nickName1",
+                "testId1",
+                "password1",
+                email
+        );
+        testRestTemplate.postForEntity(
+                "/api/members",
+                existingRequest,
+                Void.class
+        );
+
+        var request = new MemberRegisterRequest(
+                "nickName2",
+                "testId2",
+                "password2",
+                email
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+
+    }
+
 
     private static MemberRegisterRequest generateRequest() {
         return new MemberRegisterRequest(
