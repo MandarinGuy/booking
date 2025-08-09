@@ -19,6 +19,7 @@ public class MemberService implements MemberRegisterer {
             throw new IllegalArgumentException("이미 존재하는 회원입니다: " + request.userId());
         if(memberJpaRepository.existsByEmail(request.email()))
             throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + request.email());
+
         var newMember = Member.register(request);
         memberJpaRepository.save(newMember);
     }

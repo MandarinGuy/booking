@@ -6,6 +6,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.domain.MemberRegisterRequest;
 import org.mandarin.booking.persist.MemberJpaRepository;
@@ -156,7 +158,37 @@ public class POST_specs {
         );
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test@gmail",
+            "test@.com",
+            "test@com",
+            "test.com",
+            "@gmail.com"
+    })
+    void 올바르지_않은_형식의_email로_회원가입을_시도하면_400_Bad_Request_상태코드를_반환한다(
+            String invalidEmail,
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                "nickName1",
+                UUID.randomUUID().toString(),   // userId
+                "password1",
+                invalidEmail
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
 

@@ -1,6 +1,5 @@
 package org.mandarin.booking.persist;
 
-import jakarta.validation.constraints.NotBlank;
 import org.mandarin.booking.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 

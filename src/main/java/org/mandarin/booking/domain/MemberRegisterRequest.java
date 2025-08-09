@@ -1,5 +1,6 @@
 package org.mandarin.booking.domain;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record MemberRegisterRequest(
@@ -12,6 +13,7 @@ public record MemberRegisterRequest(
         @NotBlank(message = "Password hash cannot be blank")
         String passwordHash,
 
+        @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
         @NotBlank(message = "Email cannot be blank")
         String email) {
 }
