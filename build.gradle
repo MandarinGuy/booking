@@ -17,6 +17,10 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	byteBuddyAgent
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -44,9 +48,14 @@ dependencies {
 
 	// Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Mockito inline 사용 시 필요한 Byte Buddy Agent
+	byteBuddyAgent "net.bytebuddy:byte-buddy-agent:1.17.6"
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 	systemProperty 'spring.profiles.active', 'test'
+	// javaagent 선부착 (Mockito self-attach 방지)
+	jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
 }
