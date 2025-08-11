@@ -1,11 +1,11 @@
 package org.mandarin.booking.webapi.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
+import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import java.util.List;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,12 +13,12 @@ import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.domain.Member;
 import org.mandarin.booking.domain.MemberRegisterRequest;
 import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
+import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.mandarin.booking.persist.MemberJpaRepository;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(
         webEnvironment = RANDOM_PORT,
@@ -78,9 +78,9 @@ public class POST_specs {
         // Arrange
         var request = new MemberRegisterRequest(
                 null, // nickName
-                "testId",
-                "testPassword",
-                generateEMail()
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                generateEmail()
         );
 
         // Act
@@ -101,16 +101,16 @@ public class POST_specs {
         // Arrange
         var userId = "id";
         var existingRequest = new MemberRegisterRequest(
-                "nickName1",
+                NicknameGenerator.generateNickName(),
                 userId,
-                "password1",
-                "test1@gmail.com"
+                PasswordGenerator.generatePassword(),
+                generateEmail()
         );
         var request = new MemberRegisterRequest(
-                "nickName2",
+                NicknameGenerator.generateNickName(),
                 userId,
-                "password2",
-                "test2@gmail.com"
+                PasswordGenerator.generatePassword(),
+                generateEmail()
         );
 
         testRestTemplate.postForEntity(
@@ -135,11 +135,11 @@ public class POST_specs {
             @Autowired TestRestTemplate testRestTemplate
     ) {
         // Arrange
-        var email = generateEMail();
+        var email = generateEmail();
         var existingRequest = new MemberRegisterRequest(
-                "nickName1",
-                "testId1",
-                "password1",
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
                 email
         );
         testRestTemplate.postForEntity(
@@ -149,9 +149,9 @@ public class POST_specs {
         );
 
         var request = new MemberRegisterRequest(
-                "nickName2",
-                "testId2",
-                "password2",
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
                 email
         );
 
@@ -179,9 +179,9 @@ public class POST_specs {
     ) {
         // Arrange
         var request = new MemberRegisterRequest(
-                "nickName1",
-                UUID.randomUUID().toString(),   // userId
-                "password1",
+                NicknameGenerator.generateNickName(),
+                generateUserId(),   // userId
+                PasswordGenerator.generatePassword(),
                 invalidEmail
         );
 
@@ -203,12 +203,12 @@ public class POST_specs {
             @Autowired TestRestTemplate testRestTemplate
     ) {
         // Arrange
-        String rawPassword = "testPassword";
+        String rawPassword = PasswordGenerator.generatePassword();
         var request = new MemberRegisterRequest(
-                "testName",
-                UUID.randomUUID().toString(), // userId
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
                 rawPassword,
-                generateEMail()
+                generateEmail()
         );
 
         // Act
@@ -222,8 +222,6 @@ public class POST_specs {
         // Assert
         List<Member> memberList = memberRepository.findAll();
 
-        memberList.forEach(System.out::println);
-
         var savedMember = memberList
                 .stream()
                 .filter(member -> member.getUserId().equals(request.userId()))
@@ -233,17 +231,12 @@ public class POST_specs {
         assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
 
-    private static String generateEMail() {
-        return UUID.randomUUID().toString() + "@gmail.com";
-    }
-
-
-    private static MemberRegisterRequest generateRequest() {
+    private MemberRegisterRequest generateRequest() {
         return new MemberRegisterRequest(
-                "testName",
-                UUID.randomUUID().toString(),
-                "testPassword",
-                generateEMail()
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                generateEmail()
         );
     }
 }
