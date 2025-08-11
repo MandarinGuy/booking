@@ -4,7 +4,7 @@ import org.mandarin.booking.domain.Member;
 
 public record MemberRegisterResponse(
         String userId,
-        String nickname,
+        String nickName,
         String email
 ) {
     public static MemberRegisterResponse from(Member member) {

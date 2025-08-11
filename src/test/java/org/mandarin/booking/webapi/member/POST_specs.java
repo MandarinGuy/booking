@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
+import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
 import org.mandarin.booking.domain.PasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
@@ -217,6 +218,29 @@ public class POST_specs {
         var savedMember = memberRepository.findByUserId(request.userId());
 
         assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+    }
+    
+    @Test
+    void 회원가입_후_반환된_응답에_회원_정보가_포함된다(
+            @Autowired TestRestTemplate testRestTemplate
+    ){
+        // Arrange
+        var request = generateRequest();
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                MemberRegisterResponse.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().userId()).isEqualTo(request.userId());
+        assertThat(response.getBody().nickName()).isEqualTo(request.nickName());
+        assertThat(response.getBody().email()).isEqualTo(request.email());
+
     }
 
     private MemberRegisterRequest generateRequest() {
