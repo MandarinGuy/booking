@@ -54,12 +54,38 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+    
+    @ParameterizedTest
+    @MethodSource("org.mandarin.booking.webapi.auth.POST_specs#blankPasswordRequests")
+    void 요청_본문의_password가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
+            // Arrange
+            AuthRequest request,
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 
     private static AuthRequest[] blankUserIdRequests() {
         return new AuthRequest[]{
                 new AuthRequest(null, generatePassword()),
                 new AuthRequest("", generatePassword()),
                 new AuthRequest(" ", generatePassword())
+        };
+    }
+
+    private static AuthRequest[] blankPasswordRequests() {
+        return new AuthRequest[]{
+                new AuthRequest("testUser", null),
+                new AuthRequest("testUser", ""),
+                new AuthRequest("testUser", " ")
         };
     }
 }
