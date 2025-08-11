@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 
 @Entity
 @Getter

@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberCommandRepository {
     private final MemberJpaRepository jpaRepository;
 
-    public void insert(Member member) {
-        if (member == null) {
-            throw new IllegalArgumentException("Member cannot be null");
-        }
-        jpaRepository.save(member);
+    public Member insert(Member member) {
+        return jpaRepository.save(member);
     }
 }

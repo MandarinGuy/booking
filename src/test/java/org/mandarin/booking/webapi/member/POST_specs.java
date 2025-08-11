@@ -5,17 +5,15 @@ import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generate
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.BookingApplication;
-import org.mandarin.booking.domain.Member;
-import org.mandarin.booking.domain.MemberRegisterRequest;
+import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.domain.PasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
-import org.mandarin.booking.persist.MemberJpaRepository;
+import org.mandarin.booking.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -48,7 +46,7 @@ public class POST_specs {
     @Test
     void 올바른_회원가입_요청을_하면_데이터베이스에_회원_정보가_저장된다(
             @Autowired TestRestTemplate testRestTemplate,
-            @Autowired MemberJpaRepository memberRepository
+            @Autowired MemberQueryRepository memberRepository
     ) {
         // Arrange
         var request = generateRequest();
@@ -61,11 +59,7 @@ public class POST_specs {
         );
 
         // Assert
-        var matchingMember = memberRepository.findAll()
-                .stream()
-                .filter(member -> member.getUserId().equals(request.userId()))
-                .findFirst()
-                .orElseThrow();
+        var matchingMember = memberRepository.findByUserId(request.userId());
 
         assertThat(matchingMember).isNotNull();
     }
@@ -198,7 +192,7 @@ public class POST_specs {
 
     @Test
     void 비밀번호가_올바르게_암호화_된다(
-            @Autowired MemberJpaRepository memberRepository,
+            @Autowired MemberQueryRepository memberRepository,
             @Autowired PasswordEncoder passwordEncoder,
             @Autowired TestRestTemplate testRestTemplate
     ) {
@@ -220,13 +214,7 @@ public class POST_specs {
         assertThat(res.getStatusCode().value()).isEqualTo(200);
 
         // Assert
-        List<Member> memberList = memberRepository.findAll();
-
-        var savedMember = memberList
-                .stream()
-                .filter(member -> member.getUserId().equals(request.userId()))
-                .findFirst()
-                .orElseThrow();
+        var savedMember = memberRepository.findByUserId(request.userId());
 
         assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
