@@ -11,11 +11,16 @@
 
 - 본문
 
-    ```java
-    MemberRegisterRequest(String nickName, String userId, String password, String email) {
+    ```json
+    {
+        "nickName": "string",
+        "userId": "string",
+        "password": "string",
+        "email": "string"
     }
     ```
- curl 명령 예시
+
+curl 명령 예시
 
     ```bash
     curl -i -X POST '<http://localhost:8080/api/member>' \\
@@ -34,8 +39,11 @@
 - 상태코드: `200 OK`
 - 본문
 
-    ```java
-    MemberRegisterResponse(String userId, String nickName, String email) {
+    ```json
+    {
+        "nickName": "test",
+        "userId": "test1234",
+        "email": "test@gmail.com"
     }
     ```
 
@@ -46,7 +54,6 @@
         "email": "test@gmail.com"
     }
     ```
-
 
 ### 테스트
 
