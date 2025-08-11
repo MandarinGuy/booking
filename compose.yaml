@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: booking-mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: qweasd123
+      MYSQL_DATABASE: booking
+    ports:
+      - "3306:3306"
+

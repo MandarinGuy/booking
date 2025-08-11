@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.spotbugs' version '6.2.4'
 }
 
 group = 'org.mandarin'
@@ -17,15 +18,48 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	byteBuddyAgent
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 	implementation("org.projectlombok:lombok:1.18.36")
 	annotationProcessor('org.projectlombok:lombok:1.18.36')
+
+	// Spring web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Spring data JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	//h2 database
+	testRuntimeOnly 'com.h2database:h2'
+
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+	implementation 'com.mysql:mysql-connector-j:8.3.0'
+
+	// Spring validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Mockito inline 사용 시 필요한 Byte Buddy Agent
+	byteBuddyAgent "net.bytebuddy:byte-buddy-agent:1.17.6"
+
+	// spotbugs
+	spotbugs 'com.github.spotbugs:spotbugs:4.9.3'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 	systemProperty 'spring.profiles.active', 'test'
+	// javaagent 선부착 (Mockito self-attach 방지)
+	jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
 }

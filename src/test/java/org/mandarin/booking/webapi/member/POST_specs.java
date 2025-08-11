@@ -1,0 +1,230 @@
+package org.mandarin.booking.webapi.member;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
+import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mandarin.booking.BookingApplication;
+import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
+import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
+import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
+import org.mandarin.booking.persist.MemberQueryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+
+@SpringBootTest(
+        webEnvironment = RANDOM_PORT,
+        classes = BookingApplication.class
+)
+public class POST_specs {
+
+    @Test
+    void 올바른_요청하면_200_OK_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+
+        // Arrange
+        var request = generateRequest();
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    void 올바른_회원가입_요청을_하면_데이터베이스에_회원_정보가_저장된다(
+            @Autowired TestRestTemplate testRestTemplate,
+            @Autowired MemberQueryRepository memberRepository
+    ) {
+        // Arrange
+        var request = generateRequest();
+
+        // Act
+        testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        var matchingMember = memberRepository.findByUserId(request.userId());
+
+        assertThat(matchingMember).isNotNull();
+    }
+
+
+    @Test
+    void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                null, // nickName
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                generateEmail()
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 이미_존재하는_userId로_회원가입_요청을_하면_400_Bad_Request_상태(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var userId = "id";
+        var existingRequest = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                userId,
+                PasswordGenerator.generatePassword(),
+                generateEmail()
+        );
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                userId,
+                PasswordGenerator.generatePassword(),
+                generateEmail()
+        );
+
+        testRestTemplate.postForEntity(
+                "/api/members",
+                existingRequest,
+                Void.class
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 이미_존재하는_email로_회원가입_요청을_하면_400_Bad_Request_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var email = generateEmail();
+        var existingRequest = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                email
+        );
+        testRestTemplate.postForEntity(
+                "/api/members",
+                existingRequest,
+                Void.class
+        );
+
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                email
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test@gmail",
+            "test@.com",
+            "test@com",
+            "test.com",
+            "@gmail.com"
+    })
+    void 올바르지_않은_형식의_email로_회원가입을_시도하면_400_Bad_Request_상태코드를_반환한다(
+            String invalidEmail,
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),   // userId
+                PasswordGenerator.generatePassword(),
+                invalidEmail
+        );
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 비밀번호가_올바르게_암호화_된다(
+            @Autowired MemberQueryRepository memberRepository,
+            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
+        // Arrange
+        String rawPassword = PasswordGenerator.generatePassword();
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                rawPassword,
+                generateEmail()
+        );
+
+        // Act
+        var res = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                Void.class
+        );
+        assertThat(res.getStatusCode().value()).isEqualTo(200);
+
+        // Assert
+        var savedMember = memberRepository.findByUserId(request.userId());
+
+        assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+    }
+
+    private MemberRegisterRequest generateRequest() {
+        return new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                generateEmail()
+        );
+    }
+}
