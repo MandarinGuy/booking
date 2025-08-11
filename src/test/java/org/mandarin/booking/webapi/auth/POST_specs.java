@@ -54,7 +54,7 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
-    
+
     @ParameterizedTest
     @MethodSource("org.mandarin.booking.webapi.auth.POST_specs#blankPasswordRequests")
     void 요청_본문의_password가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
@@ -71,6 +71,26 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 존재하지_않는_userId_비밀번호로_요청하면_401_Unauthorized_상태코드를_반환한다(
+        @Autowired TestRestTemplate testRestTemplate
+    ){
+        // Arrange
+        var request = new AuthRequest("nonExistentUser", generatePassword());
+
+        // don't need to save member in the database
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 
     private static AuthRequest[] blankUserIdRequests() {
