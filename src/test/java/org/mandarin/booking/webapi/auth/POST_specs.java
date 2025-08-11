@@ -10,7 +10,6 @@ import org.mandarin.booking.adapter.webapi.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
 
 @SpringBootTest(
         webEnvironment = RANDOM_PORT,
@@ -32,6 +31,6 @@ public class POST_specs {
         );
         
         // Assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
 }
