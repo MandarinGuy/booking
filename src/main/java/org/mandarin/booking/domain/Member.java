@@ -36,4 +36,8 @@ public class Member {
         member.email = request.email();
         return member;
     }
+
+    public boolean matchesPassword(String rawPassword, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(rawPassword, this.passwordHash);
+    }
 }
