@@ -1,7 +1,10 @@
 package org.mandarin.booking.webapi.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
+import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
+import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import org.junit.jupiter.api.Test;
@@ -9,7 +12,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.BookingApplication;
 import org.mandarin.booking.adapter.webapi.AuthRequest;
+import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.adapter.webapi.TokenHolder;
+import org.mandarin.booking.domain.Member;
+import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.persist.MemberCommandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -75,12 +82,46 @@ public class POST_specs {
 
     @Test
     void 존재하지_않는_userId_비밀번호로_요청하면_401_Unauthorized_상태코드를_반환한다(
-        @Autowired TestRestTemplate testRestTemplate
-    ){
+            @Autowired TestRestTemplate testRestTemplate
+    ) {
         // Arrange
         var request = new AuthRequest("nonExistentUser", generatePassword());
 
         // don't need to save member in the database
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
+    }
+
+    @Test
+    void 요청_본문의_password가_userId에_해당하는_password가_일치하지_않으면_401_Unauthorized_상태코드를_반환한다(
+            @Autowired TestRestTemplate testRestTemplate,
+            @Autowired MemberCommandRepository memberRepository,
+            @Autowired PasswordEncoder passwordEncoder
+    ) {
+        // Arrange
+        var userId = generateUserId();
+
+        var invalidPassword = generatePassword();
+        var request = new AuthRequest(userId, invalidPassword);
+
+        //save member
+        memberRepository.insert(
+                Member.create(new MemberRegisterRequest(
+                                generateNickName(),
+                                userId,
+                                generatePassword(),
+                                generateEmail()
+                        ),
+                        passwordEncoder)
+        );
 
         // Act
         var response = testRestTemplate.postForEntity(
