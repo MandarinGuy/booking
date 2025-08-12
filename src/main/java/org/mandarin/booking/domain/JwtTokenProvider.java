@@ -21,13 +21,21 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public String generateToken(String userId, String nickName, long expiration) {
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        Date exp = new Date(nowMillis + expiration);
         return Jwts.builder()
-                .setHeader(Map.of("typ", "JWT"))
-                .setSubject(userId)
-                .claims(Map.of("userId", userId, "nickName", nickName))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .header()
+                .add("typ", "JWT")
+                .and()
+                .subject(userId)
+                .claims(Map.of(
+                        "userId", userId,
+                        "nickName", nickName
+                ))
+                .issuedAt(now)
+                .expiration(exp)
                 .signWith(key)
-                .issuedAt(new Date())
                 .compact();
     }
 }
