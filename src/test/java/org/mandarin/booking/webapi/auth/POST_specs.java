@@ -12,6 +12,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Import;
         classes = BookingApplication.class
 )
 @Import(TestConfig.class)
+@DisplayName("POST /api/auth/login")
 public class POST_specs {
     @Test
     void 올바른_요청을_보내면_200_OK_상태코드를_반환한다(

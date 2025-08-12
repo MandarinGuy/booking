@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.webapi.AuthRequest;
 import org.mandarin.booking.adapter.webapi.AuthUseCase;
 import org.mandarin.booking.adapter.webapi.TokenHolder;
+import org.mandarin.booking.domain.error.AuthException;
 import org.mandarin.booking.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public TokenHolder login(AuthRequest request) {
-        var member = queryRepository.findByUserId(request.userId());
+        var member = queryRepository.findByUserId(request.userId())
+                .orElseThrow(
+                        () -> new AuthException(String.format("회원 아이디 '%s'에 해당하는 회원이 존재하지 않습니다.", request.userId())));
         if (!member.matchesPassword(request.password(), passwordEncoder)) {
-            throw new IllegalArgumentException("Invalid userId or password");
+            throw new AuthException("Invalid userId or password");
         }
 
         return generateTokens(member);

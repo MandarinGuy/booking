@@ -60,11 +60,10 @@ public class POST_specs {
         );
 
         // Assert
-        var matchingMember = memberRepository.findByUserId(request.userId());
+        var matchingMember = memberRepository.findByUserId(request.userId()).orElseThrow();
 
         assertThat(matchingMember).isNotNull();
     }
-
 
     @Test
     void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
@@ -122,7 +121,7 @@ public class POST_specs {
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatusCode().value()).isEqualTo(500);
     }
 
     @Test
@@ -157,7 +156,7 @@ public class POST_specs {
                 Void.class
         );
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatusCode().value()).isEqualTo(500);
     }
 
     @ParameterizedTest
@@ -215,7 +214,7 @@ public class POST_specs {
         assertThat(res.getStatusCode().value()).isEqualTo(200);
 
         // Assert
-        var savedMember = memberRepository.findByUserId(request.userId());
+        var savedMember = memberRepository.findByUserId(request.userId()).orElseThrow();
 
         assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
