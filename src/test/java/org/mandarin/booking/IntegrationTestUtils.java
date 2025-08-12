@@ -15,16 +15,16 @@ public class IntegrationTestUtils {
     private final MemberCommandRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public IntegrationTestUtils(TestRestTemplate testRestTemplate, 
-                               MemberCommandRepository memberRepository, 
+    public IntegrationTestUtils(TestRestTemplate testRestTemplate,
+                               MemberCommandRepository memberRepository,
                                PasswordEncoder passwordEncoder) {
         this.testRestTemplate = testRestTemplate;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void insertDummyMember(String userId, String password) {
-        memberRepository.insert(
+    public Member insertDummyMember(String userId, String password) {
+        return memberRepository.insert(
                 Member.create(new MemberRegisterRequest(
                         generateNickName(),
                         userId,

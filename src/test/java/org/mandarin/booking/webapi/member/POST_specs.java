@@ -3,12 +3,12 @@ package org.mandarin.booking.webapi.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mandarin.booking.BookingApplication;
+import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
 import org.mandarin.booking.domain.PasswordEncoder;
@@ -16,13 +16,10 @@ import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.mandarin.booking.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
-@SpringBootTest(
-        webEnvironment = RANDOM_PORT,
-        classes = BookingApplication.class
-)
+@IntegrationTest
+@DisplayName("POST /api/auth/login")
 public class POST_specs {
 
     @Test

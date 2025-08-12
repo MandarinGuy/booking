@@ -17,28 +17,33 @@ public class AuthService implements AuthUseCase {
     private final TokenProvider tokenProvider;
 
     @Value("${jwt.token.access}")
-    private long accessTokenExpiration;
+    private long accessTokenExp;
 
     @Value("${jwt.token.refresh}")
-    private long refreshTokenExpiration;
+    private long refreshTokenExp;
 
     @Override
     public TokenHolder login(AuthRequest request) {
-        var member = queryRepository.findByUserId(request.userId())
-                .orElseThrow(
-                        () -> new AuthException(String.format("회원 아이디 '%s'에 해당하는 회원이 존재하지 않습니다.", request.userId())));
-        if (!member.matchesPassword(request.password(), passwordEncoder)) {
-            throw new AuthException("Invalid userId or password");
-        }
+        var member = getMember(request.userId());
+        checkPasswordMatch(member, request.password());
 
         return generateTokens(member);
     }
 
+    private void checkPasswordMatch(Member member, String password) {
+        if (!member.matchesPassword(password, passwordEncoder)) {
+            throw new AuthException("Invalid userId or password");
+        }
+    }
+
+    private Member getMember(String userId) {
+        return queryRepository.findByUserId(userId)
+                .orElseThrow(() -> new AuthException(String.format("회원 아이디 '%s'에 해당하는 회원이 존재하지 않습니다.", userId)));
+    }
+
     private TokenHolder generateTokens(Member member) {
-        var accessToken =
-                tokenProvider.generateToken(member.getUserId(), member.getNickName(), accessTokenExpiration);
-        var refreshToken =
-                tokenProvider.generateToken(member.getUserId(), member.getNickName(), refreshTokenExpiration);
+        var accessToken = tokenProvider.generateToken(member.getUserId(), member.getNickName(), accessTokenExp);
+        var refreshToken = tokenProvider.generateToken(member.getUserId(), member.getNickName(), refreshTokenExp);
         return new TokenHolder(accessToken, refreshToken);
     }
 }
