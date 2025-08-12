@@ -6,6 +6,10 @@ import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.gener
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -15,6 +19,7 @@ import org.mandarin.booking.TestConfig;
 import org.mandarin.booking.adapter.webapi.AuthRequest;
 import org.mandarin.booking.adapter.webapi.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
@@ -34,7 +39,6 @@ public class POST_specs {
 
         // save member
         integrationUtils.insertDummyMember(request.userId(), request.password());
-
 
         // Act
         var response = integrationUtils.post(
@@ -147,44 +151,84 @@ public class POST_specs {
         assertThat(response.getBody().refreshToken()).isNotBlank();
 
     }
-    
-@Test
-void 전달된_토큰은_유효한_JWT_형식이어야_한다(
-    @Autowired IntegrationTestUtils integrationUtils
-){
-    // Arrange
-    var userId = generateUserId();
-    var password = generatePassword();
-    integrationUtils.insertDummyMember(userId, password);
 
-    var request = new AuthRequest(userId, password);
+    @Test
+    void 전달된_토큰은_유효한_JWT_형식이어야_한다(
+            @Autowired IntegrationTestUtils integrationUtils
+    ) {
+        // Arrange
+        var userId = generateUserId();
+        var password = generatePassword();
+        integrationUtils.insertDummyMember(userId, password);
 
-    // Act
-    var response = integrationUtils.post(
-            "/api/auth/login",
-            request,
-            TokenHolder.class
-    );
+        var request = new AuthRequest(userId, password);
 
-    var accessToken = response.getBody().accessToken();
-    var refreshToken = response.getBody().refreshToken();
+        // Act
+        var response = integrationUtils.post(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
 
-    assertThat(accessToken.split("\\.")).hasSize(3);
-    assertThat(refreshToken.split("\\.")).hasSize(3);
+        var accessToken = response.getBody().accessToken();
+        var refreshToken = response.getBody().refreshToken();
 
-    assertThat(accessToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
-    assertThat(refreshToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
+        assertThat(accessToken.split("\\.")).hasSize(3);
+        assertThat(refreshToken.split("\\.")).hasSize(3);
 
-    assertThatCode(() -> {
-        String[] accessTokenParts = accessToken.split("\\.");
-        String[] refreshTokenParts = refreshToken.split("\\.");
+        assertThat(accessToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
+        assertThat(refreshToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
 
-        java.util.Base64.getUrlDecoder().decode(accessTokenParts[0]);
-        java.util.Base64.getUrlDecoder().decode(accessTokenParts[1]);
-        java.util.Base64.getUrlDecoder().decode(refreshTokenParts[0]);
-        java.util.Base64.getUrlDecoder().decode(refreshTokenParts[1]);
-    }).doesNotThrowAnyException();
-}
+        assertThatCode(() -> {
+            String[] accessTokenParts = accessToken.split("\\.");
+            String[] refreshTokenParts = refreshToken.split("\\.");
+
+            java.util.Base64.getUrlDecoder().decode(accessTokenParts[0]);
+            java.util.Base64.getUrlDecoder().decode(accessTokenParts[1]);
+            java.util.Base64.getUrlDecoder().decode(refreshTokenParts[0]);
+            java.util.Base64.getUrlDecoder().decode(refreshTokenParts[1]);
+        }).doesNotThrowAnyException();
+    }
+
+    @Test
+    void 전달된_토큰은_만료되지_않아야한다(
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Value("${jwt.token.secret}") String secretKey) {
+        // Arrange
+        var userId = generateUserId();
+        var password = generatePassword();
+        integrationUtils.insertDummyMember(userId, password);
+        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
+
+        var request = new AuthRequest(userId, password);
+
+        // Act
+        var response = integrationUtils.post(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+        var accessToken = response.getBody().accessToken();
+        var refreshToken = response.getBody().refreshToken();
+
+        // Assert
+        var accessTokenExpiration = getExpiration(key, accessToken);
+        var refreshTokenExpiration = getExpiration(key, refreshToken);
+
+        assertThat(accessTokenExpiration).isAfter(new Date());
+        assertThat(refreshTokenExpiration).isAfter(new Date());
+    }
+
+    private static Date getExpiration(SecretKey key, String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+    }
+
     private static AuthRequest[] blankUserIdRequests() {
         return new AuthRequest[]{
                 new AuthRequest(null, generatePassword()),
