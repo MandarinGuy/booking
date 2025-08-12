@@ -6,6 +6,8 @@ import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.gener
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -219,12 +221,47 @@ public class POST_specs {
         assertThat(accessTokenExpiration).isAfter(new Date());
         assertThat(refreshTokenExpiration).isAfter(new Date());
     }
+    
+    @Test
+    void 전달된_토큰에는_사용자의_userId가_포함되어야_한다(
+        @Autowired IntegrationTestUtils  integrationUtils,
+        @Value("${jwt.token.secret}") String secretKey
+    ){
+        // Arrange
+        var userId = generateUserId();
+        var password = generatePassword();
+        integrationUtils.insertDummyMember(userId, password);
+        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
-    private static Date getExpiration(SecretKey key, String token) {
+        var request = new AuthRequest(userId, password);
+
+        // Act
+        var response = integrationUtils.post(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+
+        // Assert
+        var accessToken = response.getBody().accessToken();
+        var refreshToken = response.getBody().refreshToken();
+
+        var accessTokenClaims = getTokenClaims(key, accessToken);
+        var refreshTokenClaims = getTokenClaims(key, refreshToken);
+        assertThat(accessTokenClaims.getPayload().get("userId")).isNotNull();
+        assertThat(refreshTokenClaims.getPayload().get("userId")).isNotNull();
+    }
+
+    private static Jws<Claims> getTokenClaims(SecretKey key, String accessToken) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(accessToken);
+    }
+
+    private static Date getExpiration(SecretKey key, String token) {
+        return getTokenClaims(key, token)
                 .getPayload()
                 .getExpiration();
     }
