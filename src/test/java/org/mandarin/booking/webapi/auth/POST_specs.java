@@ -113,15 +113,7 @@ public class POST_specs {
         var request = new AuthRequest(userId, invalidPassword);
 
         //save member
-        memberRepository.insert(
-                Member.create(new MemberRegisterRequest(
-                                generateNickName(),
-                                userId,
-                                generatePassword(),
-                                generateEmail()
-                        ),
-                        passwordEncoder)
-        );
+        insertDummyMember(memberRepository, passwordEncoder, userId, generatePassword());
 
         // Act
         var response = testRestTemplate.postForEntity(
@@ -132,6 +124,29 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(401);
+    }
+
+    @Test
+    void 성공적인_로그인_후_응답에_accessToken과_refreshToken가_포함되어야_한다(
+            @Autowired TestRestTemplate testRestTemplate,
+            @Autowired MemberCommandRepository memberRepository,
+            @Autowired PasswordEncoder passwordEncoder
+    ) {
+        // Arrange
+        var request = new AuthRequest(generateUserId(), generatePassword());
+        insertDummyMember(memberRepository, passwordEncoder, request.userId(), request.password());
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/auth/login",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getBody().accessToken()).isNotBlank();
+        assertThat(response.getBody().refreshToken()).isNotBlank();
+
     }
 
     private static AuthRequest[] blankUserIdRequests() {
@@ -148,5 +163,18 @@ public class POST_specs {
                 new AuthRequest("testUser", ""),
                 new AuthRequest("testUser", " ")
         };
+    }
+
+    private static void insertDummyMember(MemberCommandRepository memberRepository,
+                                          PasswordEncoder passwordEncoder,
+                                          String userId, String password) {
+        memberRepository.insert(
+                Member.create(new MemberRegisterRequest(
+                        generateNickName(),
+                        userId,
+                        password,
+                        generateEmail()
+                ), passwordEncoder)
+        );
     }
 }
