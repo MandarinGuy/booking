@@ -1,7 +1,7 @@
 ### 요청
 
 - 메서드: `POST`
-- 경로: `/auth/login`
+- 경로: `/api/auth/login`
 - 헤더
     
     ```
@@ -12,7 +12,7 @@
     
     ```json
     {
-        "username": "string",
+        "userId": "string",
         "password": "string"
     }
     
@@ -22,11 +22,11 @@
 - curl 명령 예시
     
     ```bash
-    curl -i -X POST '<http://localhost:8080/auth/login' \\
-    -H 'Content-Type: application/json' \\
+    curl -i -X POST 'http://localhost:8080/api/auth/login' \
+    -H 'Content-Type: application/json' \
     -d '
       {
-        "username": "string",
+        "userId": "string",
         "password": "string"
       }'
     ```
