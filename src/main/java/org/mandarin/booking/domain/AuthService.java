@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements AuthUseCase {
-    private final PasswordEncoder passwordEncoder;
+    private final SecurePasswordEncoder securePasswordEncoder;
     private final MemberQueryRepository queryRepository;
     private final TokenProvider tokenProvider;
 
@@ -31,7 +31,7 @@ public class AuthService implements AuthUseCase {
     }
 
     private void checkPasswordMatch(Member member, String password) {
-        if (!member.matchesPassword(password, passwordEncoder)) {
+        if (!member.matchesPassword(password, securePasswordEncoder)) {
             throw new AuthException("Invalid userId or password");
         }
     }

@@ -5,7 +5,7 @@ import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.gener
 
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.domain.Member;
-import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.domain.SecurePasswordEncoder;
 import org.mandarin.booking.persist.MemberCommandRepository;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +13,14 @@ import org.springframework.http.ResponseEntity;
 public class IntegrationTestUtils {
     private final TestRestTemplate testRestTemplate;
     private final MemberCommandRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final SecurePasswordEncoder securePasswordEncoder;
 
     public IntegrationTestUtils(TestRestTemplate testRestTemplate,
                                MemberCommandRepository memberRepository,
-                               PasswordEncoder passwordEncoder) {
+                               SecurePasswordEncoder securePasswordEncoder) {
         this.testRestTemplate = testRestTemplate;
         this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.securePasswordEncoder = securePasswordEncoder;
     }
 
     public Member insertDummyMember(String userId, String password) {
@@ -30,7 +30,7 @@ public class IntegrationTestUtils {
                         userId,
                         password,
                         generateEmail()
-                ), passwordEncoder)
+                ), securePasswordEncoder)
         );
     }
 

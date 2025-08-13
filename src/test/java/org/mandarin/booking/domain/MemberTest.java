@@ -16,8 +16,8 @@ class MemberTest {
     @Test
     void testCreation() {
         request = new MemberRegisterRequest(TEST_NICK, TEST_USER, HASHED_PASSWORD, MAIL);
-        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-        var member = Member.create(request, passwordEncoder);
+        SecurePasswordEncoder securePasswordEncoder = mock(SecurePasswordEncoder.class);
+        var member = Member.create(request, securePasswordEncoder);
 
         assertThat(member).isNotNull();
     }

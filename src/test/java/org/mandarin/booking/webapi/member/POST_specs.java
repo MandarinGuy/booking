@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
-import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.domain.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.mandarin.booking.persist.MemberQueryRepository;
@@ -190,7 +190,7 @@ public class POST_specs {
     @Test
     void 비밀번호가_올바르게_암호화_된다(
             @Autowired MemberQueryRepository memberRepository,
-            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired SecurePasswordEncoder securePasswordEncoder,
             @Autowired TestRestTemplate testRestTemplate
     ) {
         // Arrange
@@ -213,7 +213,7 @@ public class POST_specs {
         // Assert
         var savedMember = memberRepository.findByUserId(request.userId()).orElseThrow();
 
-        assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+        assertThat(securePasswordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
     
     @Test
