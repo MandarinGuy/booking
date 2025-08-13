@@ -1,4 +1,4 @@
-package org.mandarin.booking.webapi.auth;
+package org.mandarin.booking.webapi.auth.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

@@ -42,7 +42,7 @@
 
 ### 테스트
 
-- [ ] 올바른 refresh token으로 요청하면 200을 응답한다
+- [x] 올바른 refresh token으로 요청하면 200을 응답한다
 - [ ] 올바른 refresh token으로 요청하면 새로운 access token과 refresh token을 발급해 응답한다
 - [ ] 요청 토큰의 서명이 잘못된 경우 401 Unauthorized가 발생한다
 - [ ] 요청 body가 누락된 경우 400 Bad Request가 발생한다
