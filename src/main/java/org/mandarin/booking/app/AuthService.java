@@ -1,12 +1,11 @@
-package org.mandarin.booking.domain.service;
+package org.mandarin.booking.app;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.adapter.webapi.AuthRequest;
-import org.mandarin.booking.app.port.AuthUseCase;
-import org.mandarin.booking.adapter.webapi.TokenHolder;
-import org.mandarin.booking.domain.error.AuthException;
 import org.mandarin.booking.adapter.persist.MemberQueryRepository;
-import org.mandarin.booking.domain.model.Member;
+import org.mandarin.booking.domain.member.TokenHolder;
+import org.mandarin.booking.app.port.AuthUseCase;
+import org.mandarin.booking.domain.member.AuthException;
+import org.mandarin.booking.domain.member.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +23,9 @@ public class AuthService implements AuthUseCase {
     private long refreshTokenExp;
 
     @Override
-    public TokenHolder login(AuthRequest request) {
-        var member = getMember(request.userId());
-        checkPasswordMatch(member, request.password());
+    public TokenHolder login(String userId, String password) {
+        var member = getMember(userId);
+        checkPasswordMatch(member, password);
 
         return generateTokens(member);
     }

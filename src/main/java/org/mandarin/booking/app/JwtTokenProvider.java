@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.service;
+package org.mandarin.booking.app;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

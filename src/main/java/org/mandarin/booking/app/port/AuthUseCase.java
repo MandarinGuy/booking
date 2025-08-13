@@ -1,8 +1,7 @@
 package org.mandarin.booking.app.port;
 
-import org.mandarin.booking.adapter.webapi.AuthRequest;
-import org.mandarin.booking.adapter.webapi.TokenHolder;
+import org.mandarin.booking.domain.member.TokenHolder;
 
 public interface AuthUseCase {
-    TokenHolder login(AuthRequest request);
+    TokenHolder login(String userId, String password);
 }

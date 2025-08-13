@@ -1,7 +1,7 @@
 package org.mandarin.booking.adapter.webapi;
 
-import org.mandarin.booking.domain.error.DomainException;
-import org.mandarin.booking.domain.error.AuthException;
+import org.mandarin.booking.domain.DomainException;
+import org.mandarin.booking.domain.member.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

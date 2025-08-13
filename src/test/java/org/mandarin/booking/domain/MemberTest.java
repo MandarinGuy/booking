@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
-import org.mandarin.booking.domain.model.Member;
-import org.mandarin.booking.domain.service.SecurePasswordEncoder;
+import org.mandarin.booking.domain.member.Member;
+import org.mandarin.booking.domain.member.MemberRegisterRequest;
+import org.mandarin.booking.app.SecurePasswordEncoder;
 
 class MemberTest {
     private static final String MAIL = "test@test.com";

@@ -1,7 +1,7 @@
 package org.mandarin.booking.adapter.persist;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.domain.model.Member;
+import org.mandarin.booking.domain.member.Member;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

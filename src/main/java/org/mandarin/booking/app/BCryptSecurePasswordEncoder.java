@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.service;
+package org.mandarin.booking.app;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
