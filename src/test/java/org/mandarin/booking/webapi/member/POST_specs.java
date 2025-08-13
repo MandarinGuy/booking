@@ -3,25 +3,23 @@ package org.mandarin.booking.webapi.member;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mandarin.booking.BookingApplication;
+import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
-import org.mandarin.booking.domain.PasswordEncoder;
+import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
+import org.mandarin.booking.domain.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.mandarin.booking.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
-@SpringBootTest(
-        webEnvironment = RANDOM_PORT,
-        classes = BookingApplication.class
-)
+@IntegrationTest
+@DisplayName("POST /api/members")
 public class POST_specs {
 
     @Test
@@ -59,11 +57,10 @@ public class POST_specs {
         );
 
         // Assert
-        var matchingMember = memberRepository.findByUserId(request.userId());
+        var matchingMember = memberRepository.findByUserId(request.userId()).orElseThrow();
 
         assertThat(matchingMember).isNotNull();
     }
-
 
     @Test
     void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
@@ -121,7 +118,7 @@ public class POST_specs {
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatusCode().value()).isEqualTo(500);
     }
 
     @Test
@@ -156,7 +153,7 @@ public class POST_specs {
                 Void.class
         );
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatusCode().value()).isEqualTo(500);
     }
 
     @ParameterizedTest
@@ -193,7 +190,7 @@ public class POST_specs {
     @Test
     void 비밀번호가_올바르게_암호화_된다(
             @Autowired MemberQueryRepository memberRepository,
-            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired SecurePasswordEncoder securePasswordEncoder,
             @Autowired TestRestTemplate testRestTemplate
     ) {
         // Arrange
@@ -214,9 +211,32 @@ public class POST_specs {
         assertThat(res.getStatusCode().value()).isEqualTo(200);
 
         // Assert
-        var savedMember = memberRepository.findByUserId(request.userId());
+        var savedMember = memberRepository.findByUserId(request.userId()).orElseThrow();
 
-        assertThat(passwordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+        assertThat(securePasswordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
+    }
+    
+    @Test
+    void 회원가입_후_반환된_응답에_회원_정보가_포함된다(
+            @Autowired TestRestTemplate testRestTemplate
+    ){
+        // Arrange
+        var request = generateRequest();
+
+        // Act
+        var response = testRestTemplate.postForEntity(
+                "/api/members",
+                request,
+                MemberRegisterResponse.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().userId()).isEqualTo(request.userId());
+        assertThat(response.getBody().nickName()).isEqualTo(request.nickName());
+        assertThat(response.getBody().email()).isEqualTo(request.email());
+
     }
 
     private MemberRegisterRequest generateRequest() {

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PasswordEncoderImpl implements PasswordEncoder {
+public class BCryptSecurePasswordEncoder implements SecurePasswordEncoder {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override

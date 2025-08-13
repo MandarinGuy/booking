@@ -11,11 +11,16 @@
 
 - 본문
 
-    ```java
-    MemberRegisterRequest(String nickName, String userId, String passwordHash, String email) {
+    ```json
+    {
+        "nickName": "string",
+        "userId": "string",
+        "password": "string",
+        "email": "string"
     }
     ```
- curl 명령 예시
+
+curl 명령 예시
 
     ```bash
     curl -i -X POST '<http://localhost:8080/api/member>' \\
@@ -24,7 +29,7 @@
     {'
         "nickName": "test",
         "userId": "test1234",
-        "passwordHash": "$2a$10$EIXj1Z5z5Q8b7f3e4d9eOe",
+        "password": "myPassword123",
         "email": "test@gmail.com"
     }'
     ```
@@ -34,10 +39,21 @@
 - 상태코드: `200 OK`
 - 본문
 
-    ```java
-
+    ```json
+    {
+        "nickName": "test",
+        "userId": "test1234",
+        "email": "test@gmail.com"
+    }
     ```
 
+    ```json
+    {
+        "nickName": "test",
+        "userId": "test1234",
+        "email": "test@gmail.com"
+    }
+    ```
 
 ### 테스트
 
@@ -48,3 +64,4 @@
 - [x] 이미 존재하는 email로 회원가입 요청을 하면 400 Bad Request 상태코드를 반환한다
 - [x] 올바르지 않은 형식의 email로 회원가입을 시도하면 400 Bad Request 상태코드를 반환한다
 - [x] 비밀번호가 올바르게 암호화 된다
+- [x] 회원가입 후 반환된 응답에 회원 정보가 포함된다

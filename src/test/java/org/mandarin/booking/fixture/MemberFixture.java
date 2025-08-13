@@ -19,7 +19,7 @@ public class MemberFixture {
 
     public static class PasswordGenerator {
         public static String generatePassword() {
-            return "testPassword";
+            return UUID.randomUUID().toString();
         }
     }
 

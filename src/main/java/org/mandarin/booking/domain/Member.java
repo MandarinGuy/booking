@@ -28,12 +28,16 @@ public class Member {
     protected Member() {
     }
 
-    public static Member create(MemberRegisterRequest request, PasswordEncoder passwordEncoder) {
+    public static Member create(MemberRegisterRequest request, SecurePasswordEncoder securePasswordEncoder) {
         var member = new Member();
         member.nickName = request.nickName();
         member.userId = request.userId();
-        member.passwordHash = passwordEncoder.encode(request.password());
+        member.passwordHash = securePasswordEncoder.encode(request.password());
         member.email = request.email();
         return member;
+    }
+
+    public boolean matchesPassword(String rawPassword, SecurePasswordEncoder securePasswordEncoder) {
+        return securePasswordEncoder.matches(rawPassword, this.passwordHash);
     }
 }

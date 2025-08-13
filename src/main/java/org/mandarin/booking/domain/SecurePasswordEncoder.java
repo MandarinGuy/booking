@@ -1,6 +1,6 @@
 package org.mandarin.booking.domain;
 
-public interface PasswordEncoder {
+public interface SecurePasswordEncoder {
     /**
      * Encodes the given password.
      * @param password
