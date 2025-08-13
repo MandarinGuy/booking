@@ -1,11 +1,12 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.webapi.AuthRequest;
-import org.mandarin.booking.adapter.webapi.AuthUseCase;
+import org.mandarin.booking.app.port.AuthUseCase;
 import org.mandarin.booking.adapter.webapi.TokenHolder;
 import org.mandarin.booking.domain.error.AuthException;
-import org.mandarin.booking.persist.MemberQueryRepository;
+import org.mandarin.booking.adapter.persist.MemberQueryRepository;
+import org.mandarin.booking.domain.model.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

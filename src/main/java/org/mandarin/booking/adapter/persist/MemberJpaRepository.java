@@ -1,7 +1,7 @@
-package org.mandarin.booking.persist;
+package org.mandarin.booking.adapter.persist;
 
 import java.util.Optional;
-import org.mandarin.booking.domain.Member;
+import org.mandarin.booking.domain.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 interface MemberJpaRepository extends JpaRepository<Member, Long> {

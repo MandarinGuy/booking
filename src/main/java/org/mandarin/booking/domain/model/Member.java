@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.domain.model;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
+import org.mandarin.booking.domain.service.SecurePasswordEncoder;
 
 @Entity
 @Getter

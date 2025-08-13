@@ -1,7 +1,7 @@
 package org.mandarin.booking;
 
-import org.mandarin.booking.domain.SecurePasswordEncoder;
-import org.mandarin.booking.persist.MemberCommandRepository;
+import org.mandarin.booking.domain.service.SecurePasswordEncoder;
+import org.mandarin.booking.adapter.persist.MemberCommandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;

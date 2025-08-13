@@ -11,10 +11,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
-import org.mandarin.booking.domain.SecurePasswordEncoder;
+import org.mandarin.booking.domain.service.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
-import org.mandarin.booking.persist.MemberQueryRepository;
+import org.mandarin.booking.adapter.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 

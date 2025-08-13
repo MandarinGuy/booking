@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
+import org.mandarin.booking.domain.model.Member;
+import org.mandarin.booking.domain.service.SecurePasswordEncoder;
 
 class MemberTest {
     private static final String MAIL = "test@test.com";

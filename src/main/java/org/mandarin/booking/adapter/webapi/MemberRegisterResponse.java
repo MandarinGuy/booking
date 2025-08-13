@@ -1,6 +1,6 @@
 package org.mandarin.booking.adapter.webapi;
 
-import org.mandarin.booking.domain.Member;
+import org.mandarin.booking.domain.model.Member;
 
 public record MemberRegisterResponse(
         String userId,

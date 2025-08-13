@@ -1,10 +1,11 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
 import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
-import org.mandarin.booking.adapter.webapi.MemberRegisterer;
-import org.mandarin.booking.persist.MemberCommandRepository;
+import org.mandarin.booking.app.port.MemberRegisterer;
+import org.mandarin.booking.adapter.persist.MemberCommandRepository;
+import org.mandarin.booking.domain.model.Member;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.adapter.webapi;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

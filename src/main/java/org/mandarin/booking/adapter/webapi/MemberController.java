@@ -1,6 +1,7 @@
 package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
+import org.mandarin.booking.app.port.MemberRegisterer;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

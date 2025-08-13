@@ -4,9 +4,9 @@ import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generate
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 
 import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
-import org.mandarin.booking.domain.Member;
-import org.mandarin.booking.domain.SecurePasswordEncoder;
-import org.mandarin.booking.persist.MemberCommandRepository;
+import org.mandarin.booking.domain.model.Member;
+import org.mandarin.booking.domain.service.SecurePasswordEncoder;
+import org.mandarin.booking.adapter.persist.MemberCommandRepository;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 

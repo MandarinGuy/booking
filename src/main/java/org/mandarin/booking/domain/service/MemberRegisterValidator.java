@@ -1,8 +1,8 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.error.MemberException;
-import org.mandarin.booking.persist.MemberQueryRepository;
+import org.mandarin.booking.adapter.persist.MemberQueryRepository;
 import org.springframework.stereotype.Component;
 
 @Component
