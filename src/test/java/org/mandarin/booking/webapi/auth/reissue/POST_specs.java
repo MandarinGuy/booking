@@ -9,9 +9,11 @@ import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generat
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.app.TokenProvider;
+import org.mandarin.booking.adapter.webapi.ErrorResponse;
+import org.mandarin.booking.adapter.webapi.SuccessResponse;
 import org.mandarin.booking.adapter.webapi.dto.ReissueRequest;
 import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
+import org.mandarin.booking.app.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -36,7 +38,7 @@ public class POST_specs {
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getStatus()).isEqualTo("SUCCESS");
     }
 
     @Test
@@ -52,18 +54,18 @@ public class POST_specs {
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
-        var response = testUtils.post(
+        var response = (SuccessResponse<TokenHolder>)testUtils.post(
                 "/api/auth/reissue",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().accessToken()).isNotEmpty();
-        assertThat(response.getBody().refreshToken()).isNotEmpty();
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getData().accessToken()).isNotEmpty();
+        assertThat(response.getData().refreshToken()).isNotEmpty();
     }
-    
+
     @Test
     void 응답받은_access_toke과_refresh_toke은_유효한_JWT_형식이다(
             @Autowired IntegrationTestUtils testUtils,
@@ -77,18 +79,38 @@ public class POST_specs {
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
-        var response = testUtils.post(
+        var response =(SuccessResponse<TokenHolder>) testUtils.post(
                 "/api/auth/reissue",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        var accessToken = response.getBody().accessToken();
-        var refreshToken = response.getBody().refreshToken();
+        var accessToken = response.getData().accessToken();
+        var refreshToken = response.getData().refreshToken();
 
         assertJwtFormat(accessToken);
         assertJwtFormat(refreshToken);
+    }
+
+    @Test
+    void 요청_토큰의_서명이_잘못된_경우_401_Unauthorized가_발생한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        testUtils.insertDummyMember(generateUserId(), generatePassword());
+        var invalidRefresh = "invalid_refresh_token";
+        var request = new ReissueRequest(invalidRefresh);
+
+        // Act
+        var response =(ErrorResponse) testUtils.post(
+                "/api/auth/reissue",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
     }
 
     private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {

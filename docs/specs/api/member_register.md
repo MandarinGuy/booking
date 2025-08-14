@@ -22,17 +22,16 @@
 
 curl 명령 예시
 
-    ```bash
-    curl -i -X POST '<http://localhost:8080/api/member>' \\
-    -H 'Content-Type: application/json' \\
-    -d '
-    {'
-        "nickName": "test",
-        "userId": "test1234",
-        "password": "myPassword123",
-        "email": "test@gmail.com"
-    }'
-    ```
+  ```bash
+  curl -i -X POST 'http://localhost:8080/api/members' \
+  -H 'Content-Type: application/json' \
+  -d '{
+      "nickName": "test",
+      "userId": "test1234",
+      "password": "myPassword123",
+      "email": "test@gmail.com"
+  }'
+  ```
 
 ### 응답
 

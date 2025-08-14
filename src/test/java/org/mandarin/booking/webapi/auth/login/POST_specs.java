@@ -17,11 +17,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.adapter.persist.MemberQueryRepository;
+import org.mandarin.booking.adapter.webapi.SuccessResponse;
 import org.mandarin.booking.adapter.webapi.dto.AuthRequest;
 import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
 @IntegrationTest
 @DisplayName("POST /api/auth/login")
@@ -44,7 +44,7 @@ public class POST_specs {
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getStatus()).isEqualTo("SUCCESS");
     }
 
     @ParameterizedTest
@@ -52,17 +52,17 @@ public class POST_specs {
     void 요청_본문의_userId가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
             // Arrange
             AuthRequest request,
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Act
-        var response = testRestTemplate.postForEntity(
+        var response = testUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatus()).isEqualTo("BAD_REQUEST");
     }
 
     @ParameterizedTest
@@ -70,22 +70,22 @@ public class POST_specs {
     void 요청_본문의_password가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
             // Arrange
             AuthRequest request,
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Act
-        var response = testRestTemplate.postForEntity(
+        var response = testUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getStatus()).isEqualTo("BAD_REQUEST");
     }
 
     @Test
     void 존재하지_않는_userId_비밀번호로_요청하면_401_Unauthorized_상태코드를_반환한다(
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils integrationUtils
     ) {
         // Arrange
         var request = new AuthRequest("nonExistentUser", generatePassword());
@@ -93,14 +93,14 @@ public class POST_specs {
         // don't need to save member in the database
 
         // Act
-        var response = testRestTemplate.postForEntity(
+        var response = integrationUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
     }
 
     @Test
@@ -124,7 +124,7 @@ public class POST_specs {
         );
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
     }
 
     @Test
@@ -136,15 +136,16 @@ public class POST_specs {
         integrationUtils.insertDummyMember(request.userId(), request.password());
 
         // Act
-        var response = integrationUtils.post(
+        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
         // Assert
-        assertThat(response.getBody().accessToken()).isNotBlank();
-        assertThat(response.getBody().refreshToken()).isNotBlank();
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getData().accessToken()).isNotBlank();
+        assertThat(response.getData().refreshToken()).isNotBlank();
 
     }
 
@@ -160,14 +161,14 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = integrationUtils.post(
+        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
-        var accessToken = response.getBody().accessToken();
-        var refreshToken = response.getBody().refreshToken();
+        var accessToken = response.getData().accessToken();
+        var refreshToken = response.getData().refreshToken();
 
         assertJwtFormat(accessToken);
         assertJwtFormat(refreshToken);
@@ -186,14 +187,14 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = integrationUtils.post(
+        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
         );
 
-        var accessToken = response.getBody().accessToken();
-        var refreshToken = response.getBody().refreshToken();
+        var accessToken = response.getData().accessToken();
+        var refreshToken = response.getData().refreshToken();
 
         // Assert
         var accessTokenExpiration = getExpiration(key, accessToken);
@@ -218,7 +219,7 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = integrationUtils.post(
+        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
                 "/api/auth/login",
                 request,
                 TokenHolder.class
@@ -226,8 +227,8 @@ public class POST_specs {
 
 
         // Assert
-        var accessToken = response.getBody().accessToken();
-        var refreshToken = response.getBody().refreshToken();
+        var accessToken = response.getData().accessToken();
+        var refreshToken = response.getData().refreshToken();
 
         var accessTokenClaims = getTokenClaims(key, accessToken);
         var refreshTokenClaims = getTokenClaims(key, refreshToken);

@@ -13,7 +13,7 @@ public record MemberRegisterRequest(
         @NotBlank(message = "Password cannot be blank")
         String password,
 
-        @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+        @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "Invalid email format")
         @NotBlank(message = "Email cannot be blank")
         String email) {
 }

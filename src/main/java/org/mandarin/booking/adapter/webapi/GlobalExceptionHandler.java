@@ -1,34 +1,29 @@
 package org.mandarin.booking.adapter.webapi;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mandarin.booking.domain.DomainException;
 import org.mandarin.booking.domain.member.AuthException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler{
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
-    public ResponseEntity<?> handleJsonParseError(DomainException ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build();
+    public ErrorResponse handleJsonParseError(DomainException ex) {
+        return new ErrorResponse("INTERNAL_SERVER_ERROR", ex.getMessage());
     }
 
     @ExceptionHandler(AuthException.class)
-    public ResponseEntity<?> handleAuthException(AuthException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .build();
+    public ErrorResponse handleAuthException(AuthException ex) {
+        return new ErrorResponse("UNAUTHORIZED", ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .build();
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
+        return new ErrorResponse("BAD_REQUEST",
+                requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage());
     }
 }
