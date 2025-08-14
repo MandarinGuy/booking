@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.member;
+package org.mandarin.booking.adapter.webapi.dto;
 
 public record ReissueRequest(String refreshToken) {
 }

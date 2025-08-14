@@ -17,8 +17,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.domain.member.AuthRequest;
-import org.mandarin.booking.domain.member.TokenHolder;
+import org.mandarin.booking.adapter.webapi.dto.AuthRequest;
+import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -48,7 +48,7 @@ public class POST_specs {
     }
 
     @ParameterizedTest
-    @MethodSource("org.mandarin.booking.webapi.auth.POST_specs#blankUserIdRequests")
+    @MethodSource("org.mandarin.booking.webapi.auth.login.POST_specs#blankUserIdRequests")
     void 요청_본문의_userId가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
             // Arrange
             AuthRequest request,
@@ -66,7 +66,7 @@ public class POST_specs {
     }
 
     @ParameterizedTest
-    @MethodSource("org.mandarin.booking.webapi.auth.POST_specs#blankPasswordRequests")
+    @MethodSource("org.mandarin.booking.webapi.auth.login.POST_specs#blankPasswordRequests")
     void 요청_본문의_password가_누락된_경우_400_Bad_Request_상태코드를_반환한다(
             // Arrange
             AuthRequest request,

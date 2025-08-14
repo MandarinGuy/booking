@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.app.TokenProvider;
-import org.mandarin.booking.domain.member.ReissueRequest;
-import org.mandarin.booking.domain.member.TokenHolder;
+import org.mandarin.booking.adapter.webapi.dto.ReissueRequest;
+import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest

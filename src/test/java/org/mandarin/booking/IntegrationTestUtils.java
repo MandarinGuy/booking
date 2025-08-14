@@ -6,7 +6,7 @@ import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.gener
 import org.mandarin.booking.adapter.persist.MemberCommandRepository;
 import org.mandarin.booking.app.SecurePasswordEncoder;
 import org.mandarin.booking.domain.member.Member;
-import org.mandarin.booking.domain.member.MemberRegisterRequest;
+import org.mandarin.booking.domain.member.MemberCreateCommand;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
@@ -25,7 +25,7 @@ public class IntegrationTestUtils {
 
     public Member insertDummyMember(String userId, String password) {
         return memberRepository.insert(
-                Member.create(new MemberRegisterRequest(
+                Member.create(new MemberCreateCommand(
                         generateNickName(),
                         userId,
                         password,

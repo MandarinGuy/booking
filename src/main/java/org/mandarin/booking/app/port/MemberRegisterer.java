@@ -1,7 +1,7 @@
 package org.mandarin.booking.app.port;
 
-import org.mandarin.booking.domain.member.MemberRegisterRequest;
-import org.mandarin.booking.domain.member.MemberRegisterResponse;
+import org.mandarin.booking.adapter.webapi.dto.MemberRegisterRequest;
+import org.mandarin.booking.adapter.webapi.dto.MemberRegisterResponse;
 
 public interface MemberRegisterer {
     MemberRegisterResponse register(MemberRegisterRequest request);
