@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.auth.reissue;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
@@ -24,7 +25,7 @@ public class POST_specs {
         var userId = generateUserId();
         var nickName = generateNickName();
         testUtils.insertDummyMember(userId, generatePassword());
-        var validRefreshToken = tokenProvider.generateToken(userId, nickName, 1200000L);
+        var validRefreshToken = getValidRefreshToken(tokenProvider, userId, nickName);
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
@@ -47,7 +48,7 @@ public class POST_specs {
         var userId = generateUserId();
         var nickName = generateNickName();
         testUtils.insertDummyMember(userId, generatePassword());
-        var validRefreshToken = tokenProvider.generateToken(userId, nickName, 1200000L);
+        var validRefreshToken = getValidRefreshToken(tokenProvider, userId, nickName);
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
@@ -61,5 +62,36 @@ public class POST_specs {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().accessToken()).isNotEmpty();
         assertThat(response.getBody().refreshToken()).isNotEmpty();
+    }
+    
+    @Test
+    void 응답받은_access_toke과_refresh_toke은_유효한_JWT_형식이다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TokenProvider tokenProvider
+    ) {
+        // Arrange
+        var userId = generateUserId();
+        var nickName = generateNickName();
+        testUtils.insertDummyMember(userId, generatePassword());
+        var validRefreshToken = getValidRefreshToken(tokenProvider, userId, nickName);
+        var request = new ReissueRequest(validRefreshToken);
+
+        // Act
+        var response = testUtils.post(
+                "/api/auth/reissue",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        var accessToken = response.getBody().accessToken();
+        var refreshToken = response.getBody().refreshToken();
+
+        assertJwtFormat(accessToken);
+        assertJwtFormat(refreshToken);
+    }
+
+    private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {
+        return tokenProvider.generateToken(userId, nickName).refreshToken();
     }
 }

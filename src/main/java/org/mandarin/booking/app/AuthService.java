@@ -6,7 +6,6 @@ import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
 import org.mandarin.booking.app.port.AuthUseCase;
 import org.mandarin.booking.domain.member.AuthException;
 import org.mandarin.booking.domain.member.Member;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,18 +15,18 @@ public class AuthService implements AuthUseCase {
     private final MemberQueryRepository queryRepository;
     private final TokenProvider tokenProvider;
 
-    @Value("${jwt.token.access}")
-    private long accessTokenExp;
-
-    @Value("${jwt.token.refresh}")
-    private long refreshTokenExp;
-
     @Override
     public TokenHolder login(String userId, String password) {
         var member = getMember(userId);
         checkPasswordMatch(member, password);
 
-        return generateTokens(member);
+        return tokenProvider.generateToken(member.getUserId(), member.getNickName());
+    }
+
+    @Override
+    public TokenHolder reissue(String refreshToken) {
+        tokenProvider.validateToken(refreshToken);
+        return tokenProvider.generateToken(refreshToken);
     }
 
     private void checkPasswordMatch(Member member, String password) {
@@ -39,11 +38,5 @@ public class AuthService implements AuthUseCase {
     private Member getMember(String userId) {
         return queryRepository.findByUserId(userId)
                 .orElseThrow(() -> new AuthException(String.format("회원 아이디 '%s'에 해당하는 회원이 존재하지 않습니다.", userId)));
-    }
-
-    private TokenHolder generateTokens(Member member) {
-        var accessToken = tokenProvider.generateToken(member.getUserId(), member.getNickName(), accessTokenExp);
-        var refreshToken = tokenProvider.generateToken(member.getUserId(), member.getNickName(), refreshTokenExp);
-        return new TokenHolder(accessToken, refreshToken);
     }
 }

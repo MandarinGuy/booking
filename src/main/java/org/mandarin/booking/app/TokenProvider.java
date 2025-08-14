@@ -1,5 +1,11 @@
 package org.mandarin.booking.app;
 
+import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
+
 public interface TokenProvider {
-    String generateToken(String userId, String nickName, long expiration);
+    TokenHolder generateToken(String refreshToken);
+
+    TokenHolder generateToken(String userId, String nickName);
+
+    void validateToken(String token);
 }

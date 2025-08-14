@@ -21,6 +21,6 @@ public record AuthController(AuthUseCase authUsecase) {
 
     @PostMapping("/reissue")
     public TokenHolder reissue(@RequestBody @Valid ReissueRequest request) {
-        return new TokenHolder("newAccessToken", "newRefreshToken");
+        return authUsecase.reissue(request.refreshToken());
     }
 }
