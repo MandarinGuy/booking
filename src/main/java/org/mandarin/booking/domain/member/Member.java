@@ -1,21 +1,16 @@
 package org.mandarin.booking.domain.member;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.mandarin.booking.app.SecurePasswordEncoder;
+import org.mandarin.booking.domain.AbstractEntity;
 
 @Entity
 @Getter
-public class Member {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "member_id")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Member extends AbstractEntity {
 
     private String nickName;
 
@@ -25,15 +20,13 @@ public class Member {
 
     private String email;
 
-    protected Member() {
-    }
-
-    public static Member create(MemberRegisterRequest request, SecurePasswordEncoder securePasswordEncoder) {
+    public static Member create(MemberCreateCommand command,
+                                SecurePasswordEncoder securePasswordEncoder) {
         var member = new Member();
-        member.nickName = request.nickName();
-        member.userId = request.userId();
-        member.passwordHash = securePasswordEncoder.encode(request.password());
-        member.email = request.email();
+        member.nickName = command.nickName();
+        member.userId = command.userId();
+        member.passwordHash = securePasswordEncoder.encode(command.password());
+        member.email = command.email();
         return member;
     }
 
