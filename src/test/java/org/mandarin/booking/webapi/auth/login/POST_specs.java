@@ -1,13 +1,12 @@
 package org.mandarin.booking.webapi.auth.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
+import static org.mandarin.booking.JwtTestUtils.getExpiration;
+import static org.mandarin.booking.JwtTestUtils.getTokenClaims;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -17,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.adapter.persist.MemberQueryRepository;
 import org.mandarin.booking.adapter.webapi.dto.AuthRequest;
 import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,21 +169,8 @@ public class POST_specs {
         var accessToken = response.getBody().accessToken();
         var refreshToken = response.getBody().refreshToken();
 
-        assertThat(accessToken.split("\\.")).hasSize(3);
-        assertThat(refreshToken.split("\\.")).hasSize(3);
-
-        assertThat(accessToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
-        assertThat(refreshToken).matches("^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$");
-
-        assertThatCode(() -> {
-            String[] accessTokenParts = accessToken.split("\\.");
-            String[] refreshTokenParts = refreshToken.split("\\.");
-
-            java.util.Base64.getUrlDecoder().decode(accessTokenParts[0]);
-            java.util.Base64.getUrlDecoder().decode(accessTokenParts[1]);
-            java.util.Base64.getUrlDecoder().decode(refreshTokenParts[0]);
-            java.util.Base64.getUrlDecoder().decode(refreshTokenParts[1]);
-        }).doesNotThrowAnyException();
+        assertJwtFormat(accessToken);
+        assertJwtFormat(refreshToken);
     }
 
     @Test
@@ -219,7 +206,8 @@ public class POST_specs {
     @Test
     void 전달된_토큰에는_사용자의_userId가_포함되어야_한다(
         @Autowired IntegrationTestUtils  integrationUtils,
-        @Value("${jwt.token.secret}") String secretKey
+        @Value("${jwt.token.secret}") String secretKey,
+        @Autowired MemberQueryRepository memberRepository
     ){
         // Arrange
         var userId = generateUserId();
@@ -245,19 +233,10 @@ public class POST_specs {
         var refreshTokenClaims = getTokenClaims(key, refreshToken);
         assertThat(accessTokenClaims.getPayload().get("userId")).isNotNull();
         assertThat(refreshTokenClaims.getPayload().get("userId")).isNotNull();
-    }
 
-    private static Jws<Claims> getTokenClaims(SecretKey key, String accessToken) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(accessToken);
-    }
-
-    private static Date getExpiration(SecretKey key, String token) {
-        return getTokenClaims(key, token)
-                .getPayload()
-                .getExpiration();
+        var currentUserId = accessTokenClaims.getPayload().get("userId").toString();
+        var savedMember = memberRepository.findByUserId(currentUserId).orElseThrow();
+        assertThat(savedMember).isNotNull();
     }
 
     private static AuthRequest[] blankUserIdRequests() {
