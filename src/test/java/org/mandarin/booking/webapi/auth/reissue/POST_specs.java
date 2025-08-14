@@ -37,4 +37,29 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
+
+    @Test
+    void 올바른_refresh_token으로_요청하면_새로운_access_token과_refresh_token을_발급해_응답한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TokenProvider tokenProvider
+    ) {
+        // Arrange
+        var userId = generateUserId();
+        var nickName = generateNickName();
+        testUtils.insertDummyMember(userId, generatePassword());
+        var validRefreshToken = tokenProvider.generateToken(userId, nickName, 1200000L);
+        var request = new ReissueRequest(validRefreshToken);
+
+        // Act
+        var response = testUtils.post(
+                "/api/auth/reissue",
+                request,
+                TokenHolder.class
+        );
+
+        // Assert
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().accessToken()).isNotEmpty();
+        assertThat(response.getBody().refreshToken()).isNotEmpty();
+    }
 }
