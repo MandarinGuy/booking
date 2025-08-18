@@ -134,6 +134,8 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
+    
+
     private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {
         return tokenProvider.generateToken(userId, nickName).refreshToken();
     }
