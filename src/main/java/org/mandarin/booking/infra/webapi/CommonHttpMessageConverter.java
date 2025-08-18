@@ -1,9 +1,8 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.infra.webapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -18,18 +17,19 @@ import org.springframework.util.StreamUtils;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RequiredArgsConstructor
 public class CommonHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private final ObjectMapper objectMapper;
+
+    public CommonHttpMessageConverter(ObjectMapper objectMapper) {
+        super(MediaType.APPLICATION_JSON);
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     protected boolean supports(final Class<?> clazz) {
         return ApiResponse.class.isAssignableFrom(clazz);
     }
 
-    /**
-     *
-     */
     @Override
     protected SuccessResponse<Object> readInternal(final Class<?> clazz,
                                                    final HttpInputMessage inputMessage)
@@ -45,8 +45,7 @@ public class CommonHttpMessageConverter extends AbstractHttpMessageConverter<Obj
     }
 
     @Override
-    protected void addDefaultHeaders(HttpHeaders headers, Object objectApiResponse, MediaType contentType)
-    {
+    protected void addDefaultHeaders(HttpHeaders headers, Object objectApiResponse, MediaType contentType) {
         try {
             super.addDefaultHeaders(headers, objectApiResponse, contentType);
         } catch (IOException e) {

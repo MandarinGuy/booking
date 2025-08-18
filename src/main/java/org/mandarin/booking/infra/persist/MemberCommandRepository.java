@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.persist;
+package org.mandarin.booking.infra.persist;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.member.Member;

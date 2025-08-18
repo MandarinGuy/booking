@@ -1,8 +1,8 @@
 package org.mandarin.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandarin.booking.adapter.persist.MemberCommandRepository;
-import org.mandarin.booking.app.SecurePasswordEncoder;
+import org.mandarin.booking.infra.persist.MemberCommandRepository;
+import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;

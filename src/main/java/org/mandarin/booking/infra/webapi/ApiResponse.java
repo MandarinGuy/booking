@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.infra.webapi;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class ApiResponse {
-    protected boolean success = true;
+public abstract class ApiResponse<T> {
     private final LocalDateTime timestamp = LocalDateTime.now();
-    protected String status;
+    protected ApiStatus status;
+    protected T data;
 }
 
 

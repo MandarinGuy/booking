@@ -2,21 +2,23 @@ package org.mandarin.booking.webapi.auth.reissue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
+import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.adapter.webapi.ErrorResponse;
-import org.mandarin.booking.adapter.webapi.SuccessResponse;
-import org.mandarin.booking.adapter.webapi.dto.ReissueRequest;
-import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
+import org.mandarin.booking.infra.webapi.dto.ReissueRequest;
+import org.mandarin.booking.infra.webapi.dto.TokenHolder;
 import org.mandarin.booking.app.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
+@DisplayName("POST /api/auth/reissue")
 public class POST_specs {
     @Test
     void 올바른_refresh_token으로_요청하면_200을_응답한다(
@@ -32,13 +34,13 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                "/api/auth/reissue",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("SUCCESS");
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
 
     @Test
@@ -54,11 +56,11 @@ public class POST_specs {
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
-        var response = (SuccessResponse<TokenHolder>)testUtils.post(
-                "/api/auth/reissue",
-                request,
-                TokenHolder.class
-        );
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         // Assert
         assertThat(response.getData()).isNotNull();
@@ -79,11 +81,11 @@ public class POST_specs {
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
-        var response =(SuccessResponse<TokenHolder>) testUtils.post(
-                "/api/auth/reissue",
-                request,
-                TokenHolder.class
-        );
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         // Assert
         var accessToken = response.getData().accessToken();
@@ -103,14 +105,14 @@ public class POST_specs {
         var request = new ReissueRequest(invalidRefresh);
 
         // Act
-        var response =(ErrorResponse) testUtils.post(
-                "/api/auth/reissue",
-                request,
-                TokenHolder.class
-        );
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
 
     private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {

@@ -49,6 +49,7 @@ dependencies {
 
 	// Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// Mockito inline 사용 시 필요한 Byte Buddy Agent
 	byteBuddyAgent "net.bytebuddy:byte-buddy-agent:1.17.6"

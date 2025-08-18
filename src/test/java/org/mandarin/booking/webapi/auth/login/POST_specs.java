@@ -6,6 +6,9 @@ import static org.mandarin.booking.JwtTestUtils.getExpiration;
 import static org.mandarin.booking.JwtTestUtils.getTokenClaims;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -16,10 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.adapter.persist.MemberQueryRepository;
-import org.mandarin.booking.adapter.webapi.SuccessResponse;
-import org.mandarin.booking.adapter.webapi.dto.AuthRequest;
-import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
+import org.mandarin.booking.infra.persist.MemberQueryRepository;
+import org.mandarin.booking.infra.webapi.dto.AuthRequest;
+import org.mandarin.booking.infra.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -38,13 +40,13 @@ public class POST_specs {
 
         // Act
         var response = integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/login",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("SUCCESS");
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
 
     @ParameterizedTest
@@ -56,13 +58,13 @@ public class POST_specs {
     ) {
         // Act
         var response = testUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/login",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("BAD_REQUEST");
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
     @ParameterizedTest
@@ -74,13 +76,13 @@ public class POST_specs {
     ) {
         // Act
         var response = testUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/login",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("BAD_REQUEST");
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
@@ -94,13 +96,13 @@ public class POST_specs {
 
         // Act
         var response = integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/login",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
 
     @Test
@@ -118,13 +120,13 @@ public class POST_specs {
 
         // Act
         var response = integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+                        "/api/auth/login",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo("UNAUTHORIZED");
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
 
     @Test
@@ -136,17 +138,15 @@ public class POST_specs {
         integrationUtils.insertDummyMember(request.userId(), request.password());
 
         // Act
-        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+        var response = integrationUtils.post(
+                        "/api/auth/login",
+                        request)
+                .assertSuccess(TokenHolder.class);
 
         // Assert
         assertThat(response.getData()).isNotNull();
         assertThat(response.getData().accessToken()).isNotBlank();
         assertThat(response.getData().refreshToken()).isNotBlank();
-
     }
 
     @Test
@@ -161,11 +161,11 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+        var response = integrationUtils.post(
+                        "/api/auth/login",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         var accessToken = response.getData().accessToken();
         var refreshToken = response.getData().refreshToken();
@@ -187,11 +187,11 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
+        var response = integrationUtils.post(
+                        "/api/auth/login",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         var accessToken = response.getData().accessToken();
         var refreshToken = response.getData().refreshToken();
@@ -203,13 +203,13 @@ public class POST_specs {
         assertThat(accessTokenExpiration).isAfter(new Date());
         assertThat(refreshTokenExpiration).isAfter(new Date());
     }
-    
+
     @Test
     void 전달된_토큰에는_사용자의_userId가_포함되어야_한다(
-        @Autowired IntegrationTestUtils  integrationUtils,
-        @Value("${jwt.token.secret}") String secretKey,
-        @Autowired MemberQueryRepository memberRepository
-    ){
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Value("${jwt.token.secret}") String secretKey,
+            @Autowired MemberQueryRepository memberRepository
+    ) {
         // Arrange
         var userId = generateUserId();
         var password = generatePassword();
@@ -219,12 +219,11 @@ public class POST_specs {
         var request = new AuthRequest(userId, password);
 
         // Act
-        var response = (SuccessResponse<TokenHolder>)integrationUtils.post(
-                "/api/auth/login",
-                request,
-                TokenHolder.class
-        );
-
+        var response = integrationUtils.post(
+                        "/api/auth/login",
+                        request
+                )
+                .assertSuccess(TokenHolder.class);
 
         // Assert
         var accessToken = response.getData().accessToken();

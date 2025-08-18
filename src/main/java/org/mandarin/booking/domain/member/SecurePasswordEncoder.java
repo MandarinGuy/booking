@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.domain.member;
 
 public interface SecurePasswordEncoder {
     /**

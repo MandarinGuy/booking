@@ -10,12 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.adapter.persist.MemberQueryRepository;
-import org.mandarin.booking.adapter.webapi.ErrorResponse;
-import org.mandarin.booking.adapter.webapi.SuccessResponse;
-import org.mandarin.booking.adapter.webapi.dto.MemberRegisterRequest;
-import org.mandarin.booking.adapter.webapi.dto.MemberRegisterResponse;
-import org.mandarin.booking.app.SecurePasswordEncoder;
+import org.mandarin.booking.infra.persist.MemberQueryRepository;
+import org.mandarin.booking.infra.webapi.dto.MemberRegisterRequest;
+import org.mandarin.booking.infra.webapi.dto.MemberRegisterResponse;
+import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,14 +76,14 @@ public class POST_specs {
         );
 
         // Act
-        var response = (ErrorResponse) testUtils.post(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getMessage()).isEqualTo("Nickname cannot be blank");
+        assertThat(response.getData()).isEqualTo("Nickname cannot be blank");
     }
 
     @Test
@@ -108,20 +106,20 @@ public class POST_specs {
         );
 
         testUtils.post(
-                "/api/members",
-                existingRequest,
-                MemberRegisterResponse.class
-        );
+                        "/api/members",
+                        existingRequest
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         // Act
-        var response = (ErrorResponse) testUtils.post(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getMessage()).contains("이미 존재하는 회원입니다:");
+        assertThat(response.getData()).contains("이미 존재하는 회원입니다:");
     }
 
     @Test
@@ -137,10 +135,10 @@ public class POST_specs {
                 email
         );
         testUtils.post(
-                "/api/members",
-                existingRequest,
-                MemberRegisterResponse.class
-        );
+                        "/api/members",
+                        existingRequest
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         var request = new MemberRegisterRequest(
                 NicknameGenerator.generateNickName(),
@@ -150,13 +148,13 @@ public class POST_specs {
         );
 
         // Act
-        var response = (ErrorResponse) testUtils.post(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
         // Assert
-        assertThat(response.getMessage()).contains("이미 존재하는 이메일입니다:");
+        assertThat(response.getData()).contains("이미 존재하는 이메일입니다:");
     }
 
     @ParameterizedTest
@@ -180,14 +178,14 @@ public class POST_specs {
         );
 
         // Act
-        var response = (ErrorResponse) testUtils.post(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getMessage()).isEqualTo("Invalid email format");
+        assertThat(response.getData()).isEqualTo("Invalid email format");
     }
 
     @Test
@@ -227,11 +225,11 @@ public class POST_specs {
         var request = generateRequest();
 
         // Act
-        var response = (SuccessResponse<MemberRegisterResponse>) testUtils.post(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         // Assert
         assertThat(response.getData()).isNotNull();

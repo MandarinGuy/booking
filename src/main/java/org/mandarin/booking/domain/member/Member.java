@@ -1,15 +1,13 @@
 package org.mandarin.booking.domain.member;
 
 import jakarta.persistence.Entity;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.mandarin.booking.app.SecurePasswordEncoder;
 import org.mandarin.booking.domain.AbstractEntity;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Member extends AbstractEntity {
 
     private String nickName;
@@ -32,5 +30,8 @@ public class Member extends AbstractEntity {
 
     public boolean matchesPassword(String rawPassword, SecurePasswordEncoder securePasswordEncoder) {
         return securePasswordEncoder.matches(rawPassword, this.passwordHash);
+    }
+
+    public record MemberCreateCommand(String nickName, String userId, String password, String email){
     }
 }

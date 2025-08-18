@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.persist;
+package org.mandarin.booking.infra.persist;
 
 import java.util.Optional;
 import org.mandarin.booking.domain.member.Member;

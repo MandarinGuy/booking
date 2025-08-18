@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import javax.crypto.SecretKey;
-import org.mandarin.booking.adapter.webapi.dto.TokenHolder;
+import org.mandarin.booking.infra.webapi.dto.TokenHolder;
 import org.mandarin.booking.domain.member.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
