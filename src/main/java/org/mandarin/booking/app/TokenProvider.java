@@ -7,5 +7,7 @@ public interface TokenProvider {
 
     TokenHolder generateToken(String userId, String nickName);
 
+    String getClaim(String token, String claimName);
+
     void validateToken(String token);
 }

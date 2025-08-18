@@ -2,6 +2,7 @@ package org.mandarin.booking.webapi.auth.reissue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
+import static org.mandarin.booking.JwtTestUtils.getExpiration;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
@@ -9,6 +10,9 @@ import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 
+import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +22,7 @@ import org.mandarin.booking.app.TokenProvider;
 import org.mandarin.booking.infra.webapi.dto.ReissueRequest;
 import org.mandarin.booking.infra.webapi.dto.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 
 @IntegrationTest
@@ -74,9 +79,11 @@ public class POST_specs {
     @Test
     void 응답받은_access_toke과_refresh_toke은_유효한_JWT_형식이다(
             @Autowired IntegrationTestUtils testUtils,
-            @Autowired TokenProvider tokenProvider
+            @Autowired TokenProvider tokenProvider,
+            @Value("${jwt.token.secret}") String key
     ) {
         // Arrange
+        SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
         var userId = generateUserId();
         var nickName = generateNickName();
         testUtils.insertDummyMember(userId, generatePassword());
@@ -96,6 +103,12 @@ public class POST_specs {
 
         assertJwtFormat(accessToken);
         assertJwtFormat(refreshToken);
+
+        var accessTokenExpiration = getExpiration(secretKey, accessToken);
+        var refreshTokenExpiration = getExpiration(secretKey, refreshToken);
+
+        assertThat(accessTokenExpiration).isAfter(new Date());
+        assertThat(refreshTokenExpiration).isAfter(new Date());
     }
 
     @Test

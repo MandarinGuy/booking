@@ -84,4 +84,16 @@ public class JwtTokenProvider implements TokenProvider {
             throw new AuthException("토큰 검증에 실패했습니다.");
         }
     }
+
+    @Override
+    public String getClaim(String token, String claimName) {
+        try {
+            Jws<Claims> claims = parseClaims(token);
+            return claims.getPayload().get(claimName, String.class);
+        } catch (JwtException e) {
+            throw new AuthException("토큰에서 클레임을 추출하는 데 실패했습니다.");
+        } catch (IllegalArgumentException e) {
+            throw new AuthException("올바르지 않은 토큰입니다.");
+        }
+    }
 }
