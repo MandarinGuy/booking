@@ -1,4 +1,8 @@
 package org.mandarin.booking.infra.webapi.dto;
 
-public record ReissueRequest(String refreshToken) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ReissueRequest(
+        @NotBlank(message = "Refresh token must not be blank")
+        String refreshToken) {
 }

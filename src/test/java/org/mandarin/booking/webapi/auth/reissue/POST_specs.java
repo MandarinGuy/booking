@@ -2,6 +2,7 @@ package org.mandarin.booking.webapi.auth.reissue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
+import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
@@ -113,6 +114,24 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+    }
+    
+    @Test
+    void 요청_body가_누락된_경우_400_Bad_Request가_발생한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new ReissueRequest(null);
+        
+        // Act
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertFailure();
+        
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
     private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {
