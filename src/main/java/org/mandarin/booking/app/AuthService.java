@@ -27,6 +27,8 @@ public class AuthService implements AuthUseCase {
     @Override
     public TokenHolder reissue(String refreshToken) {
         tokenProvider.validateToken(refreshToken);
+        if(!queryRepository.existsByUserId(refreshToken))
+            throw new AuthException("Member does not exist");
         return tokenProvider.generateToken(refreshToken);
     }
 

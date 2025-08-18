@@ -162,6 +162,29 @@ public class POST_specs {
         }
     }
 
+    @Test
+    void 존재하지_않는_사용자의_refresh_token을_요청하면_401_Unauthorize가_발생한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TokenProvider tokenProvider
+    ) {
+        // Arrange
+        var userId = generateUserId();
+        var nickName = generateNickName();
+        var validRefreshToken = getValidRefreshToken(tokenProvider, userId, nickName);
+        var request = new ReissueRequest(validRefreshToken);
+
+        // user 생성 안함
+        
+        // Act
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertFailure();
+        
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+    }
 
 
 
