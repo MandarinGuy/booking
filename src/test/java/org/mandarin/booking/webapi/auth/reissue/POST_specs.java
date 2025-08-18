@@ -2,21 +2,23 @@ package org.mandarin.booking.webapi.auth.reissue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
-import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
-import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.app.TokenProvider;
 import org.mandarin.booking.infra.webapi.dto.ReissueRequest;
 import org.mandarin.booking.infra.webapi.dto.TokenHolder;
-import org.mandarin.booking.app.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 @IntegrationTest
 @DisplayName("POST /api/auth/reissue")
@@ -134,7 +136,34 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
-    
+
+    @Nested
+    @TestPropertySource(properties = "jwt.token.refresh=100")
+    class ReissueShortToken{
+        @Test
+        void 만료된_refresh_token으로_요청하면_401_Unauthorize가_발생한다(
+                @Autowired IntegrationTestUtils testUtils,
+                @Autowired TokenProvider tokenProvider
+        ) throws InterruptedException {
+            // Arrange
+            tokenProvider.generateToken(generateUserId(), generateNickName());
+            var request = new ReissueRequest(getValidRefreshToken(tokenProvider, generateUserId(), generateNickName()));
+            Thread.sleep(100); //TODO 2025 08 18 16:47:00 : 시간 의존적 코드가 테스트 속도에 영향을 미치지 않도록 개선 필요
+
+            // Act
+            var response = testUtils.post(
+                            "/api/auth/reissue",
+                            request
+                    )
+                    .assertFailure();
+
+            // Assert
+            assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+        }
+    }
+
+
+
 
     private static String getValidRefreshToken(TokenProvider tokenProvider, String userId, String nickName) {
         return tokenProvider.generateToken(userId, nickName).refreshToken();
