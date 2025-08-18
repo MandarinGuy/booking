@@ -46,6 +46,6 @@
 - [x] 올바른 refresh token으로 요청하면 새로운 access token과 refresh token을 발급해 응답한다
 - [x] 응답받은 access toke과 refresh toke은 유효한 JWT 형식이다
 - [x] 요청 토큰의 서명이 잘못된 경우 401 Unauthorized가 발생한다
-- [ ] 요청 body가 누락된 경우 400 Bad Request가 발생한다
+- [x] 요청 body가 누락된 경우 400 Bad Request가 발생한다
 - [ ] 만료된 refresh token으로 요청하면 401 Unauthorize가 발생한다
 - [ ] 존재하지 않는 사용자의 refresh token을 요청하면 401 Unauthorize가 발생한다
