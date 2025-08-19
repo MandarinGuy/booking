@@ -50,5 +50,15 @@
 - Email(Email): 사용자의 이메일 주소.
 
 #### 행위
-- `create()`: 새로운 사용자를 생성합니다.
-- `matchesPassword()`: 사용자의 비밀번호를 확인합니다.
+- `create()`: 새로운 영화를 등록합니다.
+- `matchesPassword()`: 영화의 비밀번호를 확인합니다.
+
+### `MemberCreateCommand`
+- 새로운 사용자를 생성하기 위한 명령.
+
+#### 속성
+- 사용자 ID(UserId): 사용자의 고유 식별자.
+- 이름(NickName): 사용자의 이름.
+- 아이디(UserId): 사용자의 고유 아이디.
+- 비밀번호(PasswordHash): 사용자의 암호화된 비밀번호.
+- Email(Email): 사용자의 이메일 주소.
