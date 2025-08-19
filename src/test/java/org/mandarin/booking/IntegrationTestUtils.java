@@ -3,29 +3,33 @@ package org.mandarin.booking;
 import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
 
-import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
-import org.mandarin.booking.domain.Member;
-import org.mandarin.booking.domain.SecurePasswordEncoder;
-import org.mandarin.booking.persist.MemberCommandRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.mandarin.booking.infra.persist.MemberCommandRepository;
+import org.mandarin.booking.domain.member.SecurePasswordEncoder;
+import org.mandarin.booking.domain.member.Member;
+import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.ResponseEntity;
 
 public class IntegrationTestUtils {
     private final TestRestTemplate testRestTemplate;
     private final MemberCommandRepository memberRepository;
     private final SecurePasswordEncoder securePasswordEncoder;
+    private final ObjectMapper objectMapper;
 
     public IntegrationTestUtils(TestRestTemplate testRestTemplate,
-                               MemberCommandRepository memberRepository,
-                               SecurePasswordEncoder securePasswordEncoder) {
+                                MemberCommandRepository memberRepository,
+                                SecurePasswordEncoder securePasswordEncoder,
+                                ObjectMapper objectMapper) {
         this.testRestTemplate = testRestTemplate;
         this.memberRepository = memberRepository;
         this.securePasswordEncoder = securePasswordEncoder;
+        this.objectMapper = objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public Member insertDummyMember(String userId, String password) {
         return memberRepository.insert(
-                Member.create(new MemberRegisterRequest(
+                Member.create(new MemberCreateCommand(
                         generateNickName(),
                         userId,
                         password,
@@ -34,7 +38,9 @@ public class IntegrationTestUtils {
         );
     }
 
-    public <T,R> ResponseEntity<R> post(String path, T request, Class<R> responseType) {
-        return testRestTemplate.postForEntity(path, request, responseType);
+    public <T> TestResult post(String path, T request) {
+        return new TestResult(path, request)
+                .setContext(testRestTemplate, objectMapper);
     }
 }
+

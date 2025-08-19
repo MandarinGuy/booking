@@ -9,12 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.IntegrationTest;
-import org.mandarin.booking.adapter.webapi.MemberRegisterRequest;
-import org.mandarin.booking.adapter.webapi.MemberRegisterResponse;
-import org.mandarin.booking.domain.SecurePasswordEncoder;
+import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.infra.persist.MemberQueryRepository;
+import org.mandarin.booking.infra.webapi.dto.MemberRegisterRequest;
+import org.mandarin.booking.infra.webapi.dto.MemberRegisterResponse;
+import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
-import org.mandarin.booking.persist.MemberQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
@@ -64,7 +65,7 @@ public class POST_specs {
 
     @Test
     void 빈_값이나_null_값이_포함된_요청을_하면_400_Bad_Request_상태코드를_반환한다(
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var request = new MemberRegisterRequest(
@@ -75,19 +76,19 @@ public class POST_specs {
         );
 
         // Act
-        var response = testRestTemplate.postForEntity(
-                "/api/members",
-                request,
-                Void.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getData()).isEqualTo("Nickname cannot be blank");
     }
 
     @Test
     void 이미_존재하는_userId로_회원가입_요청을_하면_400_Bad_Request_상태(
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var userId = "id";
@@ -104,26 +105,26 @@ public class POST_specs {
                 generateEmail()
         );
 
-        testRestTemplate.postForEntity(
-                "/api/members",
-                existingRequest,
-                Void.class
-        );
+        testUtils.post(
+                        "/api/members",
+                        existingRequest
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         // Act
-        var response = testRestTemplate.postForEntity(
-                "/api/members",
-                request,
-                Void.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(500);
+        assertThat(response.getData()).contains("이미 존재하는 회원입니다:");
     }
 
     @Test
     void 이미_존재하는_email로_회원가입_요청을_하면_400_Bad_Request_상태코드를_반환한다(
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var email = generateEmail();
@@ -133,11 +134,11 @@ public class POST_specs {
                 PasswordGenerator.generatePassword(),
                 email
         );
-        testRestTemplate.postForEntity(
-                "/api/members",
-                existingRequest,
-                Void.class
-        );
+        testUtils.post(
+                        "/api/members",
+                        existingRequest
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         var request = new MemberRegisterRequest(
                 NicknameGenerator.generateNickName(),
@@ -147,13 +148,13 @@ public class POST_specs {
         );
 
         // Act
-        var response = testRestTemplate.postForEntity(
-                "/api/members",
-                request,
-                Void.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(500);
+        assertThat(response.getData()).contains("이미 존재하는 이메일입니다:");
     }
 
     @ParameterizedTest
@@ -166,7 +167,7 @@ public class POST_specs {
     })
     void 올바르지_않은_형식의_email로_회원가입을_시도하면_400_Bad_Request_상태코드를_반환한다(
             String invalidEmail,
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var request = new MemberRegisterRequest(
@@ -177,14 +178,14 @@ public class POST_specs {
         );
 
         // Act
-        var response = testRestTemplate.postForEntity(
-                "/api/members",
-                request,
-                Void.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertFailure();
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getData()).isEqualTo("Invalid email format");
     }
 
     @Test
@@ -215,27 +216,26 @@ public class POST_specs {
 
         assertThat(securePasswordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
-    
+
     @Test
     void 회원가입_후_반환된_응답에_회원_정보가_포함된다(
-            @Autowired TestRestTemplate testRestTemplate
-    ){
+            @Autowired IntegrationTestUtils testUtils
+    ) {
         // Arrange
         var request = generateRequest();
 
         // Act
-        var response = testRestTemplate.postForEntity(
-                "/api/members",
-                request,
-                MemberRegisterResponse.class
-        );
+        var response = testUtils.post(
+                        "/api/members",
+                        request
+                )
+                .assertSuccess(MemberRegisterResponse.class);
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().userId()).isEqualTo(request.userId());
-        assertThat(response.getBody().nickName()).isEqualTo(request.nickName());
-        assertThat(response.getBody().email()).isEqualTo(request.email());
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getData().userId()).isEqualTo(request.userId());
+        assertThat(response.getData().nickName()).isEqualTo(request.nickName());
+        assertThat(response.getData().email()).isEqualTo(request.email());
 
     }
 
