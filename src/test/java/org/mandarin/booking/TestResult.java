@@ -2,7 +2,7 @@ package org.mandarin.booking;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.mandarin.booking.infra.webapi.ErrorResponse;
-import org.mandarin.booking.infra.webapi.SuccessResponse;
+import org.mandarin.booking.adapter.webapi.ErrorResponse;
+import org.mandarin.booking.adapter.webapi.SuccessResponse;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

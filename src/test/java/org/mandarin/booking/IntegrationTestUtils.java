@@ -5,7 +5,7 @@ import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.gener
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.mandarin.booking.infra.persist.MemberCommandRepository;
+import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;

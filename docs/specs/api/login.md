@@ -26,8 +26,8 @@
     -H 'Content-Type: application/json' \
     -d '
       {
-        "userId": "string",
-        "password": "string"
+        "userId": "test1234",
+        "password": "myPassword123"
       }'
     ```
     

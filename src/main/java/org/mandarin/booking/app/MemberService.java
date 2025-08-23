@@ -1,11 +1,11 @@
 package org.mandarin.booking.app;
 
 import lombok.RequiredArgsConstructor;
+import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
-import org.mandarin.booking.infra.webapi.dto.MemberRegisterRequest;
-import org.mandarin.booking.infra.webapi.dto.MemberRegisterResponse;
+import org.mandarin.booking.domain.member.MemberRegisterRequest;
+import org.mandarin.booking.domain.member.MemberRegisterResponse;
 import org.mandarin.booking.app.port.MemberRegisterer;
-import org.mandarin.booking.infra.persist.MemberCommandRepository;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.springframework.stereotype.Service;

@@ -6,9 +6,9 @@ import static org.mandarin.booking.JwtTestUtils.getExpiration;
 import static org.mandarin.booking.JwtTestUtils.getTokenClaims;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
-import static org.mandarin.booking.infra.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
-import static org.mandarin.booking.infra.webapi.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -19,9 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.infra.persist.MemberQueryRepository;
-import org.mandarin.booking.infra.webapi.dto.AuthRequest;
-import org.mandarin.booking.infra.webapi.dto.TokenHolder;
+import org.mandarin.booking.app.persist.MemberQueryRepository;
+import org.mandarin.booking.domain.member.AuthRequest;
+import org.mandarin.booking.domain.member.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

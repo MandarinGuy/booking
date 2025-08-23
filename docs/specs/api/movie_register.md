@@ -20,7 +20,7 @@
 
     ```bash
       curl -i -X POST 'http://localhost:8080/api/movie' \
-      -H 'Authentication: <<accessToken>>' \
+      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU1ODQ3MzY1LCJleHAiOjE3NTU4NDc5NjV9.qivq2xlrm8me6P0oSwFLfieubmtoUB44NTSp2idDRRLG2wWE4S_4nNMJyEbEwjwaxfHpYQdzOTw0uscvNJCoKQ' \
       -H 'Content-Type: application/json' \
       -d '{
         "title": "인셉션",
@@ -52,6 +52,7 @@
 ### 테스트
 
 - [ ] 올바른 요청을 보내면 status가 SUCCESS이다
+- [ ] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다
 - [ ] title, director, runtimeMinutes, genre, releaseDate, rating은 비어있을 수 없다
 - [ ] runtimeMinutes은 0 이상이어야 한다
 - [ ] releaseDat는 ISO 8601 양식을 준수한다

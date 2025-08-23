@@ -23,48 +23,41 @@ configurations {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // ---- Spring Boot Core ----
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // ---- Data & Database ----
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+    testRuntimeOnly 'com.h2database:h2'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
-	implementation("org.projectlombok:lombok:1.18.36")
-	annotationProcessor('org.projectlombok:lombok:1.18.36')
+    // ---- Security & Auth ----
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    testImplementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
 
-	// Spring web
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // ---- Lombok ----
+    implementation 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-	// Spring data JPA
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // ---- Dev Only ----
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
-	//h2 database
-	testRuntimeOnly 'com.h2database:h2'
+    // ---- Code Quality / Tooling ----
+    spotbugs 'com.github.spotbugs:spotbugs:4.9.3'
 
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-
-	implementation 'com.mysql:mysql-connector-j:8.3.0'
-
-	// Spring validation
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	// Spring security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
-
-	// Mockito inline 사용 시 필요한 Byte Buddy Agent
-	byteBuddyAgent "net.bytebuddy:byte-buddy-agent:1.17.6"
-
-	// spotbugs
-	spotbugs 'com.github.spotbugs:spotbugs:4.9.3'
-
-	// p6spy
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-
-	// jjwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-	testImplementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    // ---- Testing ----
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
+	byteBuddyAgent 'net.bytebuddy:byte-buddy-agent:1.17.6'
 }
 
 tasks.named('test') {
