@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

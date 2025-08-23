@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 /**
  * Centralizes API status codes to achieve type-safety and remove string duplication.

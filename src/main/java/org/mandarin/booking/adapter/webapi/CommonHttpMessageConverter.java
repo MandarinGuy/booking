@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

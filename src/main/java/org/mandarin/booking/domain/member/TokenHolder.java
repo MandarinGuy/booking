@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi.dto;
+package org.mandarin.booking.domain.member;
 
 public record TokenHolder(String accessToken, String refreshToken) {
 }

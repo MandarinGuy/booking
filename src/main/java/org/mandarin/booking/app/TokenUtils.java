@@ -1,8 +1,8 @@
 package org.mandarin.booking.app;
 
-import org.mandarin.booking.infra.webapi.dto.TokenHolder;
+import org.mandarin.booking.domain.member.TokenHolder;
 
-public interface TokenProvider {
+public interface TokenUtils {
     TokenHolder generateToken(String refreshToken);
 
     TokenHolder generateToken(String userId, String nickName);

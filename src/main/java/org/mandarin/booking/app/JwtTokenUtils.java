@@ -9,14 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import javax.crypto.SecretKey;
-import org.mandarin.booking.infra.webapi.dto.TokenHolder;
 import org.mandarin.booking.domain.member.AuthException;
+import org.mandarin.booking.domain.member.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtTokenProvider implements TokenProvider {
+public class JwtTokenUtils implements TokenUtils {
     private static final String USER_ID = "userId";
     private static final String NICK_NAME = "nickName";
 
@@ -48,32 +48,6 @@ public class JwtTokenProvider implements TokenProvider {
         return new TokenHolder(accessToken, refreshToken);
     }
 
-    private String generateTokenInternal(String userId, String nickName, long expiration) {
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        Date exp = new Date(nowMillis + expiration);
-        return Jwts.builder()
-                .header()
-                .add("typ", "JWT")
-                .and()
-                .subject(userId)
-                .claims(Map.of(
-                        USER_ID, userId,
-                        NICK_NAME, nickName
-                ))
-                .issuedAt(now)
-                .expiration(exp)
-                .signWith(key)
-                .compact();
-    }
-
-    private Jws<Claims> parseClaims(String refreshToken) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(refreshToken);
-    }
-
     @Override
     public void validateToken(String token) {
         try {
@@ -95,5 +69,31 @@ public class JwtTokenProvider implements TokenProvider {
         } catch (IllegalArgumentException e) {
             throw new AuthException("올바르지 않은 토큰입니다.");
         }
+    }
+
+    private String generateTokenInternal(String userId, String nickName, long expiration) {
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        Date exp = new Date(nowMillis + expiration);
+        return Jwts.builder()
+                .header()
+                .add("typ", "JWT")
+                .and()
+                .subject(userId)
+                .claims(Map.of(
+                        USER_ID, userId,
+                        NICK_NAME, nickName
+                ))
+                .issuedAt(now)
+                .expiration(exp)
+                .signWith(key)
+                .compact();
+    }
+
+    private Jws<Claims> parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token);
     }
 }

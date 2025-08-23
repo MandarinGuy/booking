@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

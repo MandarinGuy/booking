@@ -1,4 +1,4 @@
-package org.mandarin.booking.infra.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
