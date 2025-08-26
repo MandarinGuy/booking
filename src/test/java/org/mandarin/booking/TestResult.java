@@ -6,11 +6,11 @@ import static org.springframework.http.HttpMethod.POST;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.mandarin.booking.adapter.webapi.ApiResponse;
 import org.mandarin.booking.adapter.webapi.ApiStatus;
 import org.mandarin.booking.adapter.webapi.ErrorResponse;
 import org.mandarin.booking.adapter.webapi.SuccessResponse;
@@ -31,7 +31,7 @@ public class TestResult {
     private TestRestTemplate testRestTemplate;
     private ObjectMapper objectMapper;
 
-    public <T> SuccessResponse<T> assertSuccess(Class<T> responseType) {
+    public <T> ApiResponse<T> assertSuccess(Class<T> responseType) {
         var response = readSuccessResponse(
                 getResponse(),
                 responseType
@@ -44,7 +44,7 @@ public class TestResult {
         return response;
     }
 
-    public <T> SuccessResponse<T> assertSuccess(TypeReference<T> typeReference) {
+    public <T> ApiResponse<T> assertSuccess(TypeReference<T> typeReference) {
         var response = readSuccessResponse(
                 getResponse(),
                 typeReference
@@ -75,41 +75,52 @@ public class TestResult {
         return this;
     }
 
-    private <T> SuccessResponse<T> readSuccessResponse(String raw, Class<T> dataType) {
+    private <T> ApiResponse<T> readSuccessResponse(String raw, Class<T> dataType) {
         try {
-            if (looksLikeJson(raw)) {
-                T data = (dataType == String.class)
-                        ? dataType.cast(raw)
-                        : objectMapper.readValue(raw, dataType);
-                return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+            if(objectMapper.readTree(raw).has("message")){
+                fail("Expected SuccessResponse but got ErrorResponse: " + raw);
             }
             var wrapperType = objectMapper.getTypeFactory()
                     .constructParametricType(SuccessResponse.class, dataType);
             return objectMapper.readValue(raw, wrapperType);
-        } catch (JsonProcessingException e) {
-            fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": " + e.getMessage(), e);
-            return null;
+        } catch (JsonProcessingException primary) {
+            try {
+                if (dataType == String.class) {
+                    @SuppressWarnings("unchecked")
+                    T data = (T) raw;
+                    return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+                }
+                if (dataType == Void.class) {
+                    return new SuccessResponse<>(ApiStatus.SUCCESS, null);
+                }
+                T data = objectMapper.readValue(raw, dataType);
+                return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+            } catch (Exception fallback) {
+                fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": " + primary.getMessage(), primary);
+                return null;
+            }
         }
     }
 
     private <T> SuccessResponse<T> readSuccessResponse(String raw, TypeReference<T> typeRef) {
         try {
-            if (looksLikeJson(raw)) {
-                if (typeRef.getType().getTypeName().equals("java.lang.String")) {
+            var inner = objectMapper.getTypeFactory().constructType(typeRef);
+            var wrapper = objectMapper.getTypeFactory().constructParametricType(SuccessResponse.class, inner);
+            return objectMapper.readValue(raw, wrapper);
+        } catch (JsonProcessingException primary) {
+            try {
+                if ("java.lang.String".equals(typeRef.getType().getTypeName())) {
                     @SuppressWarnings("unchecked")
                     T data = (T) raw;
                     return new SuccessResponse<>(ApiStatus.SUCCESS, data);
                 }
-                fail("Raw response is plain text and cannot be deserialized to " + typeRef.getType());
+                T data = objectMapper.readValue(raw, typeRef);
+                return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+            } catch (Exception fallback) {
+                fail("Failed to parse SuccessResponse with data type "
+                     + typeRef.getType() + ": " + primary.getMessage(), primary);
                 return null;
             }
-            JavaType inner = objectMapper.getTypeFactory().constructType(typeRef);
-            JavaType wrapper = objectMapper.getTypeFactory()
-                    .constructParametricType(SuccessResponse.class, inner);
-            return objectMapper.readValue(raw, wrapper);
-        } catch (JsonProcessingException e) {
-            fail("Failed to parse SuccessResponse with data type " + typeRef.getType() + ": " + e.getMessage(), e);
-            return null;
         }
     }
 
@@ -131,14 +142,5 @@ public class TestResult {
         return (request == null)
                 ? testRestTemplate.exchange(path, GET, new HttpEntity<>(httpHeaders), String.class).getBody()
                 : testRestTemplate.exchange(path, POST, new HttpEntity<>(request, httpHeaders), String.class).getBody();
-    }
-
-    private static boolean looksLikeJson(String s) {
-        if (s == null) {
-            return true;
-        }
-        var t = s.trim();
-        return (!t.startsWith("{") || !t.endsWith("}")) && (!t.startsWith("[") || !t.endsWith("]"))
-               && (!t.startsWith("\"") || !t.endsWith("\""));
     }
 }
