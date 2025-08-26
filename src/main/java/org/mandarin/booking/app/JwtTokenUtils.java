@@ -53,7 +53,7 @@ public class JwtTokenUtils implements TokenUtils {
         try {
             parseClaims(token);
         } catch (IllegalArgumentException e) {
-            throw new AuthException("올바르지 않은 토큰입니다.");
+            throw new AuthException("토큰이 비어있습니다.");
         } catch (JwtException e) {
             throw new AuthException("토큰 검증에 실패했습니다.");
         }

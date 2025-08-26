@@ -1,171 +1,144 @@
 package org.mandarin.booking;
 
-import static java.util.Objects.requireNonNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.assertj.core.api.Assertions.fail;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.mandarin.booking.adapter.webapi.ApiStatus;
 import org.mandarin.booking.adapter.webapi.ErrorResponse;
 import org.mandarin.booking.adapter.webapi.SuccessResponse;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-
 
 public class TestResult {
     private final String path;
     private final Object request;
-
-    private TestRestTemplate testRestTemplate;
-    private ObjectMapper objectMapper;
+    private final Map<String, String> headers = new HashMap<>();
 
     public TestResult(String path, Object request) {
         this.path = path;
         this.request = request;
     }
 
-    public <R> SuccessResponse<R> assertSuccess(Class<R> responseBodyType) {
-        String body = postForBody();
+    private TestRestTemplate testRestTemplate;
+    private ObjectMapper objectMapper;
 
-        if (body == null || body.isBlank() || responseBodyType == Void.class) {
-            return new SuccessResponse<>(SUCCESS, null);
+    public <T> SuccessResponse<T> assertSuccess(Class<T> responseType) {
+        var response = readSuccessResponse(
+                getResponse(),
+                responseType
+        );
+
+        if (response == null || response.getStatus() != ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected SUCCESS response, but got: " + response);
         }
 
-        JsonNode node = parseJson(body);
-        assertSuccessStatus(requireNonNull(node), body);
-
-        JavaType targetType = buildSuccessType(responseBodyType);
-
-        return deserializeSuccess(body, targetType, "SuccessResponse<" + responseBodyType.getSimpleName() + ">");
+        return response;
     }
 
-    public <R> SuccessResponse<R> assertSuccess(ParameterizedTypeReference<R> responseTypeRef) {
-        String body = postForBody();
-
-        if (body == null || body.isBlank()) {
-            return new SuccessResponse<>(SUCCESS, null);
+    public <T> SuccessResponse<T> assertSuccess(TypeReference<T> typeReference) {
+        var response = readSuccessResponse(
+                getResponse(),
+                typeReference
+        );
+        if (response == null || response.getStatus() != ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected SUCCESS response, but got: " + response);
         }
 
-        JsonNode node = parseJson(body);
-        assertSuccessStatus(requireNonNull(node), body);
-
-        JavaType targetType = buildSuccessType(responseTypeRef);
-
-        return deserializeSuccess(body, targetType, "SuccessResponse with parameterized type");
+        return response;
     }
 
     public ErrorResponse assertFailure() {
-        String body = postForBody();
+        var response = readErrorResponse();
+        if (response == null || response.getStatus() == ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected Error response, but got: " + response);
+        }
+        return response;
+    }
 
-        JsonNode node = parseJson(body);
-        assertErrorStatus(requireNonNull(node), body);
-
-        return deserializeError(body);
+    public TestResult withHeader(String headerName, String headerValue) {
+        headers.put(headerName, headerValue);
+        return this;
     }
 
     TestResult setContext(TestRestTemplate testRestTemplate, ObjectMapper objectMapper) {
         this.testRestTemplate = testRestTemplate;
-        this.objectMapper = objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        this.objectMapper = objectMapper;
         return this;
     }
 
-    private String postForBody() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        var resp = testRestTemplate.postForEntity(path, new HttpEntity<>(request, headers), String.class);
-        System.out.println(resp.getStatusCode());
-        System.out.println(resp.getBody());
-        return resp.getBody();
-    }
-
-
-    private JsonNode parseJson(String body) {
+    private <T> SuccessResponse<T> readSuccessResponse(String raw, Class<T> dataType) {
         try {
-            return objectMapper.readTree(body);
-        } catch (Exception e) {
-            fail("[Deserialization Failure] Expected JSON with status but failed to parse.\nActual response body: "
-                 + body, e);
-            return null; // Unreachable, added to satisfy compiler
+            if (looksLikeJson(raw)) {
+                T data = (dataType == String.class)
+                        ? dataType.cast(raw)
+                        : objectMapper.readValue(raw, dataType);
+                return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+            }
+            var wrapperType = objectMapper.getTypeFactory()
+                    .constructParametricType(SuccessResponse.class, dataType);
+            return objectMapper.readValue(raw, wrapperType);
+        } catch (JsonProcessingException e) {
+            fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": " + e.getMessage(), e);
+            return null;
         }
     }
 
-    private void assertSuccessStatus(JsonNode node, String rawBody) {
-        JsonNode statusNode = node.get("status");
-        String status = statusNode == null ? null : statusNode.asText();
-        if (status == null) {
-            fail("[Assertion Failure] Expected a success response but 'status' field is missing.\nActual response body: "
-                 + rawBody);
-            return;
-        }
-        if (!"SUCCESS".equals(status)) {
-            fail("[Assertion Failure] Expected SUCCESS but was '" + status
-                 + "'. Use assertFailure() for error responses.\nActual response body: " + rawBody);
-        }
-    }
-
-    private void assertErrorStatus(JsonNode node, String rawBody) {
-        JsonNode statusNode = node.get("status");
-        String status = statusNode == null ? null : statusNode.asText();
-        if (status == null) {
-            fail("[Assertion Failure] Expected an error response but 'status' field is missing.\nActual response body: "
-                 + rawBody);
-            return;
-        }
-        if ("SUCCESS".equals(status)) {
-            fail("[Assertion Failure] Expected an error response but got SUCCESS. Use assertSuccess() for successful responses.\nActual response body: "
-                 + rawBody);
-        }
-    }
-
-    private JavaType buildSuccessType(Class<?> responseBodyType) {
-        return objectMapper.getTypeFactory().constructParametricType(SuccessResponse.class, responseBodyType);
-    }
-
-    private JavaType buildSuccessType(ParameterizedTypeReference<?> responseTypeRef) {
-        var typeFactory = objectMapper.getTypeFactory();
-        JavaType innerType = typeFactory.constructType(responseTypeRef.getType());
-        return typeFactory.constructParametricType(SuccessResponse.class, innerType);
-    }
-
-    private <R> SuccessResponse<R> deserializeSuccess(String body, JavaType targetType, String expectationDesc) {
+    private <T> SuccessResponse<T> readSuccessResponse(String raw, TypeReference<T> typeRef) {
         try {
-            return objectMapper.readValue(body, targetType);
-        } catch (Exception e) {
-            fail("[Deserialization Failure] Expected " + expectationDesc
-                 + " but failed to deserialize.\nActual response body: " + body, e);
-            return null; // Unreachable, added to satisfy compiler
+            if (looksLikeJson(raw)) {
+                if (typeRef.getType().getTypeName().equals("java.lang.String")) {
+                    @SuppressWarnings("unchecked")
+                    T data = (T) raw;
+                    return new SuccessResponse<>(ApiStatus.SUCCESS, data);
+                }
+                fail("Raw response is plain text and cannot be deserialized to " + typeRef.getType());
+                return null;
+            }
+            JavaType inner = objectMapper.getTypeFactory().constructType(typeRef);
+            JavaType wrapper = objectMapper.getTypeFactory()
+                    .constructParametricType(SuccessResponse.class, inner);
+            return objectMapper.readValue(raw, wrapper);
+        } catch (JsonProcessingException e) {
+            fail("Failed to parse SuccessResponse with data type " + typeRef.getType() + ": " + e.getMessage(), e);
+            return null;
         }
     }
 
-    private ErrorResponse deserializeError(String body) {
+    private ErrorResponse readErrorResponse() {
+        var response = getResponse();
         try {
-            return objectMapper.readValue(body, ErrorResponse.class);
+            return objectMapper.readValue(response, ErrorResponse.class);
         } catch (Exception e) {
-            fail("[Deserialization Failure] Expected ErrorResponse but failed to deserialize.\nActual response body: "
-                 + body, e);
-            return null; // Unreachable, added to satisfy compiler
+            fail("Failed to parse ErrorResponse: " + e.getMessage(), e);
+            return null;
         }
     }
 
-    private String describeActualDataType(JsonNode dataNode) {
-        if (dataNode.isObject()) {
-            List<String> fieldNames = new ArrayList<>();
-            dataNode.fieldNames().forEachRemaining(fieldNames::add);
-            Collections.sort(fieldNames);
-            return "an object with fields " + fieldNames;
+    private String getResponse() {
+        var httpHeaders = new HttpHeaders();
+        for (Entry<String, String> entry : headers.entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
         }
-        if (dataNode.isArray()) {
-            return "an array";
+        return (request == null)
+                ? testRestTemplate.exchange(path, GET, new HttpEntity<>(httpHeaders), String.class).getBody()
+                : testRestTemplate.exchange(path, POST, new HttpEntity<>(request, httpHeaders), String.class).getBody();
+    }
+
+    private static boolean looksLikeJson(String s) {
+        if (s == null) {
+            return true;
         }
-        // NodeType을 소문자로 변환하여 "a string value", "a number value" 등으로 표현합니다.
-        return "a " + dataNode.getNodeType().toString().toLowerCase() + " value";
+        var t = s.trim();
+        return (!t.startsWith("{") || !t.endsWith("}")) && (!t.startsWith("[") || !t.endsWith("]"))
+               && (!t.startsWith("\"") || !t.endsWith("\""));
     }
 }

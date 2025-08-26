@@ -9,10 +9,17 @@ public class MemberDetails implements UserDetails {
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public MemberDetails(String userId, String password, Collection<MemberAuthority> authorities) {
+    private MemberDetails(String userId, String password, Collection<MemberAuthority> authorities) {
         this.userId = userId;
         this.password = password;
         this.authorities = authorities;
+    }
+
+    public static MemberDetails from(Member member) {
+        String userId = member.getUserId();
+        String password = member.getPasswordHash();
+        Collection<MemberAuthority> authorities = member.getAuthorities();
+        return new MemberDetails(userId, password, authorities);
     }
 
     @Override

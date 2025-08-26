@@ -8,5 +8,6 @@ public enum ApiStatus {
     SUCCESS,
     BAD_REQUEST,
     UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR
+    INTERNAL_SERVER_ERROR,
+    FORBIDDEN,
 }

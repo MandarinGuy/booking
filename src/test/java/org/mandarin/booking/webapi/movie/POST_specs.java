@@ -21,6 +21,9 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
+        var member = testUtils.insertDummyMember();
+        var jwtToken = "Bearer " + testUtils.getUserToken(member.getUserId(), member.getNickName());
+
         var request = new MovieRegisterRequest(
                 "영화 제목",
                 "감독 이름",
@@ -36,11 +39,11 @@ public class POST_specs {
         );
 
         // Act
-
         var response = testUtils.post(
                         "/api/movie",
                         request
                 )
+                .withHeader("Authorization", jwtToken)
                 .assertSuccess(Void.class);
 
         // Assert
