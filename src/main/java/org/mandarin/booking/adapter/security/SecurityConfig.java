@@ -5,7 +5,6 @@ import org.mandarin.booking.app.TokenUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final TokenUtils tokenUtils;
-    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -33,7 +31,6 @@ public class SecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.GET, "/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/reissue").permitAll()
@@ -42,11 +39,10 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
-                .addFilterBefore(new JwtFilter(tokenUtils, authenticationProvider),
+                .addFilterBefore(new JwtFilter(tokenUtils),
                         UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

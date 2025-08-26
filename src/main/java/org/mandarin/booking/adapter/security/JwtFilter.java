@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mandarin.booking.app.TokenUtils;
 import org.mandarin.booking.domain.member.AuthException;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,7 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
     private static final String PREFIX = "Bearer ";
     private final TokenUtils tokenUtils;
-    private final AuthenticationProvider authenticationProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -28,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         if (!isBearer(header)) {
-            //TODO 2025 08 26 09:58:01 : AnonymousAuthenticationToken 발급할거라 AccessDeniedHandler로 넘어감
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,8 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
             tokenUtils.validateToken(token);
             var userId = tokenUtils.getClaim(token, "userId");
             var authToken = new CustomMemberAuthenticationToken(userId, USER);
-            var auth = authenticationProvider.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (AuthException e) {
             log.error("Authentication Error: {}", e.getMessage());
             SecurityContextHolder.clearContext();

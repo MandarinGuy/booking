@@ -10,6 +10,7 @@ public class CustomMemberAuthenticationToken extends AbstractAuthenticationToken
     public CustomMemberAuthenticationToken(String userId, GrantedAuthority authority) {
         super(List.of(authority));
         this.userId = userId;
+        super.setAuthenticated(true);
     }
 
     @Override
