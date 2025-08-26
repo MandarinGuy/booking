@@ -1,7 +1,5 @@
 package org.mandarin.booking.adapter.security;
 
-import static org.mandarin.booking.domain.member.MemberAuthority.USER;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             tokenUtils.validateToken(token);
             var userId = tokenUtils.getClaim(token, "userId");
-            var authToken = new CustomMemberAuthenticationToken(userId, USER);
+            var authToken = new CustomMemberAuthenticationToken(userId);
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (AuthException e) {
             log.error("Authentication Error: {}", e.getMessage());
