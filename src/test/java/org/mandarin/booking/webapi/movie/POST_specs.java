@@ -2,6 +2,7 @@ package org.mandarin.booking.webapi.movie;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,19 +25,7 @@ public class POST_specs {
         var member = testUtils.insertDummyMember();
         var jwtToken = "Bearer " + testUtils.getUserToken(member.getUserId(), member.getNickName());
 
-        var request = new MovieRegisterRequest(
-                "영화 제목",
-                "감독 이름",
-                148,
-                "SF",
-                LocalDate.of(2010, 7, 21),
-                "AGE12",
-                "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
-                "https://example.com/posters/inception.jpg",
-                List.of("레오나르도 디카프리오",
-                        "조셉 고든레빗",
-                        "엘렌 페이지")
-        );
+        var request = generateMovieRegisterRequest();
 
         // Act
         var response = testUtils.post(
@@ -49,4 +38,40 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
+
+    private static MovieRegisterRequest generateMovieRegisterRequest() {
+        return new MovieRegisterRequest(
+                "영화 제목",
+                "감독 이름",
+                148,
+                "SF",
+                LocalDate.of(2010, 7, 21),
+                "AGE12",
+                "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
+                "https://example.com/posters/inception.jpg",
+                List.of("레오나르도 디카프리오",
+                        "조셉 고든레빗",
+                        "엘렌 페이지")
+        );
+    }
+
+    @Test
+    void Authorization_헤더에_유효한_accessToken이_없으면_status가_UNAUTHORIZED이다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = generateMovieRegisterRequest();
+        
+        // Act
+        var response = testUtils.post(
+                        "/api/movie",
+                        request
+                )
+                .assertFailure();
+        
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+    }
+
+
 }

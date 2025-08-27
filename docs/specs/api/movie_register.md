@@ -52,7 +52,7 @@
 ### 테스트
 
 - [x] 올바른 요청을 보내면 status가 SUCCESS이다
-- [ ] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다
+- [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다
 - [ ] title, director, runtimeMinutes, genre, releaseDate, rating은 비어있을 수 없다
 - [ ] runtimeMinutes은 0 이상이어야 한다
 - [ ] releaseDat는 ISO 8601 양식을 준수한다
