@@ -3,7 +3,7 @@ package org.mandarin.booking.domain.movie;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 
 public record MovieRegisterRequest(
@@ -20,8 +20,9 @@ public record MovieRegisterRequest(
         @NotBlank(message = "Genre must not be blank")
         String genre,
 
-        @NotNull(message = "Release date must not be blank")
-        LocalDate releaseDate,
+        @NotBlank(message = "Release date must not be blank")
+        @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "releaseDate must be yyyy-MM-dd")
+        String releaseDate,
 
         @NotBlank(message = "Rating must not be blank")
         String rating,

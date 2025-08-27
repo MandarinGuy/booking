@@ -5,7 +5,6 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
-import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var request = generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), "AGE12");
+        var request = generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", "2010-07-21", "AGE12");
 
         // Act
         var response = testUtils.post(
@@ -90,7 +89,30 @@ public class POST_specs {
         // Act
         var response = testUtils.post(
                         "/api/movie",
-                        generateMovieRegisterRequest("영화 제목", "감독 이름", -1, "SF", LocalDate.of(2010, 7, 21), "AGE12")
+                        generateMovieRegisterRequest("영화 제목", "감독 이름", -1, "SF", "2010-07-21", "AGE12")
+                )
+                .withHeader("Authorization", authToken)
+                .assertFailure();
+        
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+    
+    @Test
+    void releaseDate는_yyyy_MM_dd_형태를_준수하지_않으면_BAD_REQUEST이다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var authToken = getAuthToken(testUtils);
+        // 잘못된 날짜 형식
+        var request = generateMovieRegisterRequest(
+                "영화 제목", "감독 이름", 148, "SF", "21-07-2010", "AGE12"
+        );
+        
+        // Act
+        var response = testUtils.post(
+                        "/api/movie",
+                        request
                 )
                 .withHeader("Authorization", authToken)
                 .assertFailure();
@@ -106,23 +128,23 @@ public class POST_specs {
 
     static List<?> nullOrBlankElementRequests(){
         return List.of(
-                generateMovieRegisterRequest("", "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "", 148, "SF", LocalDate.of(2010, 7, 21), "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "", LocalDate.of(2010, 7, 21), "AGE12"),
+                generateMovieRegisterRequest("", "감독 이름", 148, "SF", "2010-07-21", "AGE12"),
+                generateMovieRegisterRequest("영화 제목", "", 148, "SF", "2010-07-21", "AGE12"),
+                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "", "2010-07-21", "AGE12"),
                 generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", null, "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), ""),
-                generateMovieRegisterRequest(null, "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), "AGE12"),
-                generateMovieRegisterRequest("영화 제목", null, 148, "SF", LocalDate.of(2010, 7, 21), "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, null, LocalDate.of(2010, 7, 21), "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "감독 이름", null, "SF", LocalDate.of(2010, 7, 21), "AGE12"),
+                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", "2010-07-21", ""),
+                generateMovieRegisterRequest(null, "감독 이름", 148, "SF", "2010-07-21", "AGE12"),
+                generateMovieRegisterRequest("영화 제목", null, 148, "SF", "2010-07-21", "AGE12"),
+                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, null, "2010-07-21", "AGE12"),
+                generateMovieRegisterRequest("영화 제목", "감독 이름", null, "SF", "2010-07-21", "AGE12"),
                 generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", null, "AGE12"),
-                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), null)
+                generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", "2010-07-21", null)
         );
     }
 
 
     private static MovieRegisterRequest generateMovieRegisterRequest(String title, String director, Integer runtimeMinutes,
-                                                                     String genre, LocalDate releaseDate, String rating) {
+                                                                     String genre, String releaseDate, String rating) {
         return new MovieRegisterRequest(
                 title,
                 director,
@@ -139,6 +161,6 @@ public class POST_specs {
     }
 
     private static MovieRegisterRequest generateMovieRegisterRequest() {
-        return generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", LocalDate.of(2010, 7, 21), "AGE12");
+        return generateMovieRegisterRequest("영화 제목", "감독 이름", 148, "SF", "2010-07-21", "AGE12");
     }
 }
