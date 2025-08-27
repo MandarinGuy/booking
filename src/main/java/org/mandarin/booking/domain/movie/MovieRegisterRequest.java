@@ -1,5 +1,6 @@
 package org.mandarin.booking.domain.movie;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ public record MovieRegisterRequest(
         String director,
 
         @NotNull(message = "Runtime minutes must not be null")
+        @Min(value = 0, message = "Runtime minutes must be non-negative")
         Integer runtimeMinutes,
 
         @NotBlank(message = "Genre must not be blank")

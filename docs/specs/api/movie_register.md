@@ -54,5 +54,5 @@
 - [x] 올바른 요청을 보내면 status가 SUCCESS이다
 - [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다 
 - [x] title, director, runtimeMinutes, genre, releaseDate, rating이 비어있으면 BAD_REQUEST이다
-- [ ] runtimeMinutes은 0 미만이면 BAD_REQUEST이다
-- [ ] releaseDat는 ISO 8601 양식을 준수하지 않으면 BAD_REQUEST이다
+- [x] runtimeMinutes은 0 미만이면 BAD_REQUEST이다
+- [ ] releaseDate는 ISO 8601 양식을 준수하지 않으면 BAD_REQUEST이다
