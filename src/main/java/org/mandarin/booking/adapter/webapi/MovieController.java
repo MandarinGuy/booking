@@ -1,5 +1,6 @@
 package org.mandarin.booking.adapter.webapi;
 
+import jakarta.validation.Valid;
 import org.mandarin.booking.app.Log;
 import org.mandarin.booking.domain.movie.MovieRegisterRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,7 @@ public class MovieController {
 
     @Log
     @PostMapping
-    public void register(@RequestBody MovieRegisterRequest request) {
+    public void register(@RequestBody @Valid MovieRegisterRequest request) {
         // Movie registration logic would go here
 
     }

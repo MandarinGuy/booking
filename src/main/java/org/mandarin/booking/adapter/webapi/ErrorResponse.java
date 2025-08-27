@@ -1,8 +1,10 @@
 package org.mandarin.booking.adapter.webapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
 
+@ToString
 public class ErrorResponse extends ApiResponse<String> {
 
     public ErrorResponse(ApiStatus status, String message) {
