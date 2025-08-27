@@ -37,8 +37,10 @@ public class TestResult {
                 responseType
         );
 
-        if (response == null || response.getStatus() != ApiStatus.SUCCESS) {
+        if (response == null) {
             throw new AssertionError("Expected SUCCESS response, but got: " + response);
+        } else if (response.getStatus() != ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected SUCCESS response, but got Error response: " + response);
         }
 
         return response;
@@ -49,8 +51,10 @@ public class TestResult {
                 getResponse(),
                 typeReference
         );
-        if (response == null || response.getStatus() != ApiStatus.SUCCESS) {
+        if (response == null) {
             throw new AssertionError("Expected SUCCESS response, but got: " + response);
+        } else if (response.getStatus() != ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected SUCCESS response, but got Error response: " + response);
         }
 
         return response;
@@ -58,8 +62,10 @@ public class TestResult {
 
     public ErrorResponse assertFailure() {
         var response = readErrorResponse();
-        if (response == null || response.getStatus() == ApiStatus.SUCCESS) {
+        if (response == null) {
             throw new AssertionError("Expected Error response, but got: " + response);
+        }else if (response.getStatus() == ApiStatus.SUCCESS) {
+            throw new AssertionError("Expected Error response, but got SUCCESS: " + response);
         }
         return response;
     }
@@ -127,6 +133,9 @@ public class TestResult {
     private ErrorResponse readErrorResponse() {
         var response = getResponse();
         try {
+            if(objectMapper.readTree(response).has("data")){
+                fail("Expected ErrorResponse but got SuccessResponse: " + response);
+            }
             return objectMapper.readValue(response, ErrorResponse.class);
         } catch (Exception e) {
             fail("Failed to parse ErrorResponse: " + e.getMessage(), e);
