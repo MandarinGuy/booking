@@ -21,9 +21,6 @@ public class MovieCreateCommand {
 
     private MovieCreateCommand(String title, Genre genre, int runtimeMinutes, String director, String synopsis,
                               String posterUrl, LocalDate releaseDate, Rating rating, Set<String> cast) {
-        if (runtimeMinutes < 0) {
-            throw new MovieException("running time은 음수일 수 없습니다.");
-        }
         this.title = title;
         this.genre = genre;
         this.runtimeMinutes = runtimeMinutes;
