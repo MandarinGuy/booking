@@ -96,5 +96,10 @@ public class IntegrationTestUtils {
     public Member insertDummyMember() {
         return this.insertDummyMember(generateUserId(), generatePassword());
     }
+
+    public String getAuthToken(MemberAuthority ...memberAuthority) {
+        var member = this.insertDummyMember(generateUserId(), generateNickName(), List.of(memberAuthority));
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+    }
 }
 

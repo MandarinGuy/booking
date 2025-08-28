@@ -1,11 +1,14 @@
 package org.mandarin.booking.domain.movie;
 
-import jakarta.annotation.Nullable;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import org.mandarin.booking.domain.AbstractEntity;
 
@@ -30,7 +33,10 @@ public class Movie extends AbstractEntity {
     private String posterUrl;
 
 
-    private Set<String> cast = new LinkedHashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "movie_cast", joinColumns = @JoinColumn(name = "movie_id"))
+    @Column(name = "actor_name")
+    private Set<String> casts = new HashSet<>();
 
     protected Movie() {
     }
@@ -43,7 +49,7 @@ public class Movie extends AbstractEntity {
                   Rating rating,
                   String synopsis,
                   String posterUrl,
-                  Set<String> cast) {
+                  Set<String> casts) {
 
         this.title = title;
         this.director = director;
@@ -53,28 +59,12 @@ public class Movie extends AbstractEntity {
         this.rating = rating;
         this.synopsis = synopsis;
         this.posterUrl = posterUrl;
-        if (cast != null) {
-            this.cast.addAll(cast);
-        }
+        this.casts.addAll(casts);
     }
 
-    public static Movie create(String title,
-                               String director,
-                               Integer runtimeMinutes,
-                               Genre genre,
-                               LocalDate releaseDate,
-                               Rating rating,
-                               @Nullable
-                               String synopsis,
-                               @Nullable
-                               String posterUrl,
-                               @Nullable
-                               Set<String> cast) {
-        if (runtimeMinutes < 0) {
-            throw new IllegalArgumentException("Runtime minutes cannot be negative");//TODO 2025 08 19 11:35:28 : custom exception
-        }
-
-        return new Movie(title, director, runtimeMinutes, genre, releaseDate, rating, synopsis, posterUrl, cast);
+    public static Movie create(MovieCreateCommand command) {
+        return new Movie(command.getTitle(), command.getDirector(), command.getRuntimeMinutes(), command.getGenre(),
+                command.getReleaseDate(), command.getRating(), command.getSynopsis(), command.getPosterUrl(), command.getCast());
     }
 
     public enum Genre {

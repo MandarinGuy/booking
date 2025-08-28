@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +14,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.domain.movie.MovieRegisterRequest;
+import org.mandarin.booking.domain.movie.MovieRegisterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-@DisplayName("POST /api/movie")
+@DisplayName("POST /api/movies")
 public class POST_specs {
 
     @Test
@@ -24,17 +26,17 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var jwtToken = testUtils.getAuthToken();
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
 
         var request = generateMovieRegisterRequest();
 
         // Act
         var response = testUtils.post(
-                        "/api/movie",
+                        "/api/movies",
                         request
                 )
-                .withHeader("Authorization", jwtToken)
-                .assertSuccess(Void.class);
+                .withHeader("Authorization", authToken)
+                .assertSuccess(MovieRegisterResponse.class);
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
@@ -49,7 +51,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/movie",
+                        "/api/movies",
                         request
                 )
                 .assertFailure();
@@ -65,14 +67,14 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var jwtToken = testUtils.getAuthToken();
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
 
         // Act
         var response = testUtils.post(
-                        "/api/movie",
+                        "/api/movies",
                         request
                 )
-                .withHeader("Authorization", jwtToken)
+                .withHeader("Authorization", authToken)
                 .assertFailure();
 
         // Assert
@@ -84,11 +86,11 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken();
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
 
         // Act
         var response = testUtils.post(
-                        "/api/movie",
+                        "/api/movies",
                         generateMovieRegisterRequest("영화 제목", "감독 이름", -1, "SF", "2010-07-21", "AGE12")
                 )
                 .withHeader("Authorization", authToken)
@@ -103,7 +105,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken();
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
         // 잘못된 날짜 형식
         var request = generateMovieRegisterRequest(
                 "영화 제목", "감독 이름", 148, "SF", "21-07-2010", "AGE12"
@@ -111,7 +113,7 @@ public class POST_specs {
         
         // Act
         var response = testUtils.post(
-                        "/api/movie",
+                        "/api/movies",
                         request
                 )
                 .withHeader("Authorization", authToken)
@@ -119,6 +121,26 @@ public class POST_specs {
         
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+    
+    @Test
+    void 올바른_요청을_보내면_응답_본문에_movieId가_존재한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var request = generateMovieRegisterRequest();
+        
+        // Act
+        var response = testUtils.post(
+                        "/api/movies",
+                        request
+                )
+                .withHeader("Authorization", authToken)
+                .assertSuccess(MovieRegisterResponse.class);
+        
+        // Assert
+        assertThat(response.getData().movieId()).isNotNull();
     }
 
     static List<?> nullOrBlankElementRequests(){

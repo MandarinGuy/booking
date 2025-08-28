@@ -46,12 +46,18 @@
 
     ```json
     {
+        "status": "SUCCESS",
+        "data": {
+            "movieId": 1
+        },
+        "timestamp": "2024-06-10T12:34:56.789Z"
     }
     ```
 
 ### 테스트
 
 - [x] 올바른 요청을 보내면 status가 SUCCESS이다
+- [ ] 올바른 요청을 보내면 응답 본문에 movieId가 존재한다
 - [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다 
 - [x] title, director, runtimeMinutes, genre, releaseDate, rating이 비어있으면 BAD_REQUEST이다
 - [x] runtimeMinutes은 0 미만이면 BAD_REQUEST이다

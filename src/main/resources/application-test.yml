@@ -21,3 +21,7 @@ jwt:
     secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGUtc3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGU
     access: 600000
     refresh: 1800000
+
+logging:
+  level:
+    org.springframework.security: TRACE
