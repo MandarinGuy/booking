@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -71,6 +72,8 @@ public class JwtTokenUtils implements TokenUtils {
     public Collection<String> getClaims(String token, String claimName) {
         Jws<Claims> claims = parseClaims(token);
         var rawPayload = claims.getPayload().get(claimName, String.class);
+        if(rawPayload.isBlank())
+            return new ArrayList<>();
         return Arrays.stream(rawPayload.split(",")).toList();
     }
 

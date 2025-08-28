@@ -1,9 +1,11 @@
 package org.mandarin.booking.adapter.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 class JwtFilterTest {
     private static final String PONG_WITHOUT_AUTH = "pong without auth";
     private static final String PONG_WITH_AUTH = "pong with auth";
+    private static final String WITH_USER_ROLE = "pong with user role";
 
 
     @Test
@@ -72,6 +75,37 @@ class JwtFilterTest {
         assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
     }
 
+    @Test
+    void failWithInvalidBearer(@Autowired IntegrationTestUtils testUtils) {
+        // Arrange
+        var invalidBearer = "Bearer invalid-token";
+
+        // Act
+        var response = testUtils.get("/test/with-auth")
+                .withHeader("Authorization", invalidBearer)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+        assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
+    }
+    
+    @Test
+    void lackOfAuthorityMustReturnAccessDenied(@Autowired IntegrationTestUtils testUtils){
+        // Arrange
+        var member = testUtils.insertDummyMember("dummy", "dummy", List.of());
+        var accessToken = testUtils.getAuthToken(member);
+
+        // Act
+        var response = testUtils.get("/test/with-user-role")
+                .withHeader("Authorization", accessToken)
+                .assertFailure();
+        
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
+        assertThat(response.getData()).isEqualTo("Access Denied");
+    }
+
     @RestController
     @RequestMapping("/test")
     static class TestAuthController {
@@ -83,6 +117,11 @@ class JwtFilterTest {
         @GetMapping("/with-auth")
         public String pingWithAuth() {
             return PONG_WITH_AUTH;
+        }
+
+        @GetMapping("/with-user-role")
+        public String pingWithUserRole() {
+            return WITH_USER_ROLE;
         }
     }
     @TestConfiguration
@@ -101,6 +140,7 @@ class JwtFilterTest {
                     .authorizeHttpRequests(a -> a
                             .requestMatchers("/test/without-auth").permitAll()
                             .requestMatchers("/test/with-auth").authenticated()
+                            .requestMatchers("/test/with-user-role").hasAuthority("USER")
                     )
                     .formLogin(AbstractHttpConfigurer::disable)
                     .csrf(AbstractHttpConfigurer::disable)

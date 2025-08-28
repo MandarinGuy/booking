@@ -8,14 +8,17 @@ import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generat
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.Collection;
+import java.util.List;
 import org.mandarin.booking.app.TokenUtils;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
+import org.mandarin.booking.domain.member.MemberAuthority;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.domain.member.TokenHolder;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class IntegrationTestUtils {
     private final TestRestTemplate testRestTemplate;
@@ -36,6 +39,16 @@ public class IntegrationTestUtils {
         this.objectMapper = objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    public <T> TestResult get(String path) {
+        return new TestResult(path, null)
+                .setContext(testRestTemplate, objectMapper);
+    }
+
+    public <T> TestResult post(String path, T request) {
+        return new TestResult(path, request)
+                .setContext(testRestTemplate, objectMapper);
+    }
+
     public String getValidRefreshToken() {
         var member = insertDummyMember(generateUserId(), generatePassword());
         return tokenUtils.generateToken(member.getUserId(), member.getNickName(), member.getAuthorities()).refreshToken();
@@ -43,7 +56,15 @@ public class IntegrationTestUtils {
 
     public String getAuthToken() {
         var member = this.insertDummyMember();
-         return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+    }
+
+    public String getAuthToken(Member member) {
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+    }
+
+    public TokenHolder getUserToken(String userId, String nickname, Collection<? extends GrantedAuthority> authorities) {
+        return tokenUtils.generateToken(userId, nickname, authorities);
     }
 
     public Member insertDummyMember(String userId, String password) {
@@ -58,18 +79,18 @@ public class IntegrationTestUtils {
         );
     }
 
-    public <T> TestResult get(String path) {
-        return new TestResult(path, null)
-                .setContext(testRestTemplate, objectMapper);
-    }
-
-    public <T> TestResult post(String path, T request) {
-        return new TestResult(path, request)
-                .setContext(testRestTemplate, objectMapper);
-    }
-
-    public TokenHolder getUserToken(String userId, String nickname, Collection<? extends GrantedAuthority> authorities) {
-        return tokenUtils.generateToken(userId, nickname, authorities);
+    public Member insertDummyMember(String userId, String nickName, List<MemberAuthority> authorities) {
+        var command = new MemberCreateCommand(
+                nickName,
+                userId,
+                generatePassword(),
+                generateEmail()
+        );
+        var member = Member.create(command, securePasswordEncoder);
+        ReflectionTestUtils.setField(member, "authorities", authorities);
+        return memberRepository.insert(
+                member
+        );
     }
 
     public Member insertDummyMember() {
