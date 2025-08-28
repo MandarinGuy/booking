@@ -24,7 +24,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var jwtToken = getAuthToken(testUtils);
+        var jwtToken = testUtils.getAuthToken();
 
         var request = generateMovieRegisterRequest();
 
@@ -65,7 +65,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var jwtToken = getAuthToken(testUtils);
+        var jwtToken = testUtils.getAuthToken();
 
         // Act
         var response = testUtils.post(
@@ -84,7 +84,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = getAuthToken(testUtils);
+        var authToken = testUtils.getAuthToken();
 
         // Act
         var response = testUtils.post(
@@ -103,7 +103,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = getAuthToken(testUtils);
+        var authToken = testUtils.getAuthToken();
         // 잘못된 날짜 형식
         var request = generateMovieRegisterRequest(
                 "영화 제목", "감독 이름", 148, "SF", "21-07-2010", "AGE12"
@@ -119,11 +119,6 @@ public class POST_specs {
         
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-    }
-
-    private String getAuthToken(IntegrationTestUtils testUtils) {
-        var member = testUtils.insertDummyMember();
-         return "Bearer " + testUtils.getUserToken(member.getUserId(), member.getNickName());
     }
 
     static List<?> nullOrBlankElementRequests(){

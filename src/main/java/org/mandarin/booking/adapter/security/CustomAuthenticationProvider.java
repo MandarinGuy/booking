@@ -37,6 +37,5 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         MemberDetails details = MemberDetails.from(member);
         token.setDetails(details);// set user details
         token.setAuthenticated(true);
-        token.addAuthorities(details.getAuthorities());
     }
 }

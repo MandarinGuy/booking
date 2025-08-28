@@ -21,12 +21,11 @@ public class AuthService implements AuthUseCase {
         var member = getMember(userId);
         checkPasswordMatch(member, password);
 
-        return tokenUtils.generateToken(member.getUserId(), member.getNickName());
+        return tokenUtils.generateToken(member.getUserId(), member.getNickName(), member.getAuthorities());
     }
 
     @Override
     public TokenHolder reissue(String refreshToken) {
-        tokenUtils.validateToken(refreshToken);
         var userId = tokenUtils.getClaim(refreshToken, "userId");
         if(!queryRepository.existsByUserId(userId))
             throw new AuthException("회원이 존재하지 않습니다");

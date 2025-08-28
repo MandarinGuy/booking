@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoggingAspect {
 
-    @Pointcut("@within(org.mandarin.booking.app.Log) || @annotation(org.mandarin.booking.app.Log)")
-    public void loggableTarget() {}
-
-    @Around("loggableTarget()")
+    @Around("@within(org.mandarin.booking.app.Log) || @annotation(org.mandarin.booking.app.Log)")
     public Object logMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable {
         Logger targetLogger = selectTargetLogger(joinPoint);
         String level = resolveScope(joinPoint);

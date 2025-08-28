@@ -3,15 +3,17 @@ package org.mandarin.booking.webapi.auth.reissue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
 import static org.mandarin.booking.JwtTestUtils.getExpiration;
-import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
-import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
-import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.domain.member.MemberAuthority.USER;
+import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
+import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
+import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import java.util.List;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,14 +32,10 @@ import org.springframework.test.context.TestPropertySource;
 public class POST_specs {
     @Test
     void 올바른_refresh_token으로_요청하면_200을_응답한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TokenUtils tokenUtils
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var userId = generateUserId();
-        var nickName = generateNickName();
-        testUtils.insertDummyMember(userId, generatePassword());
-        var validRefreshToken = getValidRefreshToken(tokenUtils, userId, nickName);
+        var validRefreshToken = testUtils.getValidRefreshToken();
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
@@ -53,14 +51,10 @@ public class POST_specs {
 
     @Test
     void 올바른_refresh_token으로_요청하면_새로운_access_token과_refresh_token을_발급해_응답한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TokenUtils tokenUtils
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var userId = generateUserId();
-        var nickName = generateNickName();
-        testUtils.insertDummyMember(userId, generatePassword());
-        var validRefreshToken = getValidRefreshToken(tokenUtils, userId, nickName);
+        var validRefreshToken = testUtils.getValidRefreshToken();
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
@@ -79,15 +73,11 @@ public class POST_specs {
     @Test
     void 응답받은_access_toke과_refresh_toke은_유효한_JWT_형식이다(
             @Autowired IntegrationTestUtils testUtils,
-            @Autowired TokenUtils tokenUtils,
             @Value("${jwt.token.secret}") String key
     ) {
         // Arrange
         SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
-        var userId = generateUserId();
-        var nickName = generateNickName();
-        testUtils.insertDummyMember(userId, generatePassword());
-        var validRefreshToken = getValidRefreshToken(tokenUtils, userId, nickName);
+        var validRefreshToken = testUtils.getValidRefreshToken();
         var request = new ReissueRequest(validRefreshToken);
 
         // Act
@@ -155,12 +145,11 @@ public class POST_specs {
     class ReissueShortToken{
         @Test
         void 만료된_refresh_token으로_요청하면_401_Unauthorize가_발생한다(
-                @Autowired IntegrationTestUtils testUtils,
-                @Autowired TokenUtils tokenUtils
+                @Autowired IntegrationTestUtils testUtils
         ) throws InterruptedException {
             // Arrange
-            tokenUtils.generateToken(generateUserId(), generateNickName());
-            var request = new ReissueRequest(getValidRefreshToken(tokenUtils, generateUserId(), generateNickName()));
+            var request = new ReissueRequest(
+                    testUtils.getValidRefreshToken());
             Thread.sleep(100); //TODO 2025 08 18 16:47:00 : 시간 의존적 코드가 테스트 속도에 영향을 미치지 않도록 개선 필요
 
             // Act
@@ -181,9 +170,7 @@ public class POST_specs {
             @Autowired TokenUtils tokenUtils
     ) {
         // Arrange
-        var userId = generateUserId();
-        var nickName = generateNickName();
-        var validRefreshToken = getValidRefreshToken(tokenUtils, userId, nickName);
+        var validRefreshToken = tokenUtils.generateToken(generateUserId(), generateNickName(), List.of(USER)).refreshToken();
         var request = new ReissueRequest(validRefreshToken);
 
         // user 생성 안함
@@ -197,11 +184,5 @@ public class POST_specs {
         
         // Assert
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
-    }
-
-
-
-    private static String getValidRefreshToken(TokenUtils tokenUtils, String userId, String nickName) {
-        return tokenUtils.generateToken(userId, nickName).refreshToken();
     }
 }

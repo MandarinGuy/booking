@@ -7,12 +7,15 @@ import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generat
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.Collection;
 import org.mandarin.booking.app.TokenUtils;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
+import org.mandarin.booking.domain.member.TokenHolder;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.security.core.GrantedAuthority;
 
 public class IntegrationTestUtils {
     private final TestRestTemplate testRestTemplate;
@@ -31,6 +34,16 @@ public class IntegrationTestUtils {
         this.tokenUtils = tokenUtils;
         this.securePasswordEncoder = securePasswordEncoder;
         this.objectMapper = objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
+    public String getValidRefreshToken() {
+        var member = insertDummyMember(generateUserId(), generatePassword());
+        return tokenUtils.generateToken(member.getUserId(), member.getNickName(), member.getAuthorities()).refreshToken();
+    }
+
+    public String getAuthToken() {
+        var member = this.insertDummyMember();
+         return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
     }
 
     public Member insertDummyMember(String userId, String password) {
@@ -55,8 +68,8 @@ public class IntegrationTestUtils {
                 .setContext(testRestTemplate, objectMapper);
     }
 
-    public String getUserToken(String userId, String nickname) {
-        return tokenUtils.generateToken(userId, nickname).accessToken();
+    public TokenHolder getUserToken(String userId, String nickname, Collection<? extends GrantedAuthority> authorities) {
+        return tokenUtils.generateToken(userId, nickname, authorities);
     }
 
     public Member insertDummyMember() {
