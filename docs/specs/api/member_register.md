@@ -23,7 +23,7 @@
 curl 명령 예시
 
   ```bash
-  curl -i -X POST 'http://localhost:8080/api/members' \
+  curl -i -X POST 'http://localhost:8080/api/member' \
   -H 'Content-Type: application/json' \
   -d '{
       "nickName": "test",

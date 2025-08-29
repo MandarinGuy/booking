@@ -20,7 +20,7 @@
 
     ```bash
       curl -i -X POST 'http://localhost:8080/api/movie' \
-      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU1ODQ3MzY1LCJleHAiOjE3NTU4NDc5NjV9.qivq2xlrm8me6P0oSwFLfieubmtoUB44NTSp2idDRRLG2wWE4S_4nNMJyEbEwjwaxfHpYQdzOTw0uscvNJCoKQ' \
+      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9ESVNUUklCVVRPUiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU2NDM4MjIzLCJleHAiOjE3NTY0Mzg4MjN9.DN0wZb8BdKY-7Grd0KAALXf88KX3iF_tg6UmcfotkFOlbRoRnSuY1nNVUFfZk2TxP0hvju3A8AglK3mt_hnutQ' \
       -H 'Content-Type: application/json' \
       -d '{
         "title": "인셉션",
@@ -28,10 +28,10 @@
         "runtimeMinutes": 148,
         "genre": "SF",
         "releaseDate": "2010-07-21",
-        "rating": "12세 관람가",
+        "rating": "AGE12",
         "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
         "posterUrl": "https://example.com/posters/inception.jpg",
-        "cast": [
+        "casts": [
           "레오나르도 디카프리오",
           "조셉 고든레빗",
           "엘렌 페이지"
