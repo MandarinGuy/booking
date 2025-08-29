@@ -106,6 +106,23 @@ class JwtFilterTest {
         assertThat(response.getData()).isEqualTo("Access Denied");
     }
 
+    @Test
+    void blankTokenWillFailToAuth(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var accessToken = "Bearer ";
+
+        // Act
+        var response = testUtils.get("/test/with-auth")
+                .withHeader("Authorization", accessToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+        assertThat(response.getData()).isEqualTo("토큰이 비어있습니다.");
+    }
+
     @RestController
     @RequestMapping("/test")
     static class TestAuthController {

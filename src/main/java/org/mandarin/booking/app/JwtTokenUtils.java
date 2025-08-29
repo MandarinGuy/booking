@@ -104,8 +104,6 @@ public class JwtTokenUtils implements TokenUtils {
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token);
-        } catch (IllegalArgumentException e) {
-            throw new AuthException("토큰이 비어있습니다.");
         } catch (JwtException e) {
             throw new AuthException("토큰 검증에 실패했습니다.");
         }

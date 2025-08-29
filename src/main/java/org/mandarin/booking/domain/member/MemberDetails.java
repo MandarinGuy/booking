@@ -1,9 +1,11 @@
 package org.mandarin.booking.domain.member;
 
 import java.util.Collection;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Getter
 public class MemberDetails implements UserDetails {
     private final String userId;
     private final String password;
@@ -20,16 +22,6 @@ public class MemberDetails implements UserDetails {
         String password = member.getPasswordHash();
         Collection<MemberAuthority> authorities = member.getAuthorities();
         return new MemberDetails(userId, password, authorities);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
     }
 
     @Override

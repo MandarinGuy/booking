@@ -23,8 +23,15 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         var exception = (Exception)(request.getAttribute("exception"));
-        var message = exception != null ? exception.getMessage() : authException.getMessage();
+        var message = getMessage(authException, exception);
         var errorResponse = new ErrorResponse(ApiStatus.UNAUTHORIZED, message);
         objectMapper.writeValue(response.getWriter(), errorResponse);
+    }
+
+    private String getMessage(AuthenticationException authException, Exception exception) {
+        if (exception != null) {
+            return exception.getMessage();
+        }
+        return authException.getMessage();
     }
 }
