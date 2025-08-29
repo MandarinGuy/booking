@@ -36,10 +36,10 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/member").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/reissue").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/movies").hasAuthority("ROLE_DISTRIBUTOR")
+                        .requestMatchers(HttpMethod.POST, "/api/movie").hasAuthority("ROLE_DISTRIBUTOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

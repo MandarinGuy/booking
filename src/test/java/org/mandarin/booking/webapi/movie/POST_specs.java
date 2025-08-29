@@ -18,7 +18,7 @@ import org.mandarin.booking.domain.movie.MovieRegisterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-@DisplayName("POST /api/movies")
+@DisplayName("POST /api/movie")
 public class POST_specs {
 
     @Test
@@ -32,7 +32,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         request
                 )
                 .withHeader("Authorization", authToken)
@@ -51,7 +51,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         request
                 )
                 .assertFailure();
@@ -71,7 +71,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         request
                 )
                 .withHeader("Authorization", authToken)
@@ -90,7 +90,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         generateMovieRegisterRequest("영화 제목", "감독 이름", -1, "SF", "2010-07-21", "AGE12")
                 )
                 .withHeader("Authorization", authToken)
@@ -113,7 +113,7 @@ public class POST_specs {
         
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         request
                 )
                 .withHeader("Authorization", authToken)
@@ -133,7 +133,7 @@ public class POST_specs {
         
         // Act
         var response = testUtils.post(
-                        "/api/movies",
+                        "/api/movie",
                         request
                 )
                 .withHeader("Authorization", authToken)

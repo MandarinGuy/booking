@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 @IntegrationTest
-@DisplayName("POST /api/members")
+@DisplayName("POST /api/member")
 public class POST_specs {
 
     @Test
@@ -33,7 +33,7 @@ public class POST_specs {
 
         // Act
         var response = testRestTemplate.postForEntity(
-                "/api/members",
+                "/api/member",
                 request,
                 Void.class
         );
@@ -52,7 +52,7 @@ public class POST_specs {
 
         // Act
         testRestTemplate.postForEntity(
-                "/api/members",
+                "/api/member",
                 request,
                 Void.class
         );
@@ -77,7 +77,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         request
                 )
                 .assertFailure();
@@ -106,14 +106,14 @@ public class POST_specs {
         );
 
         testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         existingRequest
                 )
                 .assertSuccess(MemberRegisterResponse.class);
 
         // Act
         var response = testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         request
                 )
                 .assertFailure();
@@ -135,7 +135,7 @@ public class POST_specs {
                 email
         );
         testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         existingRequest
                 )
                 .assertSuccess(MemberRegisterResponse.class);
@@ -149,7 +149,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         request
                 )
                 .assertFailure();
@@ -179,7 +179,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         request
                 )
                 .assertFailure();
@@ -205,7 +205,7 @@ public class POST_specs {
 
         // Act
         var res = testRestTemplate.postForEntity(
-                "/api/members",
+                "/api/member",
                 request,
                 Void.class
         );
@@ -226,7 +226,7 @@ public class POST_specs {
 
         // Act
         var response = testUtils.post(
-                        "/api/members",
+                        "/api/member",
                         request
                 )
                 .assertSuccess(MemberRegisterResponse.class);
