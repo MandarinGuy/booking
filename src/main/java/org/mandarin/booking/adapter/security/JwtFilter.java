@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mandarin.booking.app.TokenUtils;
@@ -30,10 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             try {
                 var userId = tokenUtils.getClaim(token, "userId");
-                var roles = tokenUtils.getClaims(token, "roles");
-                var authorities = roles.stream()
-                        .map(r -> r.substring(5)) // "ROLE_" 접두사 제거
-                        .map(MemberAuthority::valueOf).toList();
+                var authorities = getAuthorities(token);
                 var authToken = new CustomMemberAuthenticationToken(userId, authorities);
 
                 var authenticate = authenticationManager.authenticate(authToken);
@@ -50,6 +48,13 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private List<MemberAuthority> getAuthorities(String token) {
+        var roles = tokenUtils.getClaims(token, "roles");
+        return roles.stream()
+                .map(r -> r.substring(5)) // "ROLE_" 접두사 제거
+                .map(MemberAuthority::valueOf).toList();
     }
 
     private boolean isBearer(String header) {

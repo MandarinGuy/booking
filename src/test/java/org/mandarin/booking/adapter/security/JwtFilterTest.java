@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController;
-import org.mandarin.booking.adapter.security.JwtFilterTest.TestSecurityConfig;
+import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController.TestSecurityConfig;
 import org.mandarin.booking.app.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -89,9 +89,9 @@ class JwtFilterTest {
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
         assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
     }
-    
+
     @Test
-    void lackOfAuthorityMustReturnAccessDenied(@Autowired IntegrationTestUtils testUtils){
+    void lackOfAuthorityMustReturnAccessDenied(@Autowired IntegrationTestUtils testUtils) {
         // Arrange
         var member = testUtils.insertDummyMember("dummy", "dummy", List.of());
         var accessToken = testUtils.getAuthToken(member);
@@ -100,7 +100,7 @@ class JwtFilterTest {
         var response = testUtils.get("/test/with-user-role")
                 .withHeader("Authorization", accessToken)
                 .assertFailure();
-        
+
         // Assert
         assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
         assertThat(response.getData()).isEqualTo("Access Denied");
@@ -123,35 +123,36 @@ class JwtFilterTest {
         public String pingWithUserRole() {
             return WITH_USER_ROLE;
         }
-    }
-    @TestConfiguration
-    @EnableMethodSecurity
-    @Order(0)
-    static class TestSecurityConfig {
 
-        @Bean
-        SecurityFilterChain testOnlyEndpoints(
-                HttpSecurity http,
-                AuthenticationEntryPoint authenticationEntryPoint,
-                AccessDeniedHandler accessDeniedHandler, TokenUtils tokenUtils,
-                AuthenticationProvider authenticationProvider) throws Exception {
-            http
-                    .securityMatcher("/test/**")
-                    .authorizeHttpRequests(a -> a
-                            .requestMatchers("/test/without-auth").permitAll()
-                            .requestMatchers("/test/with-auth").authenticated()
-                            .requestMatchers("/test/with-user-role").hasAuthority("USER")
-                    )
-                    .formLogin(AbstractHttpConfigurer::disable)
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .exceptionHandling(ex -> ex
-                            .authenticationEntryPoint(authenticationEntryPoint)
-                            .accessDeniedHandler(accessDeniedHandler))
-                    .addFilterBefore(new JwtFilter(tokenUtils, authenticationProvider::authenticate),
-                            UsernamePasswordAuthenticationFilter.class);
-            return http.build();
+        @TestConfiguration
+        @EnableMethodSecurity
+        static class TestSecurityConfig {
+
+            @Bean
+            @Order(0)
+            SecurityFilterChain testOnlyEndpoints(
+                    HttpSecurity http,
+                    AuthenticationEntryPoint authenticationEntryPoint,
+                    AccessDeniedHandler accessDeniedHandler, TokenUtils tokenUtils,
+                    AuthenticationProvider authenticationProvider) throws Exception {
+                http
+                        .securityMatcher("/test/**")
+                        .authorizeHttpRequests(a -> a
+                                .requestMatchers("/test/without-auth").permitAll()
+                                .requestMatchers("/test/with-auth").authenticated()
+                                .requestMatchers("/test/with-user-role").hasAuthority("USER")
+                        )
+                        .formLogin(AbstractHttpConfigurer::disable)
+                        .csrf(AbstractHttpConfigurer::disable)
+                        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .exceptionHandling(ex -> ex
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler))
+                        .addFilterBefore(new JwtFilter(tokenUtils, authenticationProvider::authenticate),
+                                UsernamePasswordAuthenticationFilter.class);
+                return http.build();
+            }
         }
-    }
 
+    }
 }

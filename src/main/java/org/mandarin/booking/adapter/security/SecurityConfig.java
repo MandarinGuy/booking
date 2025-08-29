@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.TokenUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,12 +27,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+    @Order(1)
+    public SecurityFilterChain apiChain(HttpSecurity http,
                                                    AuthenticationProvider authenticationProvider,
                                                    AuthenticationEntryPoint authenticationEntryPoint,
                                                    AccessDeniedHandler accessDeniedHandler)
             throws Exception {
         http
+                .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
@@ -47,6 +50,22 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(new JwtFilter(tokenUtils, authenticationProvider::authenticate),
                         UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error", "/assets/**", "/favicon.ico").permitAll()
+                        .anyRequest().permitAll()
+                )
+                .securityContext(AbstractHttpConfigurer::disable)
+                .sessionManagement(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable);
+
         return http.build();
     }
 }
