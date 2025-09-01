@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class MovieCommandRepository {
-    private final MovieJpaRepository jpaRepository;
+    private final MovieRepository jpaRepository;
 
     public Movie insert(Movie movie){
         return jpaRepository.save(movie);

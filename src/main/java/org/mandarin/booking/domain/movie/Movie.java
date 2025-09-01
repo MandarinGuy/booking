@@ -10,9 +10,14 @@ import jakarta.persistence.JoinColumn;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Movie extends AbstractEntity {
     private String title;
 
@@ -23,10 +28,10 @@ public class Movie extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
+    private LocalDate releaseDate;
+
     @Enumerated(EnumType.STRING)
     private Rating rating;
-
-    private LocalDate releaseDate;
 
     private String synopsis;
 
@@ -38,33 +43,9 @@ public class Movie extends AbstractEntity {
     @Column(name = "actor_name")
     private Set<String> casts = new HashSet<>();
 
-    protected Movie() {
-    }
-
-    private Movie(String title,
-                  String director,
-                  Integer runtimeMinutes,
-                  Genre genre,
-                  LocalDate releaseDate,
-                  Rating rating,
-                  String synopsis,
-                  String posterUrl,
-                  Set<String> casts) {
-
-        this.title = title;
-        this.director = director;
-        this.runtimeMinutes = runtimeMinutes;
-        this.genre = genre;
-        this.releaseDate = releaseDate;
-        this.rating = rating;
-        this.synopsis = synopsis;
-        this.posterUrl = posterUrl;
-        this.casts.addAll(casts);
-    }
-
     public static Movie create(MovieCreateCommand command) {
         return new Movie(command.getTitle(), command.getDirector(), command.getRuntimeMinutes(), command.getGenre(),
-                command.getReleaseDate(), command.getRating(), command.getSynopsis(), command.getPosterUrl(), command.getCast());
+                command.getReleaseDate(), command.getRating(), command.getSynopsis(), command.getPosterUrl(), command.getCasts());
     }
 
     public enum Genre {

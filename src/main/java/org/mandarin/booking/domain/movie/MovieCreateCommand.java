@@ -17,10 +17,10 @@ public class MovieCreateCommand {
     private final String posterUrl;
     private final LocalDate releaseDate;
     private final Rating rating;
-    private final Set<String> cast;
+    private final Set<String> casts;
 
     private MovieCreateCommand(String title, Genre genre, int runtimeMinutes, String director, String synopsis,
-                              String posterUrl, LocalDate releaseDate, Rating rating, Set<String> cast) {
+                              String posterUrl, LocalDate releaseDate, Rating rating, Set<String> casts) {
         this.title = title;
         this.genre = genre;
         this.runtimeMinutes = runtimeMinutes;
@@ -29,7 +29,7 @@ public class MovieCreateCommand {
         this.posterUrl = posterUrl;
         this.releaseDate = releaseDate;
         this.rating = rating;
-        this.cast = cast;
+        this.casts = casts;
     }
 
     public static MovieCreateCommand from(MovieRegisterRequest request) {

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberQueryRepository {
-    private final MemberJpaRepository jpaRepository;
+    private final MemberRepository jpaRepository;
 
     public boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
