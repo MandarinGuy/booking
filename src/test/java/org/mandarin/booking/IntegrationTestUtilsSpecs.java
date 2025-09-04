@@ -1,16 +1,15 @@
 package org.mandarin.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.infra.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.domain.member.Member;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 
 @Disabled
 @IntegrationTest
@@ -29,7 +28,7 @@ public class IntegrationTestUtilsSpecs {
 
         // Act
         var response = integrationUtils.post("/test/echo", payload)
-                .assertSuccess(new ParameterizedTypeReference<Map<String, Object>>() {});
+                .assertSuccess(new TypeReference<Map<String, Object>>() {});
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
@@ -48,9 +47,8 @@ public class IntegrationTestUtilsSpecs {
         String password = "P@ssw0rd!";
 
         // save member using utils
-        Member saved = integrationUtils.insertDummyMember(userId, password);
+        var saved = integrationUtils.insertDummyMember(userId, password);
         assertThat(saved).isNotNull();
-        assertThat(saved.getId()).isNotNull();
 
         // Act
         Map<String, String> request = Map.of("userId", userId);

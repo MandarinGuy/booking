@@ -11,8 +11,18 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: create
+  docker:
+    compose:
+      lifecycle-management: start_only
+  web.resources.add-mappings: false
 jwt:
   token:
     secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGUtc3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGU
     access: 600000
     refresh: 1800000
+
+logging:
+  level:
+    org.springframework.boot.web.servlet: INFO
+    org.springframework.security.web.FilterChainProxy: TRACE
+

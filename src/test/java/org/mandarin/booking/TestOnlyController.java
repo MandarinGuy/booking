@@ -1,7 +1,7 @@
 package org.mandarin.booking;
 
 import java.util.Map;
-import org.mandarin.booking.infra.persist.MemberQueryRepository;
+import org.mandarin.booking.app.persist.MemberQueryRepository;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
