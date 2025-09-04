@@ -15,11 +15,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ShowService implements ShowRegisterer {
     private final ShowCommandRepository commandRepository;
+    private final ShowRegisterValidator validator;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
         var command = ShowCreateCommand.from(request);
         var show = Show.create(command);
+
+        validator.checkDuplicateTitle(show.getTitle());
+
         var saved = commandRepository.insert(show);
         return new ShowRegisterResponse(requireNonNull(saved.getId()));
     }

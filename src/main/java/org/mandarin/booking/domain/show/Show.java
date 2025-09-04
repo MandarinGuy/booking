@@ -32,14 +32,21 @@ public class Show extends AbstractEntity {
     private LocalDate performanceEndDate;
 
     public static Show create(ShowCreateCommand command) {
+        var startDate = command.getPerformanceStartDate();
+        var endDate = command.getPerformanceEndDate();
+
+        if (startDate.isAfter(endDate)) {
+            throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
+        }
+
         return new Show(
                 command.getTitle(),
                 command.getType(),
                 command.getRating(),
                 command.getSynopsis(),
                 command.getPosterUrl(),
-                command.getPerformanceStartDate(),
-                command.getPerformanceEndDate()
+                startDate,
+                endDate
         );
     }
 

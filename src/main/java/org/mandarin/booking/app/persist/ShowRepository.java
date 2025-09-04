@@ -5,5 +5,7 @@ import org.springframework.data.repository.Repository;
 
 public interface ShowRepository extends Repository<Show, Long> {
     Show save(Show show);
+
+    boolean existsByTitle(String title);
 }
 
