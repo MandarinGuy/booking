@@ -8,57 +8,78 @@
 ## 도메인 모델
 
 ### 영화(Movie)
+_Aggregate Root_
 - 상영될 콘텐츠 자체.
 
 #### 속성
-- 제목(Title): 영화의 이름.
-- 감독(Director): 영화를 감독한 사람.
-- 상영시간(Runtime): 영화의 총 길이(분 단위).
-- 장르(Genre): 영화의 장르(예: 액션, 드라마, 코미디 등).
-- 개봉일(ReleaseDate): 영화가 처음 개봉한 날짜.
-- 등급(Rating): 영화의 관람 등급(예: 전체 관람가, 12세 관람가 등).
-- 줄거리(Synopsis): 영화의 간단한 줄거리 설명.
-- 포스터(Poster): 영화의 포스터 이미지 URL.
-- 주연 배우(Cast): 영화에 출연한 주요 배우 목록.
+- 제목(title)
+- 감독(director)
+- 상영시간(runtimeMinutes, 분)
+- 장르(genre: ACTION/DRAMA/COMEDY/THRILLER/ROMANCE/SF/FANTASY/HORROR/ANIMATION/DOCUMENTARY/ETC)
+- 관람등급(rating: ALL/AGE12/AGE15/AGE18)
+- 개봉일(releaseDate, yyyy-MM-dd)
+- 줄거리(synopsis)
+- 포스터 URL(posterUrl)
+- 출연 배우 목록(casts: Set<String\>)
 
 #### 행위
-- `create()`: 새로운 영화를 등록합니다.
+- `create(command: MovieCreateCommand)`: 커맨드로부터 영화를 생성합니다.
 
-### 영화관(Cinema)
-- 영화 상영 시설.
+#### 관련 타입
+- `MovieCreateCommand`: 영화 생성 커맨드
+  - title, genre, runtimeMinutes, director, synopsis, posterUrl, releaseDate, rating, casts(Set<String\>)
+- `MovieRegisterRequest` / `MovieRegisterResponse`: 웹 API 요청/응답 DTO
 
-### 상영관(ScreeningRoom)
-- 영화관 내에서 실제로 영화가 상영되는 개별 공간.
-
-### 상영정보(ScreeningSchedule)
-- 특정 영화가 특정 상영관에서 특정 날짜와 시간에 상영되는 스케줄.
-
-### 좌석(Seat)
-- 상영관 내의 개별 의자.
-
-### 예매(Reservation)
-- 사용자가 특정 상영정보의 특정 좌석의 구매를 확정한 기록.
+---
 
 ### 사용자(Member)
-- 서비스를 사용하는 사람.
+_Aggregate Root_
+- 서비스를 사용하는 사람(회원).
 
 #### 속성
-- 사용자 ID(UserId): 사용자의 고유 식별자.
-- 이름(NickName): 사용자의 이름.
-- 아이디(UserId): 사용자의 고유 아이디. - unique
-- 비밀번호(PasswordHash): 사용자의 암호화된 비밀번호.
-- Email(Email): 사용자의 이메일 주소.
+- 닉네임(nickName)
+- 아이디(userId) — unique
+- 비밀번호 해시(passwordHash)
+- 이메일(email)
+- 권한(authorities: List<MemberAuthority\>) — 기본값 USER
 
 #### 행위
-- `create()`: 새로운 영화를 등록합니다.
-- `matchesPassword()`: 영화의 비밀번호를 확인합니다.
+- `create(command: MemberCreateCommand, encoder: SecurePasswordEncoder)`: 암호화된 비밀번호로 회원을 생성합니다.
+- `matchesPassword(rawPassword, encoder)`: 주어진 평문 비밀번호가 저장된 해시와 일치하는지 확인합니다.
 
-### `MemberCreateCommand`
-- 새로운 사용자를 생성하기 위한 명령.
+#### 관련 타입
+- `MemberCreateCommand` (inner record of Member): nickName, userId, password(평문), email
+- `MemberRegisterRequest` / `MemberRegisterResponse`: 웹 API 요청/응답 DTO
+- `MemberAuthority`: USER/DISTRIBUTOR/ADMIN 권한 정의, 컨버터를 사용해 문자열 영속화, 추가적인 테이블 생성 방지
 
-#### 속성
-- 사용자 ID(UserId): 사용자의 고유 식별자.
-- 이름(NickName): 사용자의 이름.
-- 아이디(UserId): 사용자의 고유 아이디.
-- 비밀번호(PasswordHash): 사용자의 암호화된 비밀번호.
-- Email(Email): 사용자의 이메일 주소.
+---
+
+### 영화관(Cinema)
+_Aggregate Root_
+- 영화 상영 시설.
+
+---
+
+### 상영관(ScreeningRoom)
+_Entity_
+- 영화관 내에서 실제로 영화가 상영되는 개별 공간.
+
+---
+
+### 상영정보(ScreeningSchedule)
+_Entity_
+- 특정 영화가 특정 상영관에서 특정 날짜와 시간에 상영되는 스케줄.
+
+---
+### 좌석(Seat)
+_Entity_
+- 상영관 내의 개별 의자.
+
+---
+
+### 예매(Reservation)
+_Aggregate Root_
+- 사용자가 특정 상영정보의 특정 좌석의 구매를 확정한 기록.
+
+
+---
