@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.github.spotbugs' version '6.2.4'
 }
 
 group = 'org.mandarin'
@@ -49,9 +48,7 @@ dependencies {
 
     // ---- Dev Only ----
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-
-    // ---- Code Quality / Tooling ----
-    spotbugs 'com.github.spotbugs:spotbugs:4.9.3'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // ---- Testing ----
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
