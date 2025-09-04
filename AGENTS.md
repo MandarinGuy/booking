@@ -198,7 +198,7 @@ docker compose up -d
 
 - 파일/이름 규칙
   - API 스펙: `docs/specs/api/<resource>_<action>.md` 또는 엔드포인트 의미가 드러나는 snake_case 파일명 사용
-    - 근거: `docs/specs/api/login.md`, `member_register.md`, `movie_register.md`, `reissue.md`
+      - 근거: `docs/specs/api/login.md`, `member_register.md`, `show_register.md`, `reissue.md`
   - 정책 문서: `docs/specs/policy/<topic>.md`
     - 근거: `docs/specs/policy/application.md`, `authentication.md`, `authorization.md`, `test.md`
   - 도메인 설계: `docs/specs/domain.md`
@@ -208,7 +208,7 @@ docker compose up -d
   2) 요청 섹션 구성
      - 메서드, 경로, 헤더 코드블록, 본문 JSON 예시(필수 필드 포맷 포함)
      - 실행 가능한 curl 예시를 제공
-     - 근거 예시: `docs/specs/api/login.md`, `member_register.md`, `movie_register.md`, `reissue.md`
+     - 근거 예시: `docs/specs/api/login.md`, `member_register.md`, `show_register.md`, `reissue.md`
   3) 응답 섹션 구성
      - 상태코드 명시, 응답 JSON 예시 제공(필수 필드 포함)
   4) 테스트 섹션 구성
@@ -253,7 +253,7 @@ docker compose up -d
   - 실행 불가한 모호한 명령 예시 금지. 검증되지 않은 외부 의존성 언급 금지.
 
 - 예시 스니펫 스타일
-  - curl: 실제 경로/헤더/본문 포함(예: `docs/specs/api/movie_register.md`의 curl 예시)
+    - curl: 실제 경로/헤더/본문 포함(예: `docs/specs/api/show_register.md`의 curl 예시)
   - JSON: 축약하지 말고 필요한 필드를 명시, 포맷은 pretty 또는 단일 라인 일관 유지.
 
 ---

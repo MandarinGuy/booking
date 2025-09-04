@@ -133,7 +133,7 @@
   - 로그인: `docs/specs/api/login.md`
   - 회원가입: `docs/specs/api/member_register.md`
   - 토큰 재발급: `docs/specs/api/reissue.md`
-  - 영화 등록: `docs/specs/api/movie_register.md`
+  - 영화 등록: `docs/specs/api/show_register.md`
 - 체크박스는 수용 기준(acceptance criteria)로 간주하며, 누락 시 테스트 보완 또는 문서 동기화가 필요하다.
 
 ---
@@ -158,7 +158,7 @@
   - 통합 테스트: 시나리오 중심 폴더 구조 사용 가능
     - 예시)
       - POST `/api/auth/login`: `src/test/java/org/mandarin/booking/webapi/auth/login/POST_specs.java`
-      - GET `/api/movies`: `src/test/java/org/mandarin/booking/webapi/movies/GET_specs.java` 
+      - GET `/api/show`: `src/test/java/org/mandarin/booking/webapi/show/GET_specs.java`
   - 아키텍처 테스트: `arch/*`
 
 ---

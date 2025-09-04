@@ -1,7 +1,7 @@
 ### 요청
 
 - 메서드: `POST`
-- 경로: `/api/movies`
+- 경로: `/api/show`
 - 헤더
 
     ```
@@ -19,7 +19,7 @@
 - curl 명령 예시
 
     ```bash
-      curl -i -X POST 'http://localhost:8080/api/movie' \
+      curl -i -X POST 'http://localhost:8080/api/show' \
       -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9ESVNUUklCVVRPUiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU2NDM4MjIzLCJleHAiOjE3NTY0Mzg4MjN9.DN0wZb8BdKY-7Grd0KAALXf88KX3iF_tg6UmcfotkFOlbRoRnSuY1nNVUFfZk2TxP0hvju3A8AglK3mt_hnutQ' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -48,7 +48,7 @@
     {
         "status": "SUCCESS",
         "data": {
-            "movieId": 1
+            "showId": 1
         },
         "timestamp": "2024-06-10T12:34:56.789Z"
     }
@@ -57,7 +57,7 @@
 ### 테스트
 
 - [x] 올바른 요청을 보내면 status가 SUCCESS이다
-- [ ] 올바른 요청을 보내면 응답 본문에 movieId가 존재한다
+- [ ] 올바른 요청을 보내면 응답 본문에 showId가 존재한다
 - [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다 
 - [x] title, director, runtimeMinutes, genre, releaseDate, rating이 비어있으면 BAD_REQUEST이다
 - [x] runtimeMinutes은 0 미만이면 BAD_REQUEST이다

@@ -63,7 +63,7 @@
 ## 5. 패키지 구조 규칙
 
 - domain: `org.mandarin.booking.domain.{boundedContext}`
-  - 예: `domain.member`, `domain.movie`
+    - 예: `domain.member`, `domain.show`
 - app: `org.mandarin.booking.app`
   - 하위: `port`, `persist`(출력 포트/구현), 서비스 클래스
 - adapter: `org.mandarin.booking.adapter.{webapi|security|...}`
@@ -78,8 +78,8 @@
 
 예시(영화 등록):
 - `adapter/webapi/MovieController` -> `app/port/MovieRegisterer` 호출
-- `domain.movie.MovieRegisterRequest`/`MovieCreateCommand` 사용하여 유스케이스 실행
-- 결과를 `domain.movie.MovieRegisterResponse` 받아 web 응답으로 래핑(`ApiResponse`)
+- `domain.show.MovieRegisterRequest`/`MovieCreateCommand` 사용하여 유스케이스 실행
+- 결과를 `domain.show.MovieRegisterResponse` 받아 web 응답으로 래핑(`ApiResponse`)
 
 ## 7. 영속성 규칙(JPA)
 

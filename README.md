@@ -73,8 +73,7 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 ## 7. 보안 개요
 - 필터 기반 JWT 인증: `JwtFilter`가 Authorization `Bearer <token>`을 파싱해 SecurityContext 설정.
 - 경로별 권한: `SecurityConfig`의 `@Order(1) apiChain`
-  - 공개: `POST /api/member`, `/api/auth/login`, `/api/auth/reissue`
-  - 권한 필요: `POST /api/movie`는 `ROLE_DISTRIBUTOR`
+    - 차후 추가 작성
 - 예외 처리: `CustomAuthenticationEntryPoint`, `CustomAccessDeniedHandler`
 
 근거: `src/main/java/org/mandarin/booking/adapter/security/*`
@@ -97,7 +96,7 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 - 로그인: [docs/specs/api/login.md](docs/specs/api/login.md)
 - 회원 가입: [docs/specs/api/member_register.md](docs/specs/api/member_register.md)
 - 토큰 재발급: [docs/specs/api/reissue.md](docs/specs/api/reissue.md)
-- 영화 등록: [docs/specs/api/movie_register.md](docs/specs/api/movie_register.md)
+- 영화 등록: [docs/specs/api/show_register.md](docs/specs/api/show_register.md)
 
 각 문서 하단의 테스트 체크리스트가 수용 기준입니다.
 
