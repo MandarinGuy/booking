@@ -161,6 +161,35 @@ public class POST_specs {
 
     }
 
+    @Test
+    void 중복된_제목의_공연을_등록하면_INTERNAL_SERVER_ERROR가_발생한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var request = validShowRegisterRequest();
+        testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withHeader("Authorization", authToken)
+                .assertSuccess(ShowRegisterResponse.class);
+
+        var duplicateTitleRequest = validShowRegisterRequest(request.title());
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        duplicateTitleRequest
+                )
+                .withHeader("Authorization", authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
+        assertThat(response.getData()).contains("이미 존재하는 공연 이름입니다:");
+    }
+
     static List<?> nullOrBlankElementRequests() {
         return List.of(
                 new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
@@ -183,6 +212,18 @@ public class POST_specs {
     private ShowRegisterRequest validShowRegisterRequest() {
         return new ShowRegisterRequest(
                 UUID.randomUUID().toString().substring(0, 10),
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        );
+    }
+
+    private ShowRegisterRequest validShowRegisterRequest(String title) {
+        return new ShowRegisterRequest(
+                title,
                 "MUSICAL",
                 "AGE12",
                 "공연 줄거리",
