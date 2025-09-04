@@ -26,11 +26,11 @@ public record ShowRegisterRequest(
         @NotBlank(message = "posterUrl is required")
         String posterUrl,
 
-        @NotNull(message = "performanceStartDate is required")
-        @FutureOrPresent(message = "performanceStartDate must be today or future")
+        @NotNull(message = "performance start date is required")
+        @FutureOrPresent(message = "performance start date must be today or future")
         LocalDate performanceStartDate,
 
-        @NotNull(message = "performanceEndDate is required")
+        @NotNull(message = "performance end date is required")
         LocalDate performanceEndDate
 ) {
 }
