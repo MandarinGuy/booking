@@ -9,6 +9,7 @@ import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -130,37 +131,6 @@ public class POST_specs {
         assertThat(response.getData().showId()).isNotNull();
     }
 
-    static List<?> nullOrBlankElementRequests() {
-        return List.of(
-                new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg", LocalDate.now(),
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg", null,
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), null)
-        );
-    }
-
-    private static ShowRegisterRequest validShowRegisterRequest() {
-        return new ShowRegisterRequest(
-                "공연 제목",
-                "MUSICAL",
-                "AGE12",
-                "공연 줄거리",
-                "https://example.com/poster.jpg",
-                LocalDate.now(),
-                LocalDate.now().plusDays(30)
-        );
-    }
-
     @Test
     void 공연_시작일은_공연_종료일_이후면_INTERNAL_SERVER_ERROR이다(
             @Autowired IntegrationTestUtils testUtils
@@ -189,6 +159,37 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
         assertThat(response.getData()).isEqualTo("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
 
+    }
+
+    static List<?> nullOrBlankElementRequests() {
+        return List.of(
+                new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg", LocalDate.now(),
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg", null,
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), null)
+        );
+    }
+
+    private ShowRegisterRequest validShowRegisterRequest() {
+        return new ShowRegisterRequest(
+                UUID.randomUUID().toString().substring(0, 10),
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        );
     }
 }
 
