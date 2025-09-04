@@ -1,17 +1,18 @@
 package org.mandarin.booking.app.persist;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.domain.movie.Movie;
+import org.mandarin.booking.domain.show.Show;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class MovieCommandRepository {
-    private final MovieRepository jpaRepository;
+public class ShowCommandRepository {
+    private final ShowRepository jpaRepository;
 
-    public Movie insert(Movie movie){
-        return jpaRepository.save(movie);
+    public Show insert(Show show) {
+        return jpaRepository.save(show);
     }
 }
+
