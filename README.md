@@ -1,13 +1,13 @@
-# booking — 영화 예매 시스템 (개요 중심 README)
-
-이 문서는 프로젝트를 어떻게 실행하는지보다는, 이 프로젝트가 무엇인지, 어떤 구성과 아키텍처를 가지는지, 어떤 기술을 왜 선택했는지, 그리고 어떤 방식으로 개발하는지를 설명합니다. 모든 주장은 저장소 내 문서/코드에 대한 링크로 근거를 제시합니다.
+# booking — 공연 예매 시스템 (개요 중심 README)
 
 - 저장소 루트: 단일 모듈(Spring Boot) 프로젝트
 
 ---
 
 ## 1. 프로젝트 소개
-영화 예매(Booking) 도메인을 다루는 학습 목적의 Spring Boot 애플리케이션입니다. 헥사고날 아키텍처(Ports & Adapters)를 채택하여 도메인 규칙을 프레임워크로부터 분리하고, 보안/웹/영속성 같은 어댑터 계층을 통해 외부 세계와 상호작용합니다.
+
+공연 예매(Booking) 도메인을 다루는 학습 목적의 Spring Boot 애플리케이션입니다. 헥사고날 아키텍처(Ports & Adapters)를 채택하여 도메인 규칙을 프레임워크로부터 분리하고, 보안/웹/영속성
+같은 어댑터 계층을 통해 외부 세계와 상호작용합니다.
 
 - 도메인 개요: [docs/specs/domain.md](docs/specs/domain.md)
 - 아키텍처/개발 규칙: [docs/specs/policy/application.md](docs/specs/policy/application.md)
@@ -41,7 +41,8 @@
 ---
 
 ## 4. 도메인 모델 요약
-- Movie (Aggregate Root): 제목, 감독, 장르, 상영시간, 개봉일, 등급, 줄거리, 포스터URL, 출연진 등. 팩토리/커맨드 기반 생성.
+
+- Show (Aggregate Root): 제목, 감독, 장르, 상영시간, 개봉일, 등급, 줄거리, 포스터URL, 출연진 등. 팩토리/커맨드 기반 생성.
 - Member (Aggregate Root): 닉네임, userId, email, passwordHash, 권한 목록. 비밀번호 해시 일치 검증.
 
 자세한 속성과 규칙: [docs/specs/domain.md](docs/specs/domain.md)
@@ -73,8 +74,7 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 ## 7. 보안 개요
 - 필터 기반 JWT 인증: `JwtFilter`가 Authorization `Bearer <token>`을 파싱해 SecurityContext 설정.
 - 경로별 권한: `SecurityConfig`의 `@Order(1) apiChain`
-  - 공개: `POST /api/member`, `/api/auth/login`, `/api/auth/reissue`
-  - 권한 필요: `POST /api/movie`는 `ROLE_DISTRIBUTOR`
+    - 차후 추가 작성
 - 예외 처리: `CustomAuthenticationEntryPoint`, `CustomAccessDeniedHandler`
 
 근거: `src/main/java/org/mandarin/booking/adapter/security/*`
@@ -97,7 +97,7 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 - 로그인: [docs/specs/api/login.md](docs/specs/api/login.md)
 - 회원 가입: [docs/specs/api/member_register.md](docs/specs/api/member_register.md)
 - 토큰 재발급: [docs/specs/api/reissue.md](docs/specs/api/reissue.md)
-- 영화 등록: [docs/specs/api/movie_register.md](docs/specs/api/movie_register.md)
+- 공연 등록: [docs/specs/api/show_register.md](docs/specs/api/show_register.md)
 
 각 문서 하단의 테스트 체크리스트가 수용 기준입니다.
 

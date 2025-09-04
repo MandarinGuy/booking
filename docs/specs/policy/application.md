@@ -45,7 +45,7 @@
 
 권장 네이밍:
 - 입력 포트: UseCase 동사형 + er (예: Registerer, UseCase)
-- 출력 포트: 리소스 + 동작 + Repository/Gateway (예: MovieCommandRepository)
+- 출력 포트: 리소스 + 동작 + Repository/Gateway (예: ShowCommandRepository)
 - 그 외에는 해당 인터페이스가 담당한 기능의 추상적 개념을 나타내는 네이밍
 
 ## 4. 트랜잭션/검증/예외/로깅 규칙
@@ -63,7 +63,7 @@
 ## 5. 패키지 구조 규칙
 
 - domain: `org.mandarin.booking.domain.{boundedContext}`
-  - 예: `domain.member`, `domain.movie`
+    - 예: `domain.member`, `domain.show`
 - app: `org.mandarin.booking.app`
   - 하위: `port`, `persist`(출력 포트/구현), 서비스 클래스
 - adapter: `org.mandarin.booking.adapter.{webapi|security|...}`
@@ -76,10 +76,11 @@
 - 유스케이스 반환값 -> web DTO로 매핑하여 응답한다.
 - 컨트롤러에서 비즈니스 로직/트랜잭션 처리 금지.
 
-예시(영화 등록):
-- `adapter/webapi/MovieController` -> `app/port/MovieRegisterer` 호출
-- `domain.movie.MovieRegisterRequest`/`MovieCreateCommand` 사용하여 유스케이스 실행
-- 결과를 `domain.movie.MovieRegisterResponse` 받아 web 응답으로 래핑(`ApiResponse`)
+예시(공연 등록):
+
+- `adapter/webapi/ShowController` -> `app/port/ShowRegisterer` 호출
+- `domain.show.ShowRegisterRequest`/`ShowCreateCommand` 사용하여 유스케이스 실행
+- 결과를 `domain.show.ShowRegisterResponse` 받아 web 응답으로 래핑(`ApiResponse`)
 
 ## 7. 영속성 규칙(JPA)
 
@@ -103,17 +104,18 @@
 
 ## 10. 확장 가이드(새 유스케이스/어댑터 추가)
 
-새 유스케이스(예: 영화 수정) 추가 절차:
-1) domain에 필요한 모델/명세 정의(예: `MovieUpdateCommand`).
-2) app/port에 입력 포트 정의(예: `MovieUpdater`).
-3) app에 서비스 구현(`MovieService` 내 메서드 또는 별도 서비스) 및 트랜잭션/검증 구현.
+새 유스케이스(예: 공연 수정) 추가 절차:
+
+1) domain에 필요한 모델/명세 정의(예: `ShowUpdateCommand`).
+2) app/port에 입력 포트 정의(예: `ShowUpdater`).
+3) app에 서비스 구현(`ShowService` 내 메서드 또는 별도 서비스) 및 트랜잭션/검증 구현.
 4) 필요 시 출력 포트 정의 및 어댑터 구현(persist/JPA 등).
 5) adapter/webapi에 컨트롤러 엔드포인트 추가 및 DTO 매핑.
 6) 아키텍처/통합 테스트 통과 확인.
 
 새 어댑터(예: 외부 결제 API) 추가 절차:
 1) app에 출력 포트 인터페이스 추가(예: `PaymentGateway`).
-2) adapter 하위에 구현(예: `adapter/payment/PaymentGatewayHttpClient`).
+2) adapter 하위에 구현(예: `adapter/external/PaymentGatewayHttpClient`).
 3) 구성(Security/Config)과 예외 매핑 추가.
 
 ## 11. 공통 규칙 요약(Do/Don’t)
@@ -131,7 +133,7 @@ Don’t
 
 ## 12. 용어
 
-- 도메인 모델: 비즈니스 개념을 표현하는 순수 객체(`Member`, `Movie` 등)
+- 도메인 모델: 비즈니스 개념을 표현하는 순수 객체(`Member`, `Show` 등)
 - 유스케이스: 시스템이 제공하는 기능 단위(등록, 로그인 등)
 - 포트: 유스케이스(입력) 또는 외부 의존(출력)을 추상화한 인터페이스
 - 어댑터: 포트를 구현하여 외부 세계와 연결하는 기술 계층

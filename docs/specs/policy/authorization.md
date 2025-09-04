@@ -25,7 +25,7 @@
   - `POST /api/auth/reissue`
 
 - 권한 필요(hasAuthority):
-  - `POST /api/movie` → `ROLE_DISTRIBUTOR`
+    - `POST /api/show` → `ROLE_DISTRIBUTOR`
 
 - 그 외 `/api/**`:
   - `anyRequest().authenticated()` → 유효한 JWT 필요(특정 권한 제한 없음). 컨트롤러/도메인 단에서 별도 검증이 필요한 경우 추가 로직으로 보완.
@@ -38,7 +38,7 @@
 - `.requestMatchers(HttpMethod.POST, "/api/member").permitAll()`
 - `.requestMatchers("/api/auth/login").permitAll()`
 - `.requestMatchers("/api/auth/reissue").permitAll()`
-- `.requestMatchers(HttpMethod.POST, "/api/movie").hasAuthority("ROLE_DISTRIBUTOR")`
+- `.requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_DISTRIBUTOR")`
 - `.anyRequest().authenticated()`
 
 ---
@@ -61,7 +61,7 @@
 ## 5. 확장 가이드(인가 규칙 추가 방법)
 - 새로운 엔드포인트 추가 시 규칙 예시:
   - 공개 엔드포인트(회원가입/로그인 유사): `.requestMatchers(HttpMethod.POST, "/api/xxx").permitAll()`
-  - 역할 제한 엔드포인트: `.requestMatchers(HttpMethod.PUT, "/api/movies/{id}").hasAuthority("ROLE_ADMIN")`
+  - 역할 제한 엔드포인트: `.requestMatchers(HttpMethod.PUT, "/api/show/{id}").hasAuthority("ROLE_ADMIN")`
   - 복수 권한 허용: `.requestMatchers(HttpMethod.POST, "/api/screening").hasAnyAuthority("ROLE_DISTRIBUTOR", "ROLE_ADMIN")`
 - 규칙 배치 위치: `SecurityConfig.apiChain`의 `authorizeHttpRequests` 빌더에 메서드/경로/권한을 추가합니다.
 - 테스트: 추가/변경 시 반드시 보안 통합 테스트를 작성하여 401/403, 성공 경로를 검증하십시오. (예: `adapter/security/*Test.java`, `webapi/**` 스펙 테스트)
