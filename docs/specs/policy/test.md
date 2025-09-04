@@ -133,7 +133,7 @@
   - 로그인: `docs/specs/api/login.md`
   - 회원가입: `docs/specs/api/member_register.md`
   - 토큰 재발급: `docs/specs/api/reissue.md`
-  - 영화 등록: `docs/specs/api/show_register.md`
+  - 공연 등록: `docs/specs/api/show_register.md`
 - 체크박스는 수용 기준(acceptance criteria)로 간주하며, 누락 시 테스트 보완 또는 문서 동기화가 필요하다.
 
 ---
