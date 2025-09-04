@@ -2,7 +2,8 @@
 name: Bug Fix
 about: Suggest an idea for this project
 title: "[BUG] "
-
+labels: ''
+assignees: ''
 
 ---
 
