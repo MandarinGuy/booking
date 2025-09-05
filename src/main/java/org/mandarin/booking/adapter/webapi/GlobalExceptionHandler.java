@@ -2,7 +2,6 @@ package org.mandarin.booking.adapter.webapi;
 
 import static java.util.Objects.requireNonNull;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
@@ -18,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     public ErrorResponse handleJsonParseError(DomainException ex) {
-        return new ErrorResponse(INTERNAL_SERVER_ERROR, ex.getMessage());
+        return new ErrorResponse(ex.getStatus(), ex.getMessage());
     }
 
     @ExceptionHandler(AuthException.class)

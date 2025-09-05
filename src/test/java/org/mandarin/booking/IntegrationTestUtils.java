@@ -7,19 +7,26 @@ import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generat
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import org.mandarin.booking.app.TokenUtils;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
+import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.MemberAuthority;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.domain.member.TokenHolder;
+import org.mandarin.booking.domain.show.Show;
+import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
+import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public record IntegrationTestUtils(MemberCommandRepository memberRepository,
+                                   ShowCommandRepository showRepository,
                                    TokenUtils tokenUtils,
                                    SecurePasswordEncoder securePasswordEncoder,
                                    ObjectMapper objectMapper,
@@ -90,6 +97,22 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
 
     public Member insertDummyMember() {
         return this.insertDummyMember(generateUserId(), generatePassword());
+    }
+
+    public Show insertDummyShow() {
+        var command = ShowCreateCommand.from(
+                new ShowRegisterRequest(
+                        UUID.randomUUID().toString().substring(0, 5),
+                        "MUSICAL",
+                        "AGE12",
+                        "synopsis",
+                        "https://example.com/poster.jpg",
+                        LocalDate.of(2025, 9, 10),
+                        LocalDate.of(2025, 12, 31)
+                )
+        );
+        var show = Show.create(command);
+        return showRepository.insert(show);
     }
 
     public String getAuthToken(MemberAuthority... memberAuthority) {

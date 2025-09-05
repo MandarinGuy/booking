@@ -45,13 +45,11 @@
 
     ```json
     {
-      "scheduleId": 100,
       "showId": 1,
       "hallId": 10,
       "startAt": "2025-09-10T19:00:00",
       "endAt": "2025-09-10T21:30:00",
-      "runtimeMinutes": 150,
-      "createdAt": "2025-09-05T11:20:00"
+      "runtimeMinutes": 150
     }
     ```
 
