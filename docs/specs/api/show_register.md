@@ -12,7 +12,15 @@
 - 본문
 
     ```json
-    
+    {
+        "title": "인셉션",
+        "type": "MUSICAL",
+        "rating": "AGE12",
+        "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
+        "posterUrl": "https://example.com/posters/inception.jpg",
+        "performanceStartDate": "2024-07-01",
+        "performanceEndDate": "2024-07-31"
+    }
     ```
 
 
@@ -23,20 +31,14 @@
       -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9ESVNUUklCVVRPUiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU2NDM4MjIzLCJleHAiOjE3NTY0Mzg4MjN9.DN0wZb8BdKY-7Grd0KAALXf88KX3iF_tg6UmcfotkFOlbRoRnSuY1nNVUFfZk2TxP0hvju3A8AglK3mt_hnutQ' \
       -H 'Content-Type: application/json' \
       -d '{
-        "title": "인셉션",
-        "director": "크리스토퍼 놀란",
-        "runtimeMinutes": 148,
-        "genre": "SF",
-        "releaseDate": "2010-07-21",
-        "rating": "AGE12",
-        "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
-        "posterUrl": "https://example.com/posters/inception.jpg",
-        "casts": [
-          "레오나르도 디카프리오",
-          "조셉 고든레빗",
-          "엘렌 페이지"
-        ]
-      }'
+            "title": "인셉션",
+            "type": "MUSICAL",
+            "rating": "AGE12",
+            "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
+            "posterUrl": "https://example.com/posters/inception.jpg",
+            "performanceStartDate": "2024-07-01",
+            "performanceEndDate": "2024-07-31"
+          }'
     ```
 
 ### 응답
@@ -57,8 +59,9 @@
 ### 테스트
 
 - [x] 올바른 요청을 보내면 status가 SUCCESS이다
-- [ ] 올바른 요청을 보내면 응답 본문에 showId가 존재한다
-- [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다 
+- [x] Authorization 헤더에 유효한 accessToken이 없으면 status가 UNAUTHORIZED이다
 - [x] title, director, runtimeMinutes, genre, releaseDate, rating이 비어있으면 BAD_REQUEST이다
-- [x] runtimeMinutes은 0 미만이면 BAD_REQUEST이다
-- [x] releaseDate는 yyyy-MM-dd 형태를 준수하지 않으면 BAD_REQUEST이다
+- [x] 허용되지 않은 타입이면 BAD_REQUEST이다
+- [x] 올바른 요청을 보내면 응답 본문에 showId가 존재한다
+- [x] 공연 시작일은 공연 종료일 이후면 INTERNAL_SERVER_ERROR이다
+- [x] 중복된 제목의 공연을 등록하면 INTERNAL_SERVER_ERROR가 발생한다

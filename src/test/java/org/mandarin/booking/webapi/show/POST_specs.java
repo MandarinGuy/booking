@@ -5,7 +5,7 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
-import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
+import static org.mandarin.booking.domain.member.MemberAuthority.ADMIN;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,7 +29,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
         var request = validShowRegisterRequest();
 
         // Act
@@ -69,7 +69,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
 
         // Act
         var response = testUtils.post(
@@ -88,7 +88,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
         var request = new ShowRegisterRequest(
                 "공연 제목",
                 "MOVIE", // invalid type
@@ -116,7 +116,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
         var request = validShowRegisterRequest();
 
         // Act
@@ -136,7 +136,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
         var request = new ShowRegisterRequest(
                 "공연 제목",
                 "MUSICAL",
@@ -166,7 +166,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(DISTRIBUTOR);
+        var authToken = testUtils.getAuthToken(ADMIN);
         var request = validShowRegisterRequest();
         testUtils.post(
                         "/api/show",
