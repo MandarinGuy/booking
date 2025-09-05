@@ -1,7 +1,7 @@
 ### 요청
 
 - 메서드: `POST`
-- 경로: `/api/movie/schedule`
+- 경로: `/api/show/schedule`
 - 헤더
 
     ```
@@ -24,7 +24,7 @@
 - curl 명령 예시
 
     ```bash
-    curl -i -X POST 'http://localhost:8080/api/movie/schedule' \
+    curl -i -X POST 'http://localhost:8080/api/show/schedule' \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer <accessToken>' \
     -d '{
