@@ -89,16 +89,44 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
+    @Test
+    void startAt이_endAt보다_늦은_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow();
+        var request = generateShowScheduleRegisterRequest(show, 150,
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                LocalDateTime.of(2025, 9, 10, 19, 0)
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).contains("The end time must be after the start time");
+    }
+
+    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {
+        return generateShowScheduleRegisterRequest(show, runtimeMinutes, LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30));
+    }
+
     private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
         return generateShowScheduleRegisterRequest(show, 150);
     }
 
-    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {
+    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes,
+                                                                                   LocalDateTime startAt,
+                                                                                   LocalDateTime endAt) {
         return new ShowScheduleRegisterRequest(
                 show.getId(),
                 10L,
-                LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30),
+                startAt,
+                endAt,
                 runtimeMinutes
         );
     }

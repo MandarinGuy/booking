@@ -41,7 +41,7 @@ public class ShowService implements ShowRegisterer {
         return new ShowScheduleRegisterResponse(saved.getId());
     }
 
-    public void checkDuplicateTitle(String title) {
+    private void checkDuplicateTitle(String title) {
         if (queryRepository.existsByName(title)) {
             throw new ShowException("이미 존재하는 공연 이름입니다:" + title);
         }
