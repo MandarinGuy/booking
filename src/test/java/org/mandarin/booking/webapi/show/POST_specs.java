@@ -37,7 +37,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertSuccess(ShowRegisterResponse.class);
 
         // Assert
@@ -76,7 +76,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertFailure();
 
         // Assert
@@ -104,7 +104,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertFailure();
 
         // Assert
@@ -124,7 +124,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertSuccess(ShowRegisterResponse.class);
 
         // Assert
@@ -152,7 +152,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertFailure();
 
         // Assert
@@ -172,7 +172,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertSuccess(ShowRegisterResponse.class);
 
         var duplicateTitleRequest = validShowRegisterRequest(request.title());
@@ -182,7 +182,7 @@ public class POST_specs {
                         "/api/show",
                         duplicateTitleRequest
                 )
-                .withHeader("Authorization", authToken)
+                .withAuthorization(authToken)
                 .assertFailure();
 
         // Assert

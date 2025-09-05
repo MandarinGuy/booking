@@ -65,13 +65,18 @@ public class TestResult {
         return response;
     }
 
-    TestResult setContext(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public TestResult withHeader(String headerName, String headerValue) {
+        headers.put(headerName, headerValue);
         return this;
     }
 
-    public TestResult withHeader(String headerName, String headerValue) {
-        headers.put(headerName, headerValue);
+    public TestResult withAuthorization(String token) {
+        this.withHeader("Authorization", token);
+        return this;
+    }
+
+    TestResult setContext(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 
