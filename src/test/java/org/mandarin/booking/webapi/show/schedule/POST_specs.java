@@ -38,4 +38,27 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
+
+    @Test
+    void 응답_본문에_scheduleId가_포함된다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow();
+        var reqeust = new ShowScheduleRegisterRequest(
+                show.getId(),
+                10L,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                150
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", reqeust)
+                .withHeader("Authorization", testUtils.getAuthToken())
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        assertThat(response.getData().scheduleId()).isNotNull();
+    }
 }
