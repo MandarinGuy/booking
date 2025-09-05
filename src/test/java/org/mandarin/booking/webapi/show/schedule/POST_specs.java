@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show.schedule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
@@ -20,16 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @DisplayName("POST /api/show/schedule")
 public class POST_specs {
 
-    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
-        return new ShowScheduleRegisterRequest(
-                show.getId(),
-                10L,
-                LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30),
-                150
-        );
-    }
-
     @Test
     void 올바른_접근_토큰과_유효한_요청을_보내면_SUCCESS_상태코드를_반환한다(
             @Autowired IntegrationTestUtils testUtils
@@ -46,7 +37,7 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
-    
+
     @Test
     void 응답_본문에_scheduleId가_포함된다(
             @Autowired IntegrationTestUtils testUtils
@@ -79,5 +70,36 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
+    }
+
+    @Test
+    void runtimeMinutes가_0_이하일_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow();
+        var request = generateShowScheduleRegisterRequest(show, 0);
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
+        return generateShowScheduleRegisterRequest(show, 150);
+    }
+
+    private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {
+        return new ShowScheduleRegisterRequest(
+                show.getId(),
+                10L,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                runtimeMinutes
+        );
     }
 }
