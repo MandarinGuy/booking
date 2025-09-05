@@ -59,7 +59,7 @@
 
 - [x] 올바른 접근 토큰과 유효한 요청을 보내면 SUCCESS 상태코드를 반환한다
 - [x] 응답 본문에 scheduleId가 포함된다
-- [ ] 권한이 없는 사용자 토큰으로 요청하면 FORBIDDEN 상태코드를 반환한다
+- [x] 권한이 없는 사용자 토큰으로 요청하면 FORBIDDEN 상태코드를 반환한다
 - [ ] runtimeMinutes가 0 이하일 경우 BAD_REQUEST를 반환한다
 - [ ] startAt이 endAt보다 늦은 경우 BAD_REQUEST를 반환한다
 - [ ] 존재하지 않는 showId를 보내면 NOT_FOUND 상태코드를 반환한다
