@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.NoRestDocs;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController.TestSecurityConfig;
 import org.mandarin.booking.app.TokenUtils;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @IntegrationTest
+@NoRestDocs
 @Import({TestSecurityConfig.class, TestAuthController.class})
 class JwtFilterTest {
     private static final String PONG_WITHOUT_AUTH = "pong without auth";

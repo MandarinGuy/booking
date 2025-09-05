@@ -16,54 +16,49 @@ import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.MemberAuthority;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.domain.member.TokenHolder;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class IntegrationTestUtils {
-    private final TestRestTemplate testRestTemplate;
-    private final MemberCommandRepository memberRepository;
-    private final TokenUtils tokenUtils;
-    private final SecurePasswordEncoder securePasswordEncoder;
-    private final ObjectMapper objectMapper;
-
-    public IntegrationTestUtils(TestRestTemplate testRestTemplate,
-                                MemberCommandRepository memberRepository,
-                                TokenUtils tokenUtils,
-                                SecurePasswordEncoder securePasswordEncoder,
-                                ObjectMapper objectMapper) {
-        this.testRestTemplate = testRestTemplate;
-        this.memberRepository = memberRepository;
-        this.tokenUtils = tokenUtils;
-        this.securePasswordEncoder = securePasswordEncoder;
-        this.objectMapper = objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+public record IntegrationTestUtils(MemberCommandRepository memberRepository,
+                                   TokenUtils tokenUtils,
+                                   SecurePasswordEncoder securePasswordEncoder,
+                                   ObjectMapper objectMapper,
+                                   DocsUtils docsUtils) {
+    public IntegrationTestUtils {
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    public <T> TestResult get(String path) {
+    public TestResult get(String path) {
         return new TestResult(path, null)
-                .setContext(testRestTemplate, objectMapper);
+                .setContext(objectMapper)
+                .setExecutor((p, req, headers) -> docsUtils.execute("GET", p, null, headers));
     }
 
     public <T> TestResult post(String path, T request) {
         return new TestResult(path, request)
-                .setContext(testRestTemplate, objectMapper);
+                .setContext(objectMapper)
+                .setExecutor((p, req, headers) -> docsUtils.execute("POST", p, req, headers));
     }
 
     public String getValidRefreshToken() {
         var member = insertDummyMember(generateUserId(), generatePassword());
-        return tokenUtils.generateToken(member.getUserId(), member.getNickName(), member.getAuthorities()).refreshToken();
+        return tokenUtils.generateToken(member.getUserId(), member.getNickName(), member.getAuthorities())
+                .refreshToken();
     }
 
     public String getAuthToken() {
         var member = this.insertDummyMember();
-        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities())
+                .accessToken();
     }
 
     public String getAuthToken(Member member) {
-        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities())
+                .accessToken();
     }
 
-    public TokenHolder getUserToken(String userId, String nickname, Collection<? extends GrantedAuthority> authorities) {
+    public TokenHolder getUserToken(String userId, String nickname,
+                                    Collection<? extends GrantedAuthority> authorities) {
         return tokenUtils.generateToken(userId, nickname, authorities);
     }
 
@@ -97,9 +92,10 @@ public class IntegrationTestUtils {
         return this.insertDummyMember(generateUserId(), generatePassword());
     }
 
-    public String getAuthToken(MemberAuthority ...memberAuthority) {
+    public String getAuthToken(MemberAuthority... memberAuthority) {
         var member = this.insertDummyMember(generateUserId(), generateNickName(), List.of(memberAuthority));
-        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities()).accessToken();
+        return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities())
+                .accessToken();
     }
 }
 

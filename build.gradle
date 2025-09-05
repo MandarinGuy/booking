@@ -2,10 +2,16 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.epages.restdocs-api-spec' version '0.18.2'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'org.mandarin'
 version = '0.0.1-SNAPSHOT'
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
 
 java {
 	toolchain {
@@ -19,6 +25,7 @@ repositories {
 
 configurations {
 	byteBuddyAgent
+    asciidoctorExt
 }
 
 dependencies {
@@ -58,8 +65,17 @@ dependencies {
 	byteBuddyAgent 'net.bytebuddy:byte-buddy-agent:1.17.6'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 
+    // ---- API Docs (REST Docs + Rest Assured) ----
+    testImplementation 'io.rest-assured:rest-assured:5.5.6'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
+
     // null safety
     implementation 'org.jspecify:jspecify:1.0.0'
+}
+ext {
+    set('snippetsDir', file('build/generated-snippets'))
 }
 
 tasks.named('test') {
@@ -67,4 +83,23 @@ tasks.named('test') {
 	systemProperty 'spring.profiles.active', 'test'
 	// javaagent 선부착 (Mockito self-attach 방지)
 	jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
+    outputs.dir snippetsDir
 }
+
+asciidoctor {
+    group = 'documentation'
+    description = 'Converts AsciiDoc files to HTML, including REST Docs snippets.'
+    dependsOn test
+    baseDirFollowsSourceDir()
+    sourceDir = file('src/docs')
+    sources {
+        include '**/*.adoc'
+    }
+    inputs.dir snippetsDir
+    attributes 'snippets': snippetsDir
+    resources {
+        from(snippetsDir) { into 'snippets' }
+    }
+    outputDir = layout.buildDirectory.dir("docs/asciidoc").get().asFile
+}
+

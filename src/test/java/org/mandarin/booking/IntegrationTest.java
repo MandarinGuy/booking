@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
         webEnvironment = RANDOM_PORT,
         classes = BookingApplication.class
 )
+@org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 @Import(TestConfig.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IntegrationTest {
