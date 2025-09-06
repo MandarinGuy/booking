@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.mandarin.booking.app.TokenUtils;
+import org.mandarin.booking.app.persist.HallRepository;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.domain.member.Member;
@@ -22,11 +23,13 @@ import org.mandarin.booking.domain.member.TokenHolder;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public record IntegrationTestUtils(MemberCommandRepository memberRepository,
                                    ShowCommandRepository showRepository,
+                                   HallRepository hallRepository,
                                    TokenUtils tokenUtils,
                                    SecurePasswordEncoder securePasswordEncoder,
                                    ObjectMapper objectMapper,
@@ -100,6 +103,10 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
     }
 
     public Show insertDummyShow() {
+        return this.insertDummyShow(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+    }
+
+    public Show insertDummyShow(LocalDate performanceStartDate, LocalDate performanceEndDate) {
         var command = ShowCreateCommand.from(
                 new ShowRegisterRequest(
                         UUID.randomUUID().toString().substring(0, 5),
@@ -107,8 +114,8 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
                         "AGE12",
                         "synopsis",
                         "https://example.com/poster.jpg",
-                        LocalDate.of(2025, 9, 10),
-                        LocalDate.of(2025, 12, 31)
+                        performanceStartDate,
+                        performanceEndDate
                 )
         );
         var show = Show.create(command);
@@ -119,6 +126,11 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
         var member = this.insertDummyMember(generateUserId(), generateNickName(), List.of(memberAuthority));
         return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities())
                 .accessToken();
+    }
+
+    public Hall insertDummyHall(Show show) {
+        var hall = Hall.create(show.getId());
+        return hallRepository.save(hall);
     }
 }
 
