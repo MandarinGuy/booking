@@ -1,7 +1,9 @@
 package org.mandarin.booking.app;
 
+import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.app.persist.ShowQueryRepository;
@@ -37,16 +39,18 @@ public class ShowService implements ShowRegisterer {
 
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
+        checkHallId(request);
+        var show = queryRepository.findById(request.showId());
+        checkShowScheduleRange(show, request.startAt(), request.endAt());
+
         var command = ShowScheduleCreateCommand.from(request);
-        verifyHallId(request);
-        var show = queryRepository.findById(command.getShowId());
 
         show.registerSchedule(command);
         var saved = commandRepository.insert(show);
         return new ShowScheduleRegisterResponse(saved.getId());
     }
 
-    private void verifyHallId(ShowScheduleRegisterRequest request) {
+    private void checkHallId(ShowScheduleRegisterRequest request) {
         var event = new HallVerificationEvent(request.hallId());
 
         applicationEventPublisher.publishEvent(event);
@@ -61,5 +65,10 @@ public class ShowService implements ShowRegisterer {
         }
     }
 
+    private static void checkShowScheduleRange(Show show, LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {
+        if (!show.isInSchedule(scheduleStartAt, scheduleEndAt)) {
+            throw new ShowException(BAD_REQUEST, "공연 기간 범위를 벗어나는 일정입니다.");
+        }
+    }
 }
 

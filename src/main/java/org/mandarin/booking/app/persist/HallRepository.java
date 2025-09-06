@@ -5,4 +5,6 @@ import org.springframework.data.repository.Repository;
 
 public interface HallRepository extends Repository<Hall, Long> {
     boolean existsById(Long id);
+
+    Hall save(Hall hall);
 }

@@ -8,6 +8,7 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.domain.member.MemberAuthority.USER;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
+import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -27,7 +29,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show);
 
         // Act
@@ -44,7 +46,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show);
 
         // Act
@@ -61,7 +63,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show);
 
         // Act
@@ -78,7 +80,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show, 0);
 
         // Act
@@ -95,7 +97,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show, 150,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
                 LocalDateTime.of(2025, 9, 10, 19, 0)
@@ -116,7 +118,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
                 10L,
@@ -140,7 +142,7 @@ public class POST_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow();
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = new ShowScheduleRegisterRequest(
                 show.getId(),
                 9999L,// 존재하지 않는 hallId
@@ -157,6 +159,31 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
         assertThat(response.getData()).contains("존재하지 않는 공연장입니다");
+    }
+
+    @Test
+    void 공연_기간_범위를_벗어나는_startAt_또는_endAt을_보낼_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
+        Hall hall = testUtils.insertDummyHall(show);
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                hall.getId(),
+                LocalDateTime.of(2023, 9, 10, 19, 0),
+                LocalDateTime.of(2023, 9, 10, 21, 30),
+                150
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).contains("공연 기간 범위를 벗어나는 일정입니다.");
     }
 
     private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {

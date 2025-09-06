@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -48,6 +49,11 @@ public class Show extends AbstractEntity {
         this.posterUrl = posterUrl;
         this.performanceStartDate = performanceStartDate;
         this.performanceEndDate = performanceEndDate;
+    }
+
+    public boolean isInSchedule(LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {
+        return scheduleStartAt.isAfter(performanceStartDate.atStartOfDay())
+               && scheduleEndAt.isBefore(performanceEndDate.atStartOfDay());
     }
 
     public static Show create(ShowCreateCommand command) {
