@@ -118,7 +118,7 @@ public class POST_specs {
         // Arrange
         var show = testUtils.insertDummyShow();
         var request = new ShowScheduleRegisterRequest(
-                9999L,
+                9999L,// 존재하지 않는 showId
                 10L,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30),
@@ -132,7 +132,31 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
-        assertThat(response.getData()).contains("No show with id").contains("9999");
+        assertThat(response.getData()).contains("존재하지 않는 공연입니다.");
+    }
+
+    @Test
+    void 존재하지_않는_hallId를_보내면_NOT_FOUND_상태코드를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow();
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                9999L,// 존재하지 않는 hallId
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                150
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+        assertThat(response.getData()).contains("존재하지 않는 공연장입니다");
     }
 
     private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {

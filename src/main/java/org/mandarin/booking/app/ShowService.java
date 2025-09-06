@@ -1,5 +1,7 @@
 package org.mandarin.booking.app;
 
+import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
+
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.app.persist.ShowQueryRepository;
@@ -12,6 +14,7 @@ import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ShowService implements ShowRegisterer {
     private final ShowCommandRepository commandRepository;
     private final ShowQueryRepository queryRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
@@ -34,6 +38,7 @@ public class ShowService implements ShowRegisterer {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var command = ShowScheduleCreateCommand.from(request);
+        verifyHallId(request);
         var show = queryRepository.findById(command.getShowId());
 
         show.registerSchedule(command);
@@ -41,10 +46,20 @@ public class ShowService implements ShowRegisterer {
         return new ShowScheduleRegisterResponse(saved.getId());
     }
 
+    private void verifyHallId(ShowScheduleRegisterRequest request) {
+        var event = new HallVerificationEvent(request.hallId());
+
+        applicationEventPublisher.publishEvent(event);
+        if (!event.isVerified()) {
+            throw new ShowException(NOT_FOUND, "존재하지 않는 공연장입니다: " + request.hallId());
+        }
+    }
+
     private void checkDuplicateTitle(String title) {
         if (queryRepository.existsByName(title)) {
             throw new ShowException("이미 존재하는 공연 이름입니다:" + title);
         }
     }
+
 }
 

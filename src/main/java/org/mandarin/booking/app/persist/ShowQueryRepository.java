@@ -20,6 +20,6 @@ public class ShowQueryRepository {
 
     public Show findById(Long showId) {
         return jpaRepository.findById(showId)
-                .orElseThrow(() -> new ShowException(NOT_FOUND, "No show with id=" + showId));
+                .orElseThrow(() -> new ShowException(NOT_FOUND, "존재하지 않는 공연입니다."));
     }
 }
