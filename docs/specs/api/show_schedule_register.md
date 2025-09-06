@@ -63,7 +63,7 @@
 - [x] runtimeMinutes가 0 이하일 경우 BAD_REQUEST를 반환한다
 - [x] startAt이 endAt보다 늦은 경우 BAD_REQUEST를 반환한다
 - [x] 존재하지 않는 showId를 보내면 NOT_FOUND 상태코드를 반환한다
-- [ ] 존재하지 않는 hallId를 보내면 NOT_FOUND 상태코드를 반환한다
+- [x] 존재하지 않는 hallId를 보내면 NOT_FOUND 상태코드를 반환한다
 - [ ] 공연 기간 범위를 벗어나는 startAt 또는 endAt을 보낼 경우 BAD_REQUEST를 반환한다
 - [ ] 동일한 hallId와 시간이 겹치는 회차를 등록하려 하면 INTERNAL_SERVER_ERROR를 반환한다
 - [ ] 동일한 요청을 여러 번 전송하면 중복 스케줄이 생성되지 않고 INTERNAL_SERVER_ERROR 또는 기존 스케줄 ID를 반환한다  
