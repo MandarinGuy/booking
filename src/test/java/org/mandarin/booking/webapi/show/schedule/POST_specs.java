@@ -3,6 +3,7 @@ package org.mandarin.booking.webapi.show.schedule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.FORBIDDEN;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.domain.member.MemberAuthority.USER;
@@ -108,6 +109,30 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
         assertThat(response.getData()).contains("The end time must be after the start time");
+    }
+
+    @Test
+    void 존재하지_않는_showId를_보내면_NOT_FOUND_상태코드를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow();
+        var request = new ShowScheduleRegisterRequest(
+                9999L,
+                10L,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                150
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+        assertThat(response.getData()).contains("No show with id").contains("9999");
     }
 
     private static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {
