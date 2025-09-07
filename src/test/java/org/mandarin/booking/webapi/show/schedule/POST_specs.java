@@ -102,6 +102,29 @@ public class POST_specs {
     }
 
     @Test
+    void runtimeMinutes은_startAt과_endAt의_차이만큼이_아니면_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hall = testUtils.insertDummyHall();
+        var request = generateShowScheduleRegisterRequest(show, 100,
+// runtimeMinutes가 100분으로 startAt, endAt의 차이인 150분과 다름
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                hall.getId());
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).contains("The runtime must match the difference between start and end times");
+    }
+
+    @Test
     void startAt이_endAt보다_늦은_경우_BAD_REQUEST를_반환한다(
             @Autowired IntegrationTestUtils testUtils
     ) {
