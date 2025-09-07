@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.mandarin.booking.app.TokenUtils;
-import org.mandarin.booking.app.persist.HallRepository;
+import org.mandarin.booking.app.persist.HallCommandRepository;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.domain.member.Member;
@@ -29,7 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public record IntegrationTestUtils(MemberCommandRepository memberRepository,
                                    ShowCommandRepository showRepository,
-                                   HallRepository hallRepository,
+                                   HallCommandRepository hallRepository,
                                    TokenUtils tokenUtils,
                                    SecurePasswordEncoder securePasswordEncoder,
                                    ObjectMapper objectMapper,
@@ -128,9 +128,9 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
                 .accessToken();
     }
 
-    public Hall insertDummyHall(Show show) {
-        var hall = Hall.create(show.getId());
-        return hallRepository.save(hall);
+    public Hall insertDummyHall() {
+        var hall = Hall.create();
+        return hallRepository.insert(hall);
     }
 }
 
