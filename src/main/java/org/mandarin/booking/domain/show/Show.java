@@ -1,6 +1,8 @@
 package org.mandarin.booking.domain.show;
 
+import static jakarta.persistence.CascadeType.MERGE;
 import static jakarta.persistence.FetchType.LAZY;
+import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
 import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
+import org.mandarin.booking.domain.venue.Hall;
 
 @Entity
 @Getter
@@ -36,12 +39,12 @@ public class Show extends AbstractEntity {
 
     private LocalDate performanceEndDate;
 
-    @OneToMany(mappedBy = "show", fetch = LAZY)
+    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = MERGE)
     private final List<ShowSchedule> schedules = new ArrayList<>();
 
-    public Show(String title, Type type, Rating rating, String synopsis, String posterUrl,
-                LocalDate performanceStartDate,
-                LocalDate performanceEndDate) {
+    private Show(String title, Type type, Rating rating, String synopsis, String posterUrl,
+                 LocalDate performanceStartDate,
+                 LocalDate performanceEndDate) {
         this.title = title;
         this.type = type;
         this.rating = rating;
@@ -51,10 +54,6 @@ public class Show extends AbstractEntity {
         this.performanceEndDate = performanceEndDate;
     }
 
-    public boolean isInSchedule(LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {
-        return scheduleStartAt.isAfter(performanceStartDate.atStartOfDay())
-               && scheduleEndAt.isBefore(performanceEndDate.atStartOfDay());
-    }
 
     public static Show create(ShowCreateCommand command) {
         var startDate = command.getPerformanceStartDate();
@@ -75,9 +74,18 @@ public class Show extends AbstractEntity {
         );
     }
 
-    public void registerSchedule(ShowScheduleCreateCommand command) {
-        var schedule = ShowSchedule.create(this, command);
+    public void registerSchedule(Hall hall, ShowScheduleCreateCommand command) {
+        if (!isInSchedule(command.startAt(), command.endAt())) {
+            throw new ShowException(BAD_REQUEST, "공연 기간 범위를 벗어나는 일정입니다.");
+        }
+
+        var schedule = ShowSchedule.create(this, hall, command);
         this.schedules.add(schedule);
+    }
+
+    private boolean isInSchedule(LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {
+        return scheduleStartAt.isAfter(performanceStartDate.atStartOfDay())
+               && scheduleEndAt.isBefore(performanceEndDate.atStartOfDay());
     }
 
     public enum Type {

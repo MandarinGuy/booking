@@ -6,10 +6,12 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.venue.Hall;
 
 @Entity
 @Getter
@@ -20,7 +22,9 @@ public class ShowSchedule extends AbstractEntity {
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
-    private Long hallId;
+    @ManyToOne(fetch = LAZY, optional = false)
+    @JoinColumn(name = "hall_id", nullable = false)
+    private Hall hall;
 
     private LocalDateTime startAt;
 
@@ -30,59 +34,33 @@ public class ShowSchedule extends AbstractEntity {
 
     private ShowSchedule(
             Show show,
-            Long hallId,
+            Hall hall,
             LocalDateTime startAt,
             LocalDateTime endAt,
             Integer runtimeMinutes
     ) {
         this.show = show;
-        this.hallId = hallId;
+        this.hall = hall;
         this.startAt = startAt;
         this.endAt = endAt;
         this.runtimeMinutes = runtimeMinutes;
     }
 
-    public static ShowSchedule create(Show show, ShowScheduleCreateCommand command) {
+    public boolean isConflict(LocalDateTime startAt, LocalDateTime endAt) {
+        return startAt.isBefore(this.endAt)
+               && endAt.isAfter(this.startAt);
+    }
+
+    static ShowSchedule create(Show show, Hall hall, ShowScheduleCreateCommand command) {
         return new ShowSchedule(
                 show,
-                command.hallId,
+                hall,
                 command.startAt,
                 command.endAt,
-                command.runtimeMinutes
+                (int) Duration.between(command.startAt, command.endAt).toMinutes()
         );
     }
 
-
-    @Getter
-    public static class ShowScheduleCreateCommand {
-        private final Long showId;
-        private final Long hallId;
-        private final LocalDateTime startAt;
-        private final LocalDateTime endAt;
-        private final Integer runtimeMinutes;
-
-        private ShowScheduleCreateCommand(
-                Long showId,
-                Long hallId,
-                LocalDateTime startAt,
-                LocalDateTime endAt,
-                Integer runtimeMinutes
-        ) {
-            this.showId = showId;
-            this.hallId = hallId;
-            this.startAt = startAt;
-            this.endAt = endAt;
-            this.runtimeMinutes = runtimeMinutes;
-        }
-
-        public static ShowScheduleCreateCommand from(ShowScheduleRegisterRequest request) {
-            return new ShowScheduleCreateCommand(
-                    request.showId(),
-                    request.hallId(),
-                    request.startAt(),
-                    request.endAt(),
-                    request.runtimeMinutes()
-            );
-        }
+    public record ShowScheduleCreateCommand(Long showId, LocalDateTime startAt, LocalDateTime endAt) {
     }
 }

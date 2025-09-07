@@ -1,18 +1,29 @@
 package org.mandarin.booking.domain.venue;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.show.ShowSchedule;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Hall extends AbstractEntity {
-    private Long showId;
+    @OneToMany(mappedBy = "hall")
+    private List<ShowSchedule> showSchedules = new ArrayList<>();
 
-    public static Hall create(Long showId) {
-        return new Hall(showId);
+    public boolean canScheduleOn(LocalDateTime startAt, LocalDateTime endAt) {
+        return showSchedules.stream()
+                .noneMatch(schedule -> schedule.isConflict(startAt, endAt));
+    }
+
+    public static Hall create() {
+        return new Hall();
     }
 }
