@@ -14,6 +14,69 @@ class AbstractEntityTest {
     static class Member extends AbstractEntity { }
     static class Product extends AbstractEntity { }
 
+    @Nested
+    @DisplayName("proxy branches")
+    class ProxySpec {
+        @Test
+        @DisplayName("id가 같으면 동일 프록시를 의미한다")
+        void equals_real_vs_proxy_same_class_same_id_true() {
+            var real = withId(new Member(), 100L);
+            var proxy = withId(new ProxyMember(), 100L);
+            assertThat(real).isEqualTo(proxy);
+            assertThat(proxy).isEqualTo(real);
+        }
+
+        @Test
+        @DisplayName("동일 프록시라도 클래스가 다르면 다른값을 반환한다")
+        void equals_proxy_vs_proxy_different_class_false() {
+            var a = withId(new ProxyMember(), 1L);
+            var b = withId(new ProxyProduct(), 1L);
+            assertThat(a).isNotEqualTo(b);
+        }
+
+        @Test
+        @DisplayName("프록시는 동일한 해시값을 가진다")
+        void hashCode_proxy_branch() {
+            var real = withId(new Member(), 1L);
+            var proxy = withId(new ProxyMember(), 2L);
+            assertThat(proxy.hashCode()).isEqualTo(real.getClass().hashCode());
+        }
+    }
+
+    // ---- HibernateProxy test doubles to cover proxy branches ----
+    static class ProxyMember extends Member implements org.hibernate.proxy.HibernateProxy {
+        @Override
+        public org.hibernate.proxy.LazyInitializer getHibernateLazyInitializer() {
+            Class<?> persistentClass = Member.class;
+            return (org.hibernate.proxy.LazyInitializer) java.lang.reflect.Proxy.newProxyInstance(
+                    getClass().getClassLoader(),
+                    new Class[]{org.hibernate.proxy.LazyInitializer.class},
+                    (proxy, method, args) -> {
+                        if (method.getName().equals("getPersistentClass")) {
+                            return persistentClass;
+                        }
+                        if (method.getReturnType().isPrimitive()) {
+                            if (method.getReturnType() == boolean.class) {
+                                return false;
+                            }
+                            if (method.getReturnType() == int.class) {
+                                return 0;
+                            }
+                            if (method.getReturnType() == long.class) {
+                                return 0L;
+                            }
+                        }
+                        return null;
+                    }
+            );
+        }
+
+        @Override
+        public Object writeReplace() {
+            return this;
+        }
+    }
+
     private static <T extends AbstractEntity> T withId(T entity, Long id) {
         try {
             Field f = AbstractEntity.class.getDeclaredField("id");
@@ -123,6 +186,39 @@ class AbstractEntityTest {
             set.add(c);
 
             assertThat(set).hasSize(3);
+        }
+    }
+
+    static class ProxyProduct extends Product implements org.hibernate.proxy.HibernateProxy {
+        @Override
+        public org.hibernate.proxy.LazyInitializer getHibernateLazyInitializer() {
+            Class<?> persistentClass = Product.class;
+            return (org.hibernate.proxy.LazyInitializer) java.lang.reflect.Proxy.newProxyInstance(
+                    getClass().getClassLoader(),
+                    new Class[]{org.hibernate.proxy.LazyInitializer.class},
+                    (proxy, method, args) -> {
+                        if (method.getName().equals("getPersistentClass")) {
+                            return persistentClass;
+                        }
+                        if (method.getReturnType().isPrimitive()) {
+                            if (method.getReturnType() == boolean.class) {
+                                return false;
+                            }
+                            if (method.getReturnType() == int.class) {
+                                return 0;
+                            }
+                            if (method.getReturnType() == long.class) {
+                                return 0L;
+                            }
+                        }
+                        return null;
+                    }
+            );
+        }
+
+        @Override
+        public Object writeReplace() {
+            return this;
         }
     }
 }
