@@ -24,7 +24,7 @@ class ShowScheduleTest {
                 Arguments.of("overlap at end (starts inside)", bStart, bEnd, bEnd.minusMinutes(30),
                         bEnd.plusMinutes(30), true),
 
-                // False cases (boundaries and no overlap)
+                // False cases
                 Arguments.of("touching before (end equals base.start)", bStart, bEnd, bStart.minusHours(2), bStart,
                         false),
                 Arguments.of("touching after (start equals base.end)", bStart, bEnd, bEnd, bEnd.plusHours(2), false),
