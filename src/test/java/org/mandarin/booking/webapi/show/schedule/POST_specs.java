@@ -108,8 +108,8 @@ public class POST_specs {
         // Arrange
         var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hall = testUtils.insertDummyHall();
-        var request = generateShowScheduleRegisterRequest(show, 100,
-// runtimeMinutes가 100분으로 startAt, endAt의 차이인 150분과 다름
+        var request = generateShowScheduleRegisterRequest(show,
+                100,// runtimeMinutes가 100분으로 startAt, endAt의 차이인 150분과 다름
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30),
                 hall.getId());
