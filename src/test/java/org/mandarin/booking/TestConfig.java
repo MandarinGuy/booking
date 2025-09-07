@@ -2,7 +2,7 @@ package org.mandarin.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mandarin.booking.app.TokenUtils;
-import org.mandarin.booking.app.persist.HallRepository;
+import org.mandarin.booking.app.persist.HallCommandRepository;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.app.persist.ShowCommandRepository;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
@@ -15,7 +15,7 @@ public class TestConfig {
     @Bean
     public IntegrationTestUtils integrationTestUtils(@Autowired MemberCommandRepository memberRepository,
                                                      @Autowired ShowCommandRepository showRepository,
-                                                     @Autowired HallRepository hallRepository,
+                                                     @Autowired HallCommandRepository hallRepository,
                                                      @Autowired TokenUtils tokenUtils,
                                                      @Autowired SecurePasswordEncoder securePasswordEncoder,
                                                      @Autowired ObjectMapper objectMapper,
