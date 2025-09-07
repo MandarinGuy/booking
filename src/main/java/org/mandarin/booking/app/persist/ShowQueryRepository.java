@@ -1,6 +1,5 @@
 package org.mandarin.booking.app.persist;
 
-import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.show.Show;
@@ -20,6 +19,6 @@ public class ShowQueryRepository {
 
     public Show findById(Long showId) {
         return jpaRepository.findById(showId)
-                .orElseThrow(() -> new ShowException(NOT_FOUND, "존재하지 않는 공연입니다."));
+                .orElseThrow(() -> new ShowException("NOT_FOUND", "존재하지 않는 공연입니다."));
     }
 }

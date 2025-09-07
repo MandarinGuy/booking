@@ -1,6 +1,5 @@
 package org.mandarin.booking.domain.show;
 
-import org.mandarin.booking.adapter.webapi.ApiStatus;
 import org.mandarin.booking.domain.DomainException;
 
 public class ShowException extends DomainException {
@@ -8,7 +7,7 @@ public class ShowException extends DomainException {
         super(message);
     }
 
-    public ShowException(ApiStatus status, String message) {
+    public ShowException(String status, String message) {
         super(status, message);
     }
 }

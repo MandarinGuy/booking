@@ -31,7 +31,11 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show);
+        var hall = testUtils.insertDummyHall();
+        var request = generateShowScheduleRegisterRequest(
+                show, hall.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30));
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -48,7 +52,11 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show);
+        var hall = testUtils.insertDummyHall();
+        var request = generateShowScheduleRegisterRequest(
+                show, hall.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30));
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -159,7 +167,7 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
-        assertThat(response.getData()).contains("존재하지 않는 공연장입니다");
+        assertThat(response.getData()).contains("해당 공연장을 찾을 수 없습니다.");
     }
 
     @Test

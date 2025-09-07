@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DomainException.class)
     public ErrorResponse handleJsonParseError(DomainException ex) {
         log.error("Domain Exception: {}", (Object[]) ex.getStackTrace());
-        return new ErrorResponse(ex.getStatus(), ex.getMessage());
+        var status = ex.getStatus();
+        return new ErrorResponse(ApiStatus.valueOf(status), ex.getMessage());
     }
 
     @ExceptionHandler(AuthException.class)

@@ -2,7 +2,6 @@ package org.mandarin.booking.domain.show;
 
 import static jakarta.persistence.CascadeType.MERGE;
 import static jakarta.persistence.FetchType.LAZY;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -76,7 +75,7 @@ public class Show extends AbstractEntity {
 
     public void registerSchedule(Hall hall, ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
-            throw new ShowException(BAD_REQUEST, "공연 기간 범위를 벗어나는 일정입니다.");
+            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
         }
 
         var schedule = ShowSchedule.create(this, hall, command);

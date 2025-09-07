@@ -102,10 +102,6 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
         return this.insertDummyMember(generateUserId(), generatePassword());
     }
 
-    public Show insertDummyShow() {
-        return this.insertDummyShow(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
-    }
-
     public Show insertDummyShow(LocalDate performanceStartDate, LocalDate performanceEndDate) {
         var command = ShowCreateCommand.from(
                 new ShowRegisterRequest(

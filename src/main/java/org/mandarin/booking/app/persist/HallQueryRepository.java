@@ -16,7 +16,7 @@ public class HallQueryRepository {
 
     public Hall getScreenableHall(ShowScheduleRegisterRequest request) {
         var hall = jpaRepository.findById(request.hallId())
-                .orElseThrow(() -> new HallException("해당 공연장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new HallException("NOT_FOUND", "해당 공연장을 찾을 수 없습니다."));
         if (!hall.canScheduleOn(request.startAt(), request.endAt())) {
             throw new ShowException("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
         }
