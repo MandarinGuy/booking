@@ -6,9 +6,11 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.NoRestDocs;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
+@NoRestDocs
 class GlobalExceptionHandlerTest {
 
     @Test

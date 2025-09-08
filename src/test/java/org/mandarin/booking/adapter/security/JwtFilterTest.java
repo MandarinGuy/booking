@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.NoRestDocs;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController.TestSecurityConfig;
 import org.mandarin.booking.app.TokenUtils;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @IntegrationTest
+@NoRestDocs
 @Import({TestSecurityConfig.class, TestAuthController.class})
 class JwtFilterTest {
     private static final String PONG_WITHOUT_AUTH = "pong without auth";
@@ -55,7 +57,7 @@ class JwtFilterTest {
         var response = testUtils.get(
                         "/test/with-auth"
                 )
-                .withHeader("Authorization", accessToken)
+                .withAuthorization(accessToken)
                 .assertSuccess(String.class);
 //
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
@@ -69,7 +71,7 @@ class JwtFilterTest {
 
         // Act & Assert
         var response = testUtils.get("/test/with-auth")
-                .withHeader("Authorization", invalidToken)
+                .withAuthorization(invalidToken)
                 .assertFailure();
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
         assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
@@ -82,7 +84,7 @@ class JwtFilterTest {
 
         // Act
         var response = testUtils.get("/test/with-auth")
-                .withHeader("Authorization", invalidBearer)
+                .withAuthorization(invalidBearer)
                 .assertFailure();
 
         // Assert
@@ -98,7 +100,7 @@ class JwtFilterTest {
 
         // Act
         var response = testUtils.get("/test/with-user-role")
-                .withHeader("Authorization", accessToken)
+                .withAuthorization(accessToken)
                 .assertFailure();
 
         // Assert
@@ -115,7 +117,7 @@ class JwtFilterTest {
 
         // Act
         var response = testUtils.get("/test/with-auth")
-                .withHeader("Authorization", accessToken)
+                .withAuthorization(accessToken)
                 .assertFailure();
 
         // Assert

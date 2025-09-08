@@ -6,4 +6,8 @@ public class ShowException extends DomainException {
     public ShowException(String message) {
         super(message);
     }
+
+    public ShowException(String status, String message) {
+        super(status, message);
+    }
 }

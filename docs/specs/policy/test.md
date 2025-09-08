@@ -72,7 +72,7 @@
 
         // Act & Assert
         var response = testUtils.get("/test/with-auth")
-                .withHeader("Authorization", invalidToken)
+                .withAuthorization(invalidToken)
                 .assertFailure();
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
         assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");

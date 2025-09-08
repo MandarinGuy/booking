@@ -1,24 +1,20 @@
 package org.mandarin.booking;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.mandarin.booking.adapter.webapi.ApiResponse;
 import org.mandarin.booking.adapter.webapi.ApiStatus;
 import org.mandarin.booking.adapter.webapi.ErrorResponse;
 import org.mandarin.booking.adapter.webapi.SuccessResponse;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 
 public class TestResult {
+    private Executor executor;
+
     private final String path;
     private final Object request;
     private final Map<String, String> headers = new HashMap<>();
@@ -28,7 +24,6 @@ public class TestResult {
         this.request = request;
     }
 
-    private TestRestTemplate testRestTemplate;
     private ObjectMapper objectMapper;
 
     public <T> ApiResponse<T> assertSuccess(Class<T> responseType) {
@@ -38,7 +33,7 @@ public class TestResult {
         );
 
         if (response == null) {
-            throw new AssertionError("Expected SUCCESS response, but got: " + response);
+            throw new AssertionError("Expected SUCCESS response, but got: " + null);
         } else if (response.getStatus() != ApiStatus.SUCCESS) {
             throw new AssertionError("Expected SUCCESS response, but got Error response: " + response);
         }
@@ -52,7 +47,7 @@ public class TestResult {
                 typeReference
         );
         if (response == null) {
-            throw new AssertionError("Expected SUCCESS response, but got: " + response);
+            throw new AssertionError("Expected SUCCESS response, but got: " + null);
         } else if (response.getStatus() != ApiStatus.SUCCESS) {
             throw new AssertionError("Expected SUCCESS response, but got Error response: " + response);
         }
@@ -63,7 +58,7 @@ public class TestResult {
     public ErrorResponse assertFailure() {
         var response = readErrorResponse();
         if (response == null) {
-            throw new AssertionError("Expected Error response, but got: " + response);
+            throw new AssertionError("Expected Error response, but got: " + null);
         }else if (response.getStatus() == ApiStatus.SUCCESS) {
             throw new AssertionError("Expected Error response, but got SUCCESS: " + response);
         }
@@ -75,15 +70,40 @@ public class TestResult {
         return this;
     }
 
-    TestResult setContext(TestRestTemplate testRestTemplate, ObjectMapper objectMapper) {
-        this.testRestTemplate = testRestTemplate;
+    public TestResult withAuthorization(String token) {
+        this.withHeader("Authorization", token);
+        return this;
+    }
+
+    TestResult setContext(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         return this;
     }
 
+    TestResult setExecutor(Executor executor) {
+        this.executor = executor;
+        return this;
+    }
+
+    private boolean isErrorEnvelope(String raw) {
+        try {
+            return objectMapper.readTree(raw).has("message");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isSuccessEnvelope(String raw) {
+        try {
+            return objectMapper.readTree(raw).has("data");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private <T> ApiResponse<T> readSuccessResponse(String raw, Class<T> dataType) {
         try {
-            if(objectMapper.readTree(raw).has("message")){
+            if (isErrorEnvelope(raw)) {
                 fail("Expected SuccessResponse but got ErrorResponse: " + raw);
             }
             var wrapperType = objectMapper.getTypeFactory()
@@ -105,6 +125,19 @@ public class TestResult {
                 fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": " + primary.getMessage(), primary);
                 return null;
             }
+        }
+    }
+
+    private ErrorResponse readErrorResponse() {
+        var response = getResponse();
+        try {
+            if (isSuccessEnvelope(response)) {
+                fail("Expected ErrorResponse but got SuccessResponse: " + response);
+            }
+            return objectMapper.readValue(response, ErrorResponse.class);
+        } catch (Exception e) {
+            fail("Failed to parse ErrorResponse: " + e.getMessage(), e);
+            return null;
         }
     }
 
@@ -130,26 +163,20 @@ public class TestResult {
         }
     }
 
-    private ErrorResponse readErrorResponse() {
-        var response = getResponse();
-        try {
-            if(objectMapper.readTree(response).has("data")){
-                fail("Expected ErrorResponse but got SuccessResponse: " + response);
+    private String getResponse() {
+        if (executor != null) {
+            try {
+                return executor.execute(path, request, headers);
+            } catch (Exception e) {
+                throw new AssertionError("Request execution failed: " + e.getMessage(), e);
             }
-            return objectMapper.readValue(response, ErrorResponse.class);
-        } catch (Exception e) {
-            fail("Failed to parse ErrorResponse: " + e.getMessage(), e);
-            return null;
         }
+        throw new AssertionError(
+                "No HTTP executor configured for TestResult. Ensure IntegrationTestUtils sets an executor.");
     }
 
-    private String getResponse() {
-        var httpHeaders = new HttpHeaders();
-        for (Entry<String, String> entry : headers.entrySet()) {
-            httpHeaders.add(entry.getKey(), entry.getValue());
-        }
-        return (request == null)
-                ? testRestTemplate.exchange(path, GET, new HttpEntity<>(httpHeaders), String.class).getBody()
-                : testRestTemplate.exchange(path, POST, new HttpEntity<>(request, httpHeaders), String.class).getBody();
+    @FunctionalInterface
+    public interface Executor {
+        String execute(String path, Object request, Map<String, String> headers) throws Exception;
     }
 }

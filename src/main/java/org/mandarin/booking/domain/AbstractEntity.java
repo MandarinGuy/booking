@@ -2,7 +2,6 @@ package org.mandarin.booking.domain;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
@@ -10,14 +9,17 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
+import org.jspecify.annotations.Nullable;
 
 @MappedSuperclass
 @ToString(callSuper = true)
 public abstract class AbstractEntity {
     @Id
-    @Getter(onMethod_ = {@Nullable})
+    @Nullable
+    @Getter
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
 
     @Override
     public final boolean equals(Object o) {

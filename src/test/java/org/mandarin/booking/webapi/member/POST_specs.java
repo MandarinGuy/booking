@@ -17,7 +17,6 @@ import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
 @IntegrationTest
 @DisplayName("POST /api/member")
@@ -25,37 +24,35 @@ public class POST_specs {
 
     @Test
     void 올바른_요청하면_200_OK_상태코드를_반환한다(
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
 
         // Arrange
         var request = generateRequest();
 
         // Act
-        var response = testRestTemplate.postForEntity(
+        var response = testUtils.post(
                 "/api/member",
-                request,
-                Void.class
-        );
+                request
+        ).assertSuccess(MemberRegisterResponse.class);
 
         // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getData()).isNotNull();
     }
 
     @Test
     void 올바른_회원가입_요청을_하면_데이터베이스에_회원_정보가_저장된다(
-            @Autowired TestRestTemplate testRestTemplate,
+            @Autowired IntegrationTestUtils testUtils,
             @Autowired MemberQueryRepository memberRepository
     ) {
         // Arrange
         var request = generateRequest();
 
         // Act
-        testRestTemplate.postForEntity(
+        testUtils.post(
                 "/api/member",
-                request,
-                Void.class
-        );
+                request
+        ).assertSuccess(MemberRegisterResponse.class);
 
         // Assert
         var matchingMember = memberRepository.findByUserId(request.userId()).orElseThrow();
@@ -192,7 +189,7 @@ public class POST_specs {
     void 비밀번호가_올바르게_암호화_된다(
             @Autowired MemberQueryRepository memberRepository,
             @Autowired SecurePasswordEncoder securePasswordEncoder,
-            @Autowired TestRestTemplate testRestTemplate
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         String rawPassword = PasswordGenerator.generatePassword();
@@ -204,12 +201,10 @@ public class POST_specs {
         );
 
         // Act
-        var res = testRestTemplate.postForEntity(
+        testUtils.post(
                 "/api/member",
-                request,
-                Void.class
-        );
-        assertThat(res.getStatusCode().value()).isEqualTo(200);
+                request
+        ).assertSuccess(MemberRegisterResponse.class);
 
         // Assert
         var savedMember = memberRepository.findByUserId(request.userId()).orElseThrow();

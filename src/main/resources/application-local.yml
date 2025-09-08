@@ -21,8 +21,3 @@ jwt:
     access: 600000
     refresh: 1800000
 
-logging:
-  level:
-    org.springframework.boot.web.servlet: INFO
-    org.springframework.security.web.FilterChainProxy: TRACE
-

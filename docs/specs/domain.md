@@ -26,12 +26,11 @@ _Aggregate Root_
 - 포스터 URL(posterUrl)
 - 공연 시작일(performanceStartDate, yyyy-MM-dd)
 - 공연 종료일(performanceEndDate, yyyy-MM-dd)
+- 공연 스케줄(schedules: List\<ShowSchedule>)
 
 #### 행위
 - `create(command: ShowCreateCommand)`
-- `addSchedule(hallId, startAt, endAt, runtimeOverride)`
-- `setCasting(scheduleId, roleName, personName)`
-- `changePerformanceWindow(start, end)`
+- `registerSchedule(hallId, startAt, endAt, runtimeOverride)`
 
 #### 관련 타입
 - `ShowCreateCommand`
@@ -73,15 +72,10 @@ _Aggregate Root_
 - 주소(address)
 
 #### 행위
-- `addHall(name)`
-- `addSeat(hallId, rowLabel, number, viewGrade, accessibility)`
-- `defineGrade(hallId, name)`
+
+- `create(show,hallId,command)`
 
 #### 관련 타입
-- `CreateVenueCommand`
-- `AddHallCommand`
-- `AddSeatCommand`
-- `DefineGradeCommand`
 
 ---
 

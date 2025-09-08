@@ -1,3 +1,4 @@
-@NonNullApi
+@NullMarked
 package org.mandarin.booking.domain.member;
-import org.springframework.lang.NonNullApi;
+
+import org.jspecify.annotations.NullMarked;
