@@ -15,8 +15,8 @@
     {
       "showId": 1,
       "hallId": 10,
-      "startAt": "2025-09-10T19:00:00",
-      "endAt": "2025-09-10T21:30:00",
+      "startAt": "2025-10-10T19:00:00",
+      "endAt": "2025-10-10T21:30:00",
       "runtimeMinutes": 150
     }
     ```
@@ -26,13 +26,12 @@
     ```bash
     curl -i -X POST 'http://localhost:8080/api/show/schedule' \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer <accessToken>' \
+    -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9BRE1JTiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU3MzExNDc5LCJleHAiOjE3NTczMTIwNzl9.xhEkuZEF0gZlvyX_F2kiAMEMGw_C2ZtGL8PmzLxhZQW32A9hmr6M0nauYEejXOFrZAb3nMdU3jFLxuhDWDbE2g' \
     -d '{
       "showId": 1,
-      "hallId": 10,
-      "startAt": "2025-09-10T19:00:00",
-      "endAt": "2025-09-10T21:30:00",
-      "runtimeMinutes": 150
+      "hallId": 1,
+      "startAt": "2025-10-10T19:00:00",
+      "endAt": "2025-10-10T21:30:00"
     }'
     ```
 
@@ -48,8 +47,7 @@
       "showId": 1,
       "hallId": 10,
       "startAt": "2025-09-10T19:00:00",
-      "endAt": "2025-09-10T21:30:00",
-      "runtimeMinutes": 150
+      "endAt": "2025-09-10T21:30:00"
     }
     ```
 

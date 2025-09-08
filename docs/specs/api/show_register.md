@@ -18,8 +18,8 @@
         "rating": "AGE12",
         "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
         "posterUrl": "https://example.com/posters/inception.jpg",
-        "performanceStartDate": "2024-07-01",
-        "performanceEndDate": "2024-07-31"
+        "performanceStartDate": "2025-10-01",
+        "performanceEndDate": "2025-10-31"
     }
     ```
 
@@ -28,7 +28,7 @@
 
     ```bash
       curl -i -X POST 'http://localhost:8080/api/show' \
-      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9ESVNUUklCVVRPUiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU2NDM4MjIzLCJleHAiOjE3NTY0Mzg4MjN9.DN0wZb8BdKY-7Grd0KAALXf88KX3iF_tg6UmcfotkFOlbRoRnSuY1nNVUFfZk2TxP0hvju3A8AglK3mt_hnutQ' \
+      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9BRE1JTiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU3MzExNDc5LCJleHAiOjE3NTczMTIwNzl9.xhEkuZEF0gZlvyX_F2kiAMEMGw_C2ZtGL8PmzLxhZQW32A9hmr6M0nauYEejXOFrZAb3nMdU3jFLxuhDWDbE2g' \
       -H 'Content-Type: application/json' \
       -d '{
             "title": "인셉션",
@@ -36,8 +36,8 @@
             "rating": "AGE12",
             "synopsis": "타인의 꿈속에 진입해 아이디어를 주입하는 특수 임무를 수행하는 이야기.",
             "posterUrl": "https://example.com/posters/inception.jpg",
-            "performanceStartDate": "2024-07-01",
-            "performanceEndDate": "2024-07-31"
+            "performanceStartDate": "2025-10-01",
+            "performanceEndDate": "2025-10-31"
           }'
     ```
 
@@ -52,7 +52,7 @@
         "data": {
             "showId": 1
         },
-        "timestamp": "2024-06-10T12:34:56.789Z"
+        "timestamp": "2025-09-10T12:34:56.789Z"
     }
     ```
 
