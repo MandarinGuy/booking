@@ -9,7 +9,7 @@ import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
-import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
+import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.domain.venue.HallException;

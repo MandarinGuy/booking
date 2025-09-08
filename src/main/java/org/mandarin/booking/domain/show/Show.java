@@ -16,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
-import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
 
 @Entity
 @Table(name = "shows")

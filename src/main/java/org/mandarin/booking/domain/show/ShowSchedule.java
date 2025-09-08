@@ -6,7 +6,6 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,7 @@ import org.mandarin.booking.domain.AbstractEntity;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class ShowSchedule extends AbstractEntity {
+class ShowSchedule extends AbstractEntity {
 
     @ManyToOne(fetch = LAZY, optional = false)
     @JoinColumn(name = "show_id", nullable = false)
@@ -43,21 +42,13 @@ public class ShowSchedule extends AbstractEntity {
         this.runtimeMinutes = runtimeMinutes;
     }
 
-    public boolean isConflict(LocalDateTime startAt, LocalDateTime endAt) {
-        return startAt.isBefore(this.endAt)
-               && endAt.isAfter(this.startAt);
-    }
-
     static ShowSchedule create(Show show, Long hallId, ShowScheduleCreateCommand command) {
         return new ShowSchedule(
                 show,
                 hallId,
-                command.startAt,
-                command.endAt,
-                (int) Duration.between(command.startAt, command.endAt).toMinutes()
+                command.startAt(),
+                command.endAt(),
+                command.getRuntimeMinutes()
         );
-    }
-
-    public record ShowScheduleCreateCommand(Long showId, LocalDateTime startAt, LocalDateTime endAt) {
     }
 }
