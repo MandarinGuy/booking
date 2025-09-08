@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.mandarin.booking.domain.AbstractEntity;
 import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
 
 @Entity
+@Table(name = "shows")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Show extends AbstractEntity {
