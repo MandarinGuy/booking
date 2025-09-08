@@ -6,6 +6,7 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.domain.member.MemberAuthority.ADMIN;
 import static org.mandarin.booking.domain.member.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.domain.member.MemberAuthority.USER;
 
@@ -39,6 +40,27 @@ public class POST_specs {
         // Act
         var response = testUtils.post("/api/show/schedule", request)
                 .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
+    }
+
+    @Test
+    void ADMIN_권한을_가진_사용자가_올바른_요청을_하는_경우_SUCCESS_상태코드를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hall = testUtils.insertDummyHall();
+        var request = generateShowScheduleRegisterRequest(
+                show, hall.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30));
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
                 .assertSuccess(ShowScheduleRegisterResponse.class);
 
         // Assert
