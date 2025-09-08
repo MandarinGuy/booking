@@ -15,4 +15,11 @@
 - [x] 리펙터링
 
 2025.08.29
-- [ ] `/api/members`와 같이 `/api`로 시작하지만 존재하지 않는 엔드포인트에 대한 처리가 `AuthenticationEntryPoint`에서 처리되고 있음
+
+- [x] `/api/members`와 같이 `/api`로 시작하지만 존재하지 않는 엔드포인트에 대한 처리가 `AuthenticationEntryPoint`에서 처리되고 있음
+
+2025.09.09
+
+- [ ] 모듈화 설계
+    - [ ] public 떡칠하지 말고 기본 접근제어자 적극 활용
+    - [ ] Spring Modulith 사용 가능한지 점검
