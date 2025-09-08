@@ -31,10 +31,10 @@ jobs:
           distribution: "temurin"
 
       - name: Build (no tests)
-        run: ./gradlew clean build -x test -x spotbugsMain -x spotbugsTest -Dspring.profiles.active=test
+        run: ./gradlew clean build -x test -Dspring.profiles.active=test
 
       - name: Test
-        run: ./gradlew test -Dspring.profiles.active=local
+        run: ./gradlew test -Dspring.profiles.active=test
 
       - name: Publish Test Report
         uses: dorny/test-reporter@v1
