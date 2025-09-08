@@ -23,3 +23,9 @@
 - [ ] 모듈화 설계
     - [ ] public 떡칠하지 말고 기본 접근제어자 적극 활용
     - [ ] Spring Modulith 사용 가능한지 점검
+
+---
+
+- [ ] venue register
+- [ ] hall register
+- [ ] 누가 AR인가? venue vs hall
