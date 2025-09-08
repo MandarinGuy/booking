@@ -11,7 +11,6 @@ import static org.mandarin.booking.domain.member.MemberAuthority.USER;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.IntegrationTest;
@@ -84,45 +83,6 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
     }
 
-    @Test
-    void runtimeMinutes가_0_이하일_경우_BAD_REQUEST를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
-    ) {
-        // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show, 0);
-
-        // Act
-        var response = testUtils.post("/api/show/schedule", request)
-                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
-                .assertFailure();
-
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-    }
-
-    @Test
-    void runtimeMinutes은_startAt과_endAt의_차이만큼이_아니면_BAD_REQUEST를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
-    ) {
-        // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testUtils.insertDummyHall();
-        var request = generateShowScheduleRegisterRequest(show,
-                100,// runtimeMinutes가 100분으로 startAt, endAt의 차이인 150분과 다름
-                LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30),
-                hall.getId());
-
-        // Act
-        var response = testUtils.post("/api/show/schedule", request)
-                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
-                .assertFailure();
-
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getData()).contains("The runtime must match the difference between start and end times");
-    }
 
     @Test
     void startAt이_endAt보다_늦은_경우_BAD_REQUEST를_반환한다(
@@ -130,7 +90,7 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show, 150,
+        var request = generateShowScheduleRegisterRequest(show,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
                 LocalDateTime.of(2025, 9, 10, 19, 0), 10L
         );
@@ -155,8 +115,7 @@ public class POST_specs {
                 9999L,// 존재하지 않는 showId
                 10L,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30),
-                150
+                LocalDateTime.of(2025, 9, 10, 21, 30)
         );
 
         // Act
@@ -179,8 +138,7 @@ public class POST_specs {
                 show.getId(),
                 9999L,// 존재하지 않는 hallId
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30),
-                150
+                LocalDateTime.of(2025, 9, 10, 21, 30)
         );
 
         // Act
@@ -204,8 +162,7 @@ public class POST_specs {
                 show.getId(),
                 hall.getId(),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
-                LocalDateTime.of(2023, 9, 10, 21, 30),
-                150
+                LocalDateTime.of(2023, 9, 10, 21, 30)
         );
 
         // Act
@@ -260,35 +217,30 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
-        assertThat(response.getData()).contains("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
-    }
-
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes) {
-        return generateShowScheduleRegisterRequest(show, runtimeMinutes, LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30), 10L);
+        assertThat(response.getData()).contains("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
     }
 
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
-        return generateShowScheduleRegisterRequest(show, 150);
+        return generateShowScheduleRegisterRequest(show, LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30), 10L);
     }
+
 
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
                                                                             long hallId,
                                                                             LocalDateTime startAt,
                                                                             LocalDateTime endAt) {
-        return generateShowScheduleRegisterRequest(show,
-                (int) ChronoUnit.MINUTES.between(startAt, endAt), startAt, endAt, hallId);
+        return generateShowScheduleRegisterRequest(show, startAt, endAt, hallId);
     }
 
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, int runtimeMinutes,
+    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
                                                                             LocalDateTime startAt,
                                                                             LocalDateTime endAt, long hallId) {
         return new ShowScheduleRegisterRequest(
                 show.getId(),
                 hallId,
                 startAt,
-                endAt,
-                runtimeMinutes
+                endAt
         );
     }
 }

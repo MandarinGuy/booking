@@ -15,9 +15,11 @@ import org.jspecify.annotations.Nullable;
 @ToString(callSuper = true)
 public abstract class AbstractEntity {
     @Id
-    @Getter(onMethod_ = {@Nullable})
+    @Nullable
+    @Getter
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
 
     @Override
     public final boolean equals(Object o) {

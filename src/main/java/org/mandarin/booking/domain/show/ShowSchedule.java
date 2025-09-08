@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
-import org.mandarin.booking.domain.venue.Hall;
 
 @Entity
 @Getter
@@ -22,9 +21,7 @@ public class ShowSchedule extends AbstractEntity {
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
-    @ManyToOne(fetch = LAZY, optional = false)
-    @JoinColumn(name = "hall_id", nullable = false)
-    private Hall hall;
+    private Long hallId;
 
     private LocalDateTime startAt;
 
@@ -34,13 +31,13 @@ public class ShowSchedule extends AbstractEntity {
 
     private ShowSchedule(
             Show show,
-            Hall hall,
+            Long hallId,
             LocalDateTime startAt,
             LocalDateTime endAt,
             Integer runtimeMinutes
     ) {
         this.show = show;
-        this.hall = hall;
+        this.hallId = hallId;
         this.startAt = startAt;
         this.endAt = endAt;
         this.runtimeMinutes = runtimeMinutes;
@@ -51,10 +48,10 @@ public class ShowSchedule extends AbstractEntity {
                && endAt.isAfter(this.startAt);
     }
 
-    static ShowSchedule create(Show show, Hall hall, ShowScheduleCreateCommand command) {
+    static ShowSchedule create(Show show, Long hallId, ShowScheduleCreateCommand command) {
         return new ShowSchedule(
                 show,
-                hall,
+                hallId,
                 command.startAt,
                 command.endAt,
                 (int) Duration.between(command.startAt, command.endAt).toMinutes()

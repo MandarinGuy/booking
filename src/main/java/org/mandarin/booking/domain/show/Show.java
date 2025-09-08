@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
 import org.mandarin.booking.domain.show.ShowSchedule.ShowScheduleCreateCommand;
-import org.mandarin.booking.domain.venue.Hall;
 
 @Entity
 @Getter
@@ -73,15 +72,12 @@ public class Show extends AbstractEntity {
         );
     }
 
-    public void registerSchedule(Hall hall, ShowScheduleCreateCommand command) {
+    public void registerSchedule(Long hallId, ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
         }
-        if (!hall.canScheduleOn(command.startAt(), command.endAt())) {
-            throw new ShowException("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
-        }
 
-        var schedule = ShowSchedule.create(this, hall, command);
+        var schedule = ShowSchedule.create(this, hallId, command);
         this.schedules.add(schedule);
     }
 
