@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,9 +33,9 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain apiChain(HttpSecurity http,
-                                                   AuthenticationProvider authenticationProvider,
-                                                   AuthenticationEntryPoint authenticationEntryPoint,
-                                                   AccessDeniedHandler accessDeniedHandler)
+                                        AuthenticationProvider authenticationProvider,
+                                        AuthenticationEntryPoint authenticationEntryPoint,
+                                        AccessDeniedHandler accessDeniedHandler)
             throws Exception {
         http
                 .securityMatcher("/api/**")
@@ -52,6 +56,21 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(tokenUtils, authenticationProvider::authenticate),
                         UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    static RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("ADMIN").implies("DISTRIBUTOR")
+                .role("DISTRIBUTOR").implies("USER")
+                .build();
+    }
+
+    @Bean
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        return expressionHandler;
     }
 
     @Bean
