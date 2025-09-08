@@ -77,6 +77,9 @@ public class Show extends AbstractEntity {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
         }
+        if (!hall.canScheduleOn(command.startAt(), command.endAt())) {
+            throw new ShowException("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
+        }
 
         var schedule = ShowSchedule.create(this, hall, command);
         this.schedules.add(schedule);

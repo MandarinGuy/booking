@@ -4,6 +4,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import org.springframework.core.annotation.Order;
 
 public record ShowScheduleRegisterRequest(
         Long showId,
@@ -14,11 +15,13 @@ public record ShowScheduleRegisterRequest(
         @Min(value = 1, message = "The screening time should be at least 1 minute")
         Integer runtimeMinutes
 ) {
+    @Order(0)
     @AssertTrue(message = "The end time must be after the start time")
     private boolean isEndAfterStart() {
         return endAt.isAfter(startAt);
     }
 
+    @Order(1)
     @AssertTrue(message = "The runtime must match the difference between start and end times")
     private boolean isRuntimeValid() {
         long between = ChronoUnit.MINUTES.between(startAt, endAt);

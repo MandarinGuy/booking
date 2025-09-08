@@ -38,7 +38,7 @@ public class ShowService implements ShowRegisterer {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
-        var hall = hallQueryRepository.getScreenableHall(request);
+        var hall = hallQueryRepository.getHall(request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());
 
         show.registerSchedule(hall, command);
