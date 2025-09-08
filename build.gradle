@@ -75,7 +75,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 
     // ---- API Docs (REST Docs + Rest Assured) ----
-    testImplementation 'io.rest-assured:rest-assured:5.5.6'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
 
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
