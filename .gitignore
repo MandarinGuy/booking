@@ -1,6 +1,4 @@
-# Gradle 캐시·빌드 정보
 .gradle/
 /build
 .idea
 .aiassistant/rules/AGENTS.md
-/src/docs/
