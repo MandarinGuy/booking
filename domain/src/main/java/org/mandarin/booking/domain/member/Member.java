@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.domain.AbstractEntity;
 
 @Entity

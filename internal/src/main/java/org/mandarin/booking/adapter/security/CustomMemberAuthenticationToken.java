@@ -2,7 +2,7 @@ package org.mandarin.booking.adapter.security;
 
 import java.util.Collection;
 import org.jspecify.annotations.NullUnmarked;
-import org.mandarin.booking.domain.member.MemberAuthority;
+import org.mandarin.booking.MemberAuthority;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 

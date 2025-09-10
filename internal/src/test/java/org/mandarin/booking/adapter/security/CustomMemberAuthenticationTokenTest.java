@@ -1,7 +1,7 @@
 package org.mandarin.booking.adapter.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.domain.member.MemberAuthority.USER;
+import static org.mandarin.booking.MemberAuthority.USER;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

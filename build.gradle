@@ -61,7 +61,7 @@ subprojects {
 
     tasks.named('test') {
         useJUnitPlatform()
-        failFast = true
+//        failFast = true
         systemProperty 'spring.profiles.active', 'test'
     }
 }

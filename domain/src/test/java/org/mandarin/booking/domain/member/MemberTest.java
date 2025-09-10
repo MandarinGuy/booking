@@ -1,12 +1,10 @@
-package org.mandarin.booking.domain;
+package org.mandarin.booking.domain.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
-import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 
 class MemberTest {
     private static final String MAIL = "test@test.com";

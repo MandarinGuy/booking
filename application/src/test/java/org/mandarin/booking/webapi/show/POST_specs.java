@@ -1,11 +1,11 @@
 package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
-import static org.mandarin.booking.domain.member.MemberAuthority.ADMIN;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,7 +1,6 @@
 package org.mandarin.booking.adapter.security;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.app.TokenUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

@@ -1,6 +1,4 @@
-package org.mandarin.booking.domain.member;
-
-import org.mandarin.booking.domain.DomainException;
+package org.mandarin.booking;
 
 public class AuthException extends DomainException {
     public AuthException(String message) {

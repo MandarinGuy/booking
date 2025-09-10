@@ -1,8 +1,9 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.app;
 
 import lombok.RequiredArgsConstructor;
+import org.mandarin.booking.AuthException;
+import org.mandarin.booking.adapter.security.CustomMemberAuthenticationToken;
 import org.mandarin.booking.app.persist.MemberQueryRepository;
-import org.mandarin.booking.domain.member.AuthException;
 import org.mandarin.booking.domain.member.Member;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;

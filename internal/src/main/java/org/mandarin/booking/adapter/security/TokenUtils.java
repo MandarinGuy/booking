@@ -1,8 +1,8 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.adapter.security;
 
 import java.util.Collection;
-import org.mandarin.booking.domain.member.MemberAuthority;
-import org.mandarin.booking.domain.member.TokenHolder;
+import org.mandarin.booking.MemberAuthority;
+import org.mandarin.booking.TokenHolder;
 
 public interface TokenUtils {
     TokenHolder generateToken(String refreshToken);

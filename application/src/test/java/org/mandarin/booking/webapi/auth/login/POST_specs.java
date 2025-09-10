@@ -19,9 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
+import org.mandarin.booking.TokenHolder;
 import org.mandarin.booking.app.persist.MemberQueryRepository;
 import org.mandarin.booking.domain.member.AuthRequest;
-import org.mandarin.booking.domain.member.TokenHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

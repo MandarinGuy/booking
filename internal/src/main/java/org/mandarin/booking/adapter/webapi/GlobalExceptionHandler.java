@@ -6,8 +6,8 @@ import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mandarin.booking.domain.DomainException;
-import org.mandarin.booking.domain.member.AuthException;
+import org.mandarin.booking.AuthException;
+import org.mandarin.booking.DomainException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -2,3 +2,6 @@ rootProject.name = 'booking'
 
 include ':application'
 include ':domain'
+
+include 'internal'
+include 'common'

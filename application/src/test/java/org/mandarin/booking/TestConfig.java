@@ -1,7 +1,7 @@
 package org.mandarin.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandarin.booking.app.TokenUtils;
+import org.mandarin.booking.adapter.security.TokenUtils;
 import org.mandarin.booking.app.persist.HallCommandRepository;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.app.persist.ShowCommandRepository;

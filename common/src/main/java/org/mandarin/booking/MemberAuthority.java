@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.member;
+package org.mandarin.booking;
 
 public enum MemberAuthority {
     USER,

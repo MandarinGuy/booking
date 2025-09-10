@@ -12,7 +12,6 @@ import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.NoRestDocs;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController;
 import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController.TestSecurityConfig;
-import org.mandarin.booking.app.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
