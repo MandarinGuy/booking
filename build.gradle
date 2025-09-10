@@ -1,113 +1,67 @@
+buildscript {
+    ext {
+        dependencyManagementVersion = '1.1.7'
+        springBootVersion = '3.5.4'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.4'
-	id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.epages.restdocs-api-spec' version '0.18.2'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'base'
 }
 
-group = 'org.mandarin'
-version = '0.0.1-SNAPSHOT'
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-test-fixtures'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
+    group = 'org.yechan'
+    version = '1.0-SNAPSHOT'
+    sourceCompatibility = '21'
 
-repositories {
-	mavenCentral()
-}
-
-configurations {
-	byteBuddyAgent
-    asciidoctorExt
-}
-
-dependencies {
-    // ---- Spring Boot Core ----
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-    // ---- Data & Database ----
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.mysql:mysql-connector-j:8.3.0'
-    testRuntimeOnly 'com.h2database:h2'
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-
-    // ---- Querydsl ----
-    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
-    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
-    // Ensure APT has Jakarta APIs (some environments require explicit presence)
-    annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-    annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-
-    // ---- Security & Auth ----
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-    testImplementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-
-    // ---- Lombok ----
-    compileOnly 'org.projectlombok:lombok:1.18.36'
-    annotationProcessor 'org.projectlombok:lombok:1.18.36'
-    testCompileOnly 'org.projectlombok:lombok:1.18.36'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
-
-    // ---- Dev Only ----
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-    // ---- Testing ----
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
-	byteBuddyAgent 'net.bytebuddy:byte-buddy-agent:1.17.6'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
-
-    // ---- API Docs (REST Docs + Rest Assured) ----
-    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
-
-    // null safety
-    implementation 'org.jspecify:jspecify:1.0.0'
-}
-ext {
-    set('snippetsDir', file('build/generated-snippets'))
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-	systemProperty 'spring.profiles.active', 'test'
-	// javaagent 선부착 (Mockito self-attach 방지)
-	jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
-    outputs.dir snippetsDir
-}
-
-asciidoctor {
-    group = 'documentation'
-    description = 'Converts AsciiDoc files to HTML, including REST Docs snippets.'
-    dependsOn test
-    baseDirFollowsSourceDir()
-    sourceDir = file('src/docs')
-    sources {
-        include '**/*.adoc'
+    configurations {
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
-    inputs.dir snippetsDir
-    attributes 'snippets': snippetsDir
-    resources {
-        from(snippetsDir) { into 'snippets' }
-    }
-    outputDir = layout.buildDirectory.dir("docs/asciidoc").get().asFile
-}
 
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // ---- Lombok ----
+        compileOnly 'org.projectlombok:lombok:1.18.36'
+        annotationProcessor 'org.projectlombok:lombok:1.18.36'
+        testCompileOnly 'org.projectlombok:lombok:1.18.36'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+        // ---- Testing ----
+        testImplementation 'org.mockito:mockito-inline:5.2.0'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        // null safety
+        implementation 'org.jspecify:jspecify:1.0.0'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+        failFast = true
+        systemProperty 'spring.profiles.active', 'test'
+    }
+}

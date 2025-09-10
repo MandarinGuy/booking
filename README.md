@@ -115,7 +115,9 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 ---
 
 ## 11. 버전/도구 근거 링크
-- Spring Boot/Java/Gradle 버전: [build.gradle](build.gradle), [gradle-wrapper.properties](gradle/wrapper/gradle-wrapper.properties)
+
+- Spring Boot/Java/Gradle
+  버전: [build.gradle](application/build.gradle), [gradle-wrapper.properties](gradle/wrapper/gradle-wrapper.properties)
 - 애플리케이션 엔트리포인트: `src/main/java/org/mandarin/booking/BookingApplication.java`
 - 보안 설정/필터: `src/main/java/org/mandarin/booking/adapter/security/SecurityConfig.java`, `src/main/java/org/mandarin/booking/adapter/security/JwtFilter.java`
 - 아키텍처 규칙: [docs/specs/policy/application.md](docs/specs/policy/application.md)
