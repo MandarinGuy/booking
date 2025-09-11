@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class LoggingAspect {
+class LoggingAspect {
 
-    @Around("@within(org.mandarin.booking.app.Log) || @annotation(org.mandarin.booking.app.Log)")
+    @Around("@within(org.mandarin.booking.Log) || @annotation(org.mandarin.booking.Log)")
     public Object around(ProceedingJoinPoint jp) throws Throwable {
         Logger logger = selectTargetLogger(jp);
         String level = resolveScope(jp);
@@ -40,7 +40,7 @@ public class LoggingAspect {
 
     @AfterThrowing(
             argNames = "pjp,ex",
-            pointcut = "@within(org.mandarin.booking.app.Log) || @annotation(org.mandarin.booking.app.Log)",
+            pointcut = "@within(org.mandarin.booking.Log) || @annotation(org.mandarin.booking.Log)",
             throwing = "ex"
     )
     public void afterThrowing(JoinPoint pjp, Throwable ex) {

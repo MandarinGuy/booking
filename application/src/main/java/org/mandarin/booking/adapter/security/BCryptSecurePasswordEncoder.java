@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.adapter.security;
 
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;

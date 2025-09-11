@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

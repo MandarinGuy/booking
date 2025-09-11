@@ -12,8 +12,8 @@ import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.NoRestDocs;
 import org.mandarin.booking.adapter.JwtFilter;
 import org.mandarin.booking.adapter.TokenUtils;
-import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController;
-import org.mandarin.booking.adapter.security.JwtFilterTest.TestAuthController.TestSecurityConfig;
+import org.mandarin.booking.adapter.security.AuthIntegrationTest.TestAuthController;
+import org.mandarin.booking.adapter.security.AuthIntegrationTest.TestAuthController.TestSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @IntegrationTest
 @NoRestDocs
 @Import({TestSecurityConfig.class, TestAuthController.class})
-class JwtFilterTest {
+class AuthIntegrationTest {
     private static final String PONG_WITHOUT_AUTH = "pong without auth";
     private static final String PONG_WITH_AUTH = "pong with auth";
     private static final String WITH_USER_ROLE = "pong with user role";

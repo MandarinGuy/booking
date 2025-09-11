@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.adapter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -18,7 +18,6 @@ import org.jspecify.annotations.Nullable;
 import org.mandarin.booking.AuthException;
 import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.TokenHolder;
-import org.mandarin.booking.adapter.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
