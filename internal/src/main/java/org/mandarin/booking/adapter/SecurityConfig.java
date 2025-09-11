@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+class SecurityConfig {
     private final TokenUtils tokenUtils;
 
     @Bean

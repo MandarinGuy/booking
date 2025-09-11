@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.adapter;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;

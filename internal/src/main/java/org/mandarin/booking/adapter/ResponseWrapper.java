@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.adapter;
 
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice
-public class ResponseWrapper implements ResponseBodyAdvice<Object> {
+class ResponseWrapper implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(final MethodParameter returnType,
                             final Class<? extends HttpMessageConverter<?>> converterType) {

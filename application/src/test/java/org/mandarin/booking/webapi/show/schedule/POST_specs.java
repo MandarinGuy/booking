@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.MemberAuthority.USER;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.FORBIDDEN;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.INTERNAL_SERVER_ERROR;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
+import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
+import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
+import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

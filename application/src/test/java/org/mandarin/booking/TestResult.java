@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
-import org.mandarin.booking.adapter.webapi.ApiResponse;
-import org.mandarin.booking.adapter.webapi.ApiStatus;
-import org.mandarin.booking.adapter.webapi.ErrorResponse;
-import org.mandarin.booking.adapter.webapi.SuccessResponse;
+import org.mandarin.booking.adapter.ApiResponse;
+import org.mandarin.booking.adapter.ApiStatus;
+import org.mandarin.booking.adapter.ErrorResponse;
+import org.mandarin.booking.adapter.SuccessResponse;
 
 public class TestResult {
     private Executor executor;

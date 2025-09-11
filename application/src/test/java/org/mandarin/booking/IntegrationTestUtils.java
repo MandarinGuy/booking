@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import org.mandarin.booking.adapter.security.TokenUtils;
+import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.app.persist.HallCommandRepository;
 import org.mandarin.booking.app.persist.MemberCommandRepository;
 import org.mandarin.booking.app.persist.ShowCommandRepository;

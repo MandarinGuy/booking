@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import org.springframework.util.StreamUtils;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class CommonHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
+class CommonHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private final ObjectMapper objectMapper;
 
     public CommonHttpMessageConverter(ObjectMapper objectMapper) {

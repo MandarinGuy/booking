@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.MemberAuthority.USER;

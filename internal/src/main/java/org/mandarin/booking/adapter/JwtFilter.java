@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.adapter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

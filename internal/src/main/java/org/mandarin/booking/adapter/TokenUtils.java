@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.adapter;
 
 import java.util.Collection;
 import org.mandarin.booking.MemberAuthority;

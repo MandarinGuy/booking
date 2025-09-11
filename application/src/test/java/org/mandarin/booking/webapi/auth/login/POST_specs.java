@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
 import static org.mandarin.booking.JwtTestUtils.getExpiration;
 import static org.mandarin.booking.JwtTestUtils.getTokenClaims;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
 

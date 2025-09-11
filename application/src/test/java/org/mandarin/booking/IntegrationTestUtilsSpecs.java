@@ -1,7 +1,7 @@
 package org.mandarin.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;

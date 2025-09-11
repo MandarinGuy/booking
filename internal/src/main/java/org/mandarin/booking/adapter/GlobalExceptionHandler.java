@@ -1,9 +1,9 @@
-package org.mandarin.booking.adapter.webapi;
+package org.mandarin.booking.adapter;
 
 import static java.util.Objects.requireNonNull;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.NOT_FOUND;
-import static org.mandarin.booking.adapter.webapi.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
+import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.mandarin.booking.AuthException;
@@ -15,7 +15,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException.class)
     public ErrorResponse handleJsonParseError(DomainException ex) {
