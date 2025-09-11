@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/member")
-public record MemberController(MemberRegisterer memberRegisterer) {
+record MemberController(MemberRegisterer memberRegisterer) {
 
     @PostMapping
-    public MemberRegisterResponse register(@RequestBody @Valid MemberRegisterRequest request) {
+    MemberRegisterResponse register(@RequestBody @Valid MemberRegisterRequest request) {
         return memberRegisterer.register(request);
     }
 }

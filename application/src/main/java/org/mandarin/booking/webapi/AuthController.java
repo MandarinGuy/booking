@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-public record AuthController(AuthUseCase authUsecase) {
+record AuthController(AuthUseCase authUsecase) {
 
     @PostMapping("/login")
-    public TokenHolder login(@RequestBody @Valid AuthRequest request) {
+    TokenHolder login(@RequestBody @Valid AuthRequest request) {
         return authUsecase.login(request.userId(), request.password());
     }
 
     @PostMapping("/reissue")
-    public TokenHolder reissue(@RequestBody @Valid ReissueRequest request) {
+    TokenHolder reissue(@RequestBody @Valid ReissueRequest request) {
         return authUsecase.reissue(request.refreshToken());
     }
 }

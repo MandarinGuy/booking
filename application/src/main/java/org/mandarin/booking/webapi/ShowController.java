@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/show")
-public record ShowController(ShowRegisterer showRegisterer) {
+record ShowController(ShowRegisterer showRegisterer) {
 
     @PostMapping
-    public ShowRegisterResponse register(@RequestBody @Valid ShowRegisterRequest request) {
+    ShowRegisterResponse register(@RequestBody @Valid ShowRegisterRequest request) {
         return showRegisterer.register(request);
     }
 
     @PostMapping("/schedule")
-    public ShowScheduleRegisterResponse registerSchedule(@RequestBody @Valid ShowScheduleRegisterRequest request) {
+    ShowScheduleRegisterResponse registerSchedule(@RequestBody @Valid ShowScheduleRegisterRequest request) {
         return showRegisterer.registerSchedule(request);
     }
 }
