@@ -14,7 +14,7 @@ ext {
 
 dependencies {
     api(project(':domain'))
-    api(project(':common'))
+    implementation project(':common')
     api(project(':internal'))
     // ---- Spring Boot Core ----
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -63,5 +63,6 @@ asciidoctor {
 
 tasks.named('test') {
     jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
+    jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
     outputs.dir snippetsDir
 }
