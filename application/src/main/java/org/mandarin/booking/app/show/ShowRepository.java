@@ -1,4 +1,4 @@
-package org.mandarin.booking.app.persist;
+package org.mandarin.booking.app.show;
 
 import java.util.Optional;
 import org.mandarin.booking.domain.show.Show;

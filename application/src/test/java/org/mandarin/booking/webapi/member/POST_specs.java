@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.IntegrationTest;
 import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.app.persist.MemberQueryRepository;
+import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.MemberRegisterRequest;
 import org.mandarin.booking.domain.member.MemberRegisterResponse;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;

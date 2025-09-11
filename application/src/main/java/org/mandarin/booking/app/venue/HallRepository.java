@@ -1,4 +1,4 @@
-package org.mandarin.booking.app.persist;
+package org.mandarin.booking.app.venue;
 
 import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.data.repository.Repository;

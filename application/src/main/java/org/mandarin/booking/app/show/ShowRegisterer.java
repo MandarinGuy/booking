@@ -1,4 +1,4 @@
-package org.mandarin.booking.app.port;
+package org.mandarin.booking.app.show;
 
 import jakarta.validation.Valid;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;

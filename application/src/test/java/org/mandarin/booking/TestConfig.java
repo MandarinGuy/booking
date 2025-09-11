@@ -2,9 +2,9 @@ package org.mandarin.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mandarin.booking.adapter.TokenUtils;
-import org.mandarin.booking.app.persist.HallCommandRepository;
-import org.mandarin.booking.app.persist.MemberCommandRepository;
-import org.mandarin.booking.app.persist.ShowCommandRepository;
+import org.mandarin.booking.app.member.MemberCommandRepository;
+import org.mandarin.booking.app.show.ShowCommandRepository;
+import org.mandarin.booking.app.venue.HallCommandRepository;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;

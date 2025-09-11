@@ -1,11 +1,9 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.app.show;
 
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.app.persist.ShowCommandRepository;
-import org.mandarin.booking.app.persist.ShowQueryRepository;
-import org.mandarin.booking.app.port.ShowRegisterer;
+import org.mandarin.booking.app.venue.HallExistCheckEvent;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.ShowException;

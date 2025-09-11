@@ -1,8 +1,6 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.app.member;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.app.persist.MemberCommandRepository;
-import org.mandarin.booking.app.port.MemberRegisterer;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.MemberRegisterRequest;

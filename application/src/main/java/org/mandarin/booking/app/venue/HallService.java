@@ -1,7 +1,6 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.app.venue;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.app.persist.HallQueryRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 

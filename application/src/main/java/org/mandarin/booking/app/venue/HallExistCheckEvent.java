@@ -1,4 +1,4 @@
-package org.mandarin.booking.app;
+package org.mandarin.booking.app.venue;
 
 import lombok.Getter;
 

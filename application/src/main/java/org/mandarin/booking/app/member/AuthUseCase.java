@@ -1,4 +1,4 @@
-package org.mandarin.booking.app.port;
+package org.mandarin.booking.app.member;
 
 import org.mandarin.booking.TokenHolder;
 
