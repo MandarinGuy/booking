@@ -23,9 +23,6 @@ public class ResponseWrapper implements ResponseBodyAdvice<Object> {
                                   final MediaType selectedContentType,
                                   final Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   final ServerHttpRequest request, final ServerHttpResponse response) {
-        if (body == null) {
-            return new SuccessResponse<>(ApiStatus.SUCCESS, "null");
-        }
         return new SuccessResponse<>(ApiStatus.SUCCESS, body);
     }
 }
