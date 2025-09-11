@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+class CustomAuthenticationProvider implements AuthenticationProvider {
     private final MemberQueryRepository queryRepository;
 
     @Override
