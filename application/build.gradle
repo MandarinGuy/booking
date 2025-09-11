@@ -17,7 +17,6 @@ dependencies {
     api(project(':internal'))
     api(project(':external'))
 
-    implementation project(':common')
     // ---- Spring Boot Core ----
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

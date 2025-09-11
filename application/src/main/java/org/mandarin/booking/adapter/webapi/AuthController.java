@@ -1,4 +1,4 @@
-package org.mandarin.booking.webapi;
+package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
 import org.mandarin.booking.TokenHolder;
