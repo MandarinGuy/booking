@@ -1,5 +1,6 @@
 package org.mandarin.booking.adapter.webapi;
 
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -23,6 +24,6 @@ public class ResponseWrapper implements ResponseBodyAdvice<Object> {
                                   final MediaType selectedContentType,
                                   final Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   final ServerHttpRequest request, final ServerHttpResponse response) {
-        return new SuccessResponse<>(ApiStatus.SUCCESS, body);
+        return new SuccessResponse<>(ApiStatus.SUCCESS, Objects.requireNonNull(body));
     }
 }
