@@ -11,11 +11,6 @@ import org.mandarin.booking.domain.AbstractEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Hall extends AbstractEntity {
 
-//    public boolean canScheduleOn(LocalDateTime startAt, LocalDateTime endAt) {
-//        return showSchedules.stream()
-//                .noneMatch(schedule -> schedule.isConflict(startAt, endAt));
-//    }
-
     public static Hall create() {
         return new Hall();
     }
