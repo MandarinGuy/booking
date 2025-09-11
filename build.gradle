@@ -23,7 +23,6 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'java-test-fixtures'
 
     group = 'org.yechan'
     version = '1.0-SNAPSHOT'
@@ -62,6 +61,7 @@ subprojects {
     tasks.named('test') {
         useJUnitPlatform()
 //        failFast = true
+        jvmArgs = ['-XX:+EnableDynamicAgentLoading', '-Xshare:off']
         systemProperty 'spring.profiles.active', 'test'
     }
 }
