@@ -1,21 +1,21 @@
 package org.mandarin.booking.webapi.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
-import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
+import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mandarin.booking.IntegrationTest;
-import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.MemberRegisterRequest;
 import org.mandarin.booking.domain.member.MemberRegisterResponse;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
-import org.mandarin.booking.fixture.MemberFixture.NicknameGenerator;
-import org.mandarin.booking.fixture.MemberFixture.PasswordGenerator;
+import org.mandarin.booking.utils.IntegrationTest;
+import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.MemberFixture.NicknameGenerator;
+import org.mandarin.booking.utils.MemberFixture.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest

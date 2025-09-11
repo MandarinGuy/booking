@@ -1,4 +1,4 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;

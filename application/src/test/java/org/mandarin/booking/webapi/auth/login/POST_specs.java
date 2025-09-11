@@ -1,14 +1,14 @@
 package org.mandarin.booking.webapi.auth.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.JwtTestUtils.assertJwtFormat;
-import static org.mandarin.booking.JwtTestUtils.getExpiration;
-import static org.mandarin.booking.JwtTestUtils.getTokenClaims;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
-import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
-import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.utils.JwtTestUtils.assertJwtFormat;
+import static org.mandarin.booking.utils.JwtTestUtils.getExpiration;
+import static org.mandarin.booking.utils.JwtTestUtils.getTokenClaims;
+import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
+import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
 
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -17,11 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mandarin.booking.IntegrationTest;
-import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.TokenHolder;
 import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.AuthRequest;
+import org.mandarin.booking.utils.IntegrationTest;
+import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

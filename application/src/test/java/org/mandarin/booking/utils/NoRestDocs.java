@@ -1,4 +1,4 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

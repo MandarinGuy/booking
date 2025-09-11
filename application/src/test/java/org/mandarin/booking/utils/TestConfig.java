@@ -1,4 +1,4 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mandarin.booking.adapter.TokenUtils;

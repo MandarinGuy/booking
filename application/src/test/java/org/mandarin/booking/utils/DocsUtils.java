@@ -1,4 +1,4 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
 import static io.restassured.RestAssured.given;
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;

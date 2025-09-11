@@ -7,13 +7,13 @@ import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.IntegrationTest;
-import org.mandarin.booking.IntegrationTestUtils;
-import org.mandarin.booking.NoRestDocs;
 import org.mandarin.booking.adapter.JwtFilter;
 import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.adapter.security.AuthIntegrationTest.TestAuthController;
 import org.mandarin.booking.adapter.security.AuthIntegrationTest.TestAuthController.TestSecurityConfig;
+import org.mandarin.booking.utils.IntegrationTest;
+import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.NoRestDocs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

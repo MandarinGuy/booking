@@ -1,9 +1,9 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
-import static org.mandarin.booking.fixture.MemberFixture.EmailGenerator.generateEmail;
-import static org.mandarin.booking.fixture.MemberFixture.NicknameGenerator.generateNickName;
-import static org.mandarin.booking.fixture.MemberFixture.PasswordGenerator.generatePassword;
-import static org.mandarin.booking.fixture.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
+import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
+import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
+import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import org.mandarin.booking.MemberAuthority;
+import org.mandarin.booking.TokenHolder;
 import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.app.member.MemberCommandRepository;
 import org.mandarin.booking.app.show.ShowCommandRepository;

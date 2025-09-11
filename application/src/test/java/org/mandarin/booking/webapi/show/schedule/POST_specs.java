@@ -15,11 +15,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.IntegrationTest;
-import org.mandarin.booking.IntegrationTestUtils;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
+import org.mandarin.booking.utils.IntegrationTest;
+import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest

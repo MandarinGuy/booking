@@ -1,4 +1,4 @@
-package org.mandarin.booking.fixture;
+package org.mandarin.booking.utils;
 
 import java.util.UUID;
 

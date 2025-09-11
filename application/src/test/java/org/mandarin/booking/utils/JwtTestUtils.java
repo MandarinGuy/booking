@@ -1,4 +1,4 @@
-package org.mandarin.booking;
+package org.mandarin.booking.utils;
 
 import static java.util.Base64.getUrlDecoder;
 import static org.assertj.core.api.Assertions.assertThat;
