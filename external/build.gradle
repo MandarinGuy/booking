@@ -1,0 +1,15 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    // ---- Data & Database ----
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'com.h2database:h2'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+}
