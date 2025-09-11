@@ -28,8 +28,9 @@ public class AuthService implements AuthUseCase {
     @Override
     public TokenHolder reissue(String refreshToken) {
         var userId = tokenUtils.getClaim(refreshToken, "userId");
-        if(!queryRepository.existsByUserId(userId))
+        if (!queryRepository.existsByUserId(userId)) {
             throw new AuthException("회원이 존재하지 않습니다");
+        }
         return tokenUtils.generateToken(refreshToken);
     }
 

@@ -56,7 +56,7 @@ public class JwtTokenUtils implements TokenUtils {
         String userId = claims.getPayload().get(USER_ID).toString();
         String nickName = claims.getPayload().get(NICK_NAME).toString();
         List<MemberAuthority> authorities = Arrays.stream(claims.getPayload().get(ROLES, String.class).split(","))
-                .map(s->s.substring(5))
+                .map(s -> s.substring(5))
                 .map(MemberAuthority::valueOf)
                 .toList();
         return generateToken(userId, nickName, authorities);
@@ -73,8 +73,9 @@ public class JwtTokenUtils implements TokenUtils {
     public Collection<String> getClaims(String token, String claimName) {
         Jws<Claims> claims = parseClaims(token);
         var rawPayload = claims.getPayload().get(claimName, String.class);
-        if(rawPayload.isBlank())
+        if (rawPayload.isBlank()) {
             return new ArrayList<>();
+        }
         return Arrays.stream(rawPayload.split(",")).toList();
     }
 

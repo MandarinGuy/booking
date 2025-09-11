@@ -22,24 +22,17 @@ import org.mandarin.booking.domain.AbstractEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Show extends AbstractEntity {
-    private String title;
-
-    @Enumerated(EnumType.STRING)
-    private Type type;
-
-    @Enumerated(EnumType.STRING)
-    private Rating rating;
-
-    private String synopsis;
-
-    private String posterUrl;
-
-    private LocalDate performanceStartDate;
-
-    private LocalDate performanceEndDate;
-
     @OneToMany(mappedBy = "show", fetch = LAZY, cascade = MERGE)
     private final List<ShowSchedule> schedules = new ArrayList<>();
+    private String title;
+    @Enumerated(EnumType.STRING)
+    private Type type;
+    @Enumerated(EnumType.STRING)
+    private Rating rating;
+    private String synopsis;
+    private String posterUrl;
+    private LocalDate performanceStartDate;
+    private LocalDate performanceEndDate;
 
     private Show(String title, Type type, Rating rating, String synopsis, String posterUrl,
                  LocalDate performanceStartDate,
@@ -53,6 +46,14 @@ public class Show extends AbstractEntity {
         this.performanceEndDate = performanceEndDate;
     }
 
+    public void registerSchedule(Long hallId, ShowScheduleCreateCommand command) {
+        if (!isInSchedule(command.startAt(), command.endAt())) {
+            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
+        }
+
+        var schedule = ShowSchedule.create(this, hallId, command);
+        this.schedules.add(schedule);
+    }
 
     public static Show create(ShowCreateCommand command) {
         var startDate = command.getPerformanceStartDate();
@@ -71,15 +72,6 @@ public class Show extends AbstractEntity {
                 startDate,
                 endDate
         );
-    }
-
-    public void registerSchedule(Long hallId, ShowScheduleCreateCommand command) {
-        if (!isInSchedule(command.startAt(), command.endAt())) {
-            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
-        }
-
-        var schedule = ShowSchedule.create(this, hallId, command);
-        this.schedules.add(schedule);
     }
 
     private boolean isInSchedule(LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {

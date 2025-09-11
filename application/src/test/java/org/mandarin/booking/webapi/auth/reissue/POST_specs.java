@@ -120,29 +120,51 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
-    
+
     @Test
     void 요청_body가_누락된_경우_400_Bad_Request가_발생한다(
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var request = new ReissueRequest(null);
-        
+
         // Act
         var response = testUtils.post(
                         "/api/auth/reissue",
                         request
                 )
                 .assertFailure();
-        
+
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
+    @Test
+    void 존재하지_않는_사용자의_refresh_token을_요청하면_401_Unauthorize가_발생한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TokenUtils tokenUtils
+    ) {
+        // Arrange
+        var validRefreshToken = tokenUtils.generateToken(generateUserId(), generateNickName(), List.of(USER))
+                .refreshToken();
+        var request = new ReissueRequest(validRefreshToken);
+
+        // user 생성 안함
+
+        // Act
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+    }
 
     @Nested
     @TestPropertySource(properties = "jwt.token.refresh=100")
-    class ReissueShortToken{
+    class ReissueShortToken {
         @Test
         void 만료된_refresh_token으로_요청하면_401_Unauthorize가_발생한다(
                 @Autowired IntegrationTestUtils testUtils
@@ -162,27 +184,5 @@ public class POST_specs {
             // Assert
             assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
         }
-    }
-
-    @Test
-    void 존재하지_않는_사용자의_refresh_token을_요청하면_401_Unauthorize가_발생한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TokenUtils tokenUtils
-    ) {
-        // Arrange
-        var validRefreshToken = tokenUtils.generateToken(generateUserId(), generateNickName(), List.of(USER)).refreshToken();
-        var request = new ReissueRequest(validRefreshToken);
-
-        // user 생성 안함
-        
-        // Act
-        var response = testUtils.post(
-                        "/api/auth/reissue",
-                        request
-                )
-                .assertFailure();
-        
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
 }

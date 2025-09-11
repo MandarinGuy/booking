@@ -25,6 +25,16 @@ public class Member extends AbstractEntity {
     @Convert(converter = MemberAuthorityConverter.class)
     private List<MemberAuthority> authorities = new ArrayList<>();
 
+    public String[] getParsedAuthorities() {
+        return authorities.stream()
+                .map(MemberAuthority::getAuthority)
+                .toArray(String[]::new);
+    }
+
+    public boolean matchesPassword(String rawPassword, SecurePasswordEncoder securePasswordEncoder) {
+        return securePasswordEncoder.matches(rawPassword, this.passwordHash);
+    }
+
     public static Member create(MemberCreateCommand command,
                                 SecurePasswordEncoder securePasswordEncoder) {
         var member = new Member();
@@ -36,16 +46,6 @@ public class Member extends AbstractEntity {
         return member;
     }
 
-    public String[] getParsedAuthorities() {
-        return authorities.stream()
-                .map(MemberAuthority::getAuthority)
-                .toArray(String[]::new);
-    }
-
-    public boolean matchesPassword(String rawPassword, SecurePasswordEncoder securePasswordEncoder) {
-        return securePasswordEncoder.matches(rawPassword, this.passwordHash);
-    }
-
-    public record MemberCreateCommand(String nickName, String userId, String password, String email){
+    public record MemberCreateCommand(String nickName, String userId, String password, String email) {
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public record MemberController(MemberRegisterer memberRegisterer) {
 
     @PostMapping
-    public MemberRegisterResponse register(@RequestBody @Valid MemberRegisterRequest request){
+    public MemberRegisterResponse register(@RequestBody @Valid MemberRegisterRequest request) {
         return memberRegisterer.register(request);
     }
 }

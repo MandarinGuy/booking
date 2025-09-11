@@ -24,6 +24,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 @DisplayName("POST /api/show")
 public class POST_specs {
 
+    static List<?> nullOrBlankElementRequests() {
+        return List.of(
+                new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg", LocalDate.now(),
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
+                        LocalDate.now(), LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg", null,
+                        LocalDate.now().plusDays(1)),
+                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(), null)
+        );
+    }
+
     @Test
     void 올바른_요청을_보내면_status가_SUCCESS이다(
             @Autowired IntegrationTestUtils testUtils
@@ -189,25 +208,6 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
         assertThat(response.getData()).contains("이미 존재하는 공연 이름입니다:");
-    }
-
-    static List<?> nullOrBlankElementRequests() {
-        return List.of(
-                new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg", LocalDate.now(),
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
-                        LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg", null,
-                        LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
-                        LocalDate.now(), null)
-        );
     }
 
     private ShowRegisterRequest validShowRegisterRequest() {

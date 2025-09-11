@@ -14,18 +14,16 @@ import org.mandarin.booking.adapter.ErrorResponse;
 import org.mandarin.booking.adapter.SuccessResponse;
 
 public class TestResult {
-    private Executor executor;
-
     private final String path;
     private final Object request;
     private final Map<String, String> headers = new HashMap<>();
+    private Executor executor;
+    private ObjectMapper objectMapper;
 
     public TestResult(String path, Object request) {
         this.path = path;
         this.request = request;
     }
-
-    private ObjectMapper objectMapper;
 
     public <T> ApiResponse<T> assertSuccess(Class<T> responseType) {
         var response = readSuccessResponse(
@@ -60,7 +58,7 @@ public class TestResult {
         var response = readErrorResponse();
         if (response == null) {
             throw new AssertionError("Expected Error response, but got: " + null);
-        }else if (response.getStatus() == ApiStatus.SUCCESS) {
+        } else if (response.getStatus() == ApiStatus.SUCCESS) {
             throw new AssertionError("Expected Error response, but got SUCCESS: " + response);
         }
         return response;
@@ -119,7 +117,8 @@ public class TestResult {
                 T data = objectMapper.readValue(raw, dataType);
                 return new SuccessResponse<>(ApiStatus.SUCCESS, data);
             } catch (Exception fallback) {
-                fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": " + primary.getMessage(), primary);
+                fail("Failed to parse SuccessResponse with data type " + dataType.getName() + ": "
+                     + primary.getMessage(), primary);
                 return null;
             }
         }

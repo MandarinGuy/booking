@@ -12,8 +12,16 @@ import org.junit.jupiter.api.Test;
 
 class AbstractEntityTest {
 
-    static class Member extends AbstractEntity { }
-    static class Product extends AbstractEntity { }
+    private static <T extends AbstractEntity> T withId(T entity, Long id) {
+        try {
+            Field f = AbstractEntity.class.getDeclaredField("id");
+            f.setAccessible(true);
+            f.set(entity, id);
+            return entity;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Nested
     @DisplayName("proxy branches")
@@ -41,52 +49,6 @@ class AbstractEntityTest {
             var real = withId(new Member(), 1L);
             var proxy = withId(new ProxyMember(), 2L);
             assertThat(proxy.hashCode()).isEqualTo(real.getClass().hashCode());
-        }
-    }
-
-    // ---- HibernateProxy test doubles to cover proxy branches ----
-    static class ProxyMember extends Member implements org.hibernate.proxy.HibernateProxy {
-        @Override
-        public org.hibernate.proxy.LazyInitializer getHibernateLazyInitializer() {
-            Class<?> persistentClass = Member.class;
-            return (org.hibernate.proxy.LazyInitializer) java.lang.reflect.Proxy.newProxyInstance(
-                    getClass().getClassLoader(),
-                    new Class[]{org.hibernate.proxy.LazyInitializer.class},
-                    (proxy, method, args) -> {
-                        if (method.getName().equals("getPersistentClass")) {
-                            return persistentClass;
-                        }
-                        if (method.getReturnType().isPrimitive()) {
-                            if (method.getReturnType() == boolean.class) {
-                                return false;
-                            }
-                            if (method.getReturnType() == int.class) {
-                                return 0;
-                            }
-                            if (method.getReturnType() == long.class) {
-                                return 0L;
-                            }
-                        }
-                        return null;
-                    }
-            );
-        }
-
-        @Serial
-        @Override
-        public Object writeReplace() {
-            return this;
-        }
-    }
-
-    private static <T extends AbstractEntity> T withId(T entity, Long id) {
-        try {
-            Field f = AbstractEntity.class.getDeclaredField("id");
-            f.setAccessible(true);
-            f.set(entity, id);
-            return entity;
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -188,6 +150,47 @@ class AbstractEntityTest {
             set.add(c);
 
             assertThat(set).hasSize(3);
+        }
+    }
+
+    static class Member extends AbstractEntity {
+    }
+
+    static class Product extends AbstractEntity {
+    }
+
+    // ---- HibernateProxy test doubles to cover proxy branches ----
+    static class ProxyMember extends Member implements org.hibernate.proxy.HibernateProxy {
+        @Override
+        public org.hibernate.proxy.LazyInitializer getHibernateLazyInitializer() {
+            Class<?> persistentClass = Member.class;
+            return (org.hibernate.proxy.LazyInitializer) java.lang.reflect.Proxy.newProxyInstance(
+                    getClass().getClassLoader(),
+                    new Class[]{org.hibernate.proxy.LazyInitializer.class},
+                    (proxy, method, args) -> {
+                        if (method.getName().equals("getPersistentClass")) {
+                            return persistentClass;
+                        }
+                        if (method.getReturnType().isPrimitive()) {
+                            if (method.getReturnType() == boolean.class) {
+                                return false;
+                            }
+                            if (method.getReturnType() == int.class) {
+                                return 0;
+                            }
+                            if (method.getReturnType() == long.class) {
+                                return 0L;
+                            }
+                        }
+                        return null;
+                    }
+            );
+        }
+
+        @Serial
+        @Override
+        public Object writeReplace() {
+            return this;
         }
     }
 

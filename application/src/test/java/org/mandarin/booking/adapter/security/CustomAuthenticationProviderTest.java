@@ -22,7 +22,7 @@ class CustomAuthenticationProviderTest {
     }
 
     @Test
-    void supportsFailure(){
+    void supportsFailure() {
         var isSupported = provider.supports(String.class);
         assertThat(isSupported).isFalse();
     }

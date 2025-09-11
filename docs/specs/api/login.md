@@ -3,13 +3,13 @@
 - 메서드: `POST`
 - 경로: `/api/auth/login`
 - 헤더
-    
+
     ```
     Content-Type: application/json
     ```
-    
+
 - 본문
-    
+
     ```json
     {
         "userId": "string",
@@ -17,10 +17,10 @@
     }
     
     ```
-    
+
 
 - curl 명령 예시
-    
+
     ```bash
     curl -i -X POST 'http://localhost:8080/api/auth/login' \
     -H 'Content-Type: application/json' \
@@ -30,20 +30,18 @@
         "password": "myPassword123"
       }'
     ```
-    
 
 ### 응답
 
 - 상태코드: `200 OK`
 - 본문
-    
+
     ```json
     {
         "accessToken": "string",
         "refreshToken": "string"
     }
     ```
-    
 
 ### 테스트
 

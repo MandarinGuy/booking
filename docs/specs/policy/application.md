@@ -1,6 +1,7 @@
 # 애플리케이션 아키텍처 규칙(헥사고날 아키텍처)
 
-본 문서는 booking 프로젝트가 채택한 헥사고날 아키텍처(Hexagonal Architecture, Ports & Adapters)의 규칙을 명확히 하기 위한 가이드입니다. 이 문서는 아키텍처 테스트와 코드 리뷰의 근거가 되며, 새로운 기능 추가 시 반드시 준수해야 합니다.
+본 문서는 booking 프로젝트가 채택한 헥사고날 아키텍처(Hexagonal Architecture, Ports & Adapters)의 규칙을 명확히 하기 위한 가이드입니다. 이 문서는 아키텍처 테스트와 코드
+리뷰의 근거가 되며, 새로운 기능 추가 시 반드시 준수해야 합니다.
 
 ## 1. 계층과 책임
 
@@ -8,7 +9,8 @@
 
 - domain: 도메인 모델과 비즈니스 규칙의 순수 영역
   - 위치: `src/main/java/org/mandarin/booking/domain`
-  - 포함: 엔티티(를 표현하기 위한 매핑정보), 값 객체, 도메인 서비스(필요시), 도메인 예외, 도메인 전용 인터페이스(예: `SecurePasswordEncoder`), 유스케이스에 전달되는 순수 모델(`*Request`, `*Response`, `*Command` 등)
+  - 포함: 엔티티(를 표현하기 위한 매핑정보), 값 객체, 도메인 서비스(필요시), 도메인 예외, 도메인 전용 인터페이스(예: `SecurePasswordEncoder`), 유스케이스에 전달되는 순수 모델(
+    `*Request`, `*Response`, `*Command` 등)
   - 금지: 프레임워크/외부 라이브러리 의존(JPA/Spring/Web 등), I/O 접근, 인프라 세부 사항
 
 - app: 애플리케이션 서비스(유스케이스)와 포트 인터페이스
@@ -41,9 +43,11 @@
 
 - 입력 포트(inbound port): 유스케이스 인터페이스. 위치: `app/port` 컨트롤러는 입력 포트를 통해서만 유스케이스 호출.
 - 출력 포트(outbound port): 외부 시스템/리포지토리에 대한 인터페이스. 위치: `app/persist` 또는 `app/port` 하위에 정의 가능.
-- 어댑터(adapters): 포트 인터페이스의 구현체. 위치: adapter 하위. 현재 JPA 기반 구현은 `app/persist/*Repository`를 통해 동작하며, 해당 패키지는 어댑터 계층으로 간주합니다.
+- 어댑터(adapters): 포트 인터페이스의 구현체. 위치: adapter 하위. 현재 JPA 기반 구현은 `app/persist/*Repository`를 통해 동작하며, 해당 패키지는 어댑터 계층으로
+  간주합니다.
 
 권장 네이밍:
+
 - 입력 포트: UseCase 동사형 + er (예: Registerer, UseCase)
 - 출력 포트: 리소스 + 동작 + Repository/Gateway (예: ShowCommandRepository)
 - 그 외에는 해당 인터페이스가 담당한 기능의 추상적 개념을 나타내는 네이밍
@@ -114,6 +118,7 @@
 6) 아키텍처/통합 테스트 통과 확인.
 
 새 어댑터(예: 외부 결제 API) 추가 절차:
+
 1) app에 출력 포트 인터페이스 추가(예: `PaymentGateway`).
 2) adapter 하위에 구현(예: `adapter/external/PaymentGatewayHttpClient`).
 3) 구성(Security/Config)과 예외 매핑 추가.
@@ -121,12 +126,14 @@
 ## 11. 공통 규칙 요약(Do/Don’t)
 
 Do
+
 - 유스케이스 입출력은 app 포트를 통해서만 노출/호출한다.
 - 도메인 모델은 순수하게 유지한다(프레임워크 의존 금지).
 - 어댑터는 포트 인터페이스를 구현한다.
 - 트랜잭션과 로깅은 app에서 관리한다.
 
 Don’t
+
 - 컨트롤러에서 비즈니스 로직 수행 금지.
 - app에서 adapter 패키지/구현에 의존 금지.
 - domain에서 JPA/Spring 등에 의존 금지.

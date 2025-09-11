@@ -28,7 +28,8 @@ public class IntegrationTestUtilsSpecs {
 
         // Act
         var response = integrationUtils.post("/test/echo", payload)
-                .assertSuccess(new TypeReference<Map<String, Object>>() {});
+                .assertSuccess(new TypeReference<Map<String, Object>>() {
+                });
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
