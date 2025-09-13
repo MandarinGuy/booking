@@ -13,7 +13,11 @@ import io.restassured.filter.Filter;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import java.lang.StackWalker.StackFrame;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.core.env.Environment;
 import org.springframework.restdocs.ManualRestDocumentation;
 import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
@@ -22,40 +26,110 @@ import org.springframework.stereotype.Component;
 @Component
 public record DocsUtils(Environment environment,
                         ObjectMapper objectMapper) {
-    private static final ManualRestDocumentation restDocumentation = new ManualRestDocumentation();
 
+    private static final ManualRestDocumentation restDocumentation = new ManualRestDocumentation();
+    private static final String DISPLAY_SLASH = "／";
 
     private static volatile boolean started = false;
 
     public String execute(String method, String path, Object requestBody, Map<String, String> headers)
             throws Exception {
-        var snippet = sanitize(method, path);
+        var baseSnippet = sanitize(method, path, false);
+        var methodSpecificSnippet = sanitize(method, path, true);
+
         boolean disableDocs = isRestDocsDisabledForCurrentCall();
         if (!disableDocs) {
             ensureStarted();
         }
         var spec = prepareSpec(headers, disableDocs);
-        if ("POST".equals(method)) {
+
+        if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method)) {
             spec.contentType(ContentType.JSON);
             if (requestBody != null) {
                 spec.body(objectMapper.writeValueAsString(requestBody));
             }
         }
-        var resp = ("GET".equals(method))
-                ? (disableDocs ? spec.when().get(path)
-                : spec.filter(docFilter(snippet)).when().get(path))
-                : (disableDocs ? spec.when().post(path)
-                        : spec.filter(docFilter(snippet)).when().post(path));
+
+        if (!disableDocs) {
+            spec = spec.filter(docFilter(baseSnippet)).filter(docFilter(methodSpecificSnippet));
+        }
+
+        var resp = switch (method.toUpperCase()) {
+            case "GET" -> spec.when().get(path);
+            case "POST" -> spec.when().post(path);
+            case "PUT" -> spec.when().put(path);
+            case "PATCH" -> spec.when().patch(path);
+            case "DELETE" -> spec.when().delete(path);
+            default -> throw new IllegalArgumentException("Unsupported method: " + method);
+        };
         return resp.then().extract().asString();
     }
 
+    private String sanitize(String method, String path, boolean withMethodSuffix) {
+        String groupTitle = getCurrentTestClass()
+                .flatMap(this::getDisplayNameOfClass)
+                .orElseGet(() -> (method.toUpperCase() + " " + path).replace("/", DISPLAY_SLASH).trim());
 
-    private String sanitize(String method, String path) {
-        var name = method + path;
-        name = name.replaceAll("^/+", "");
-        name = name.replaceAll("[/{}]", "-");
-        name = name.replaceAll("[^a-zA-Z0-9-_]", "-");
-        return name.toLowerCase();
+        String name = groupTitle.replace("/", DISPLAY_SLASH).replaceAll("\\s+", " ").trim();
+
+        if (withMethodSuffix) {
+            String methodTitle = getCurrentTestMethodName()
+                    .flatMap(mn -> getCurrentTestClass().flatMap(cls -> getDisplayNameOfMethod(cls, mn))
+                            .or(() -> Optional.of(mn)))
+                    .orElse("");
+
+            if (!methodTitle.isEmpty()) {
+                name = name + " - " + methodTitle;
+            }
+        }
+        return name;
+    }
+
+    private Optional<? extends Class<?>> getCurrentTestClass() {
+        try {
+            return getInstance(RETAIN_CLASS_REFERENCE)
+                    .walk(frames -> frames
+                            .map(StackFrame::getDeclaringClass)
+                            .filter(cls -> cls.getName().startsWith("org.mandarin"))
+                            .filter(cls -> cls.isAnnotationPresent(IntegrationTest.class))
+                            .findFirst());
+        } catch (Throwable t) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> getDisplayNameOfClass(Class<?> cls) {
+        DisplayName ann = cls.getAnnotation(DisplayName.class);
+        return Optional.ofNullable(ann).map(DisplayName::value);
+    }
+
+    private Optional<String> getDisplayNameOfMethod(Class<?> cls, String methodName) {
+        try {
+            Method m = Arrays.stream(cls.getDeclaredMethods())
+                    .filter(mm -> mm.getName().equals(methodName))
+                    .findFirst()
+                    .orElse(null);
+            if (m == null) {
+                return Optional.empty();
+            }
+            DisplayName ann = m.getAnnotation(DisplayName.class);
+            return Optional.ofNullable(ann).map(DisplayName::value);
+        } catch (Throwable t) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> getCurrentTestMethodName() {
+        try {
+            return getInstance(RETAIN_CLASS_REFERENCE)
+                    .walk(frames -> frames
+                            .filter(f -> f.getDeclaringClass().getName().startsWith("org.mandarin"))
+                            .filter(f -> f.getDeclaringClass().isAnnotationPresent(IntegrationTest.class))
+                            .findFirst()
+                            .map(StackFrame::getMethodName));
+        } catch (Throwable t) {
+            return Optional.empty();
+        }
     }
 
     private boolean isRestDocsDisabledForCurrentCall() {

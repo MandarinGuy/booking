@@ -8,10 +8,6 @@ configurations {
     asciidoctorExt
 }
 
-ext {
-    set('snippetsDir', file('build/generated-snippets'))
-}
-
 dependencyManagement {
     imports {
         mavenBom 'org.springframework.modulith:spring-modulith-bom:1.4.3'
@@ -23,49 +19,120 @@ dependencies {
     api(project(':internal'))
     api(project(':external'))
 
-    // ---- Spring Boot Core ----
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // ---- Dev Only ----
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // ---- Testing ----
     testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
     byteBuddyAgent 'net.bytebuddy:byte-buddy-agent:1.17.6'
 
-    // ---- Spring Modulith ----
     runtimeOnly 'org.springframework.modulith:spring-modulith-runtime'
-    implementation "org.springframework.modulith:spring-modulith-starter-core"
+    implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
     implementation 'org.springframework.modulith:spring-modulith-events-api:1.4.3'
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
 
-    // ---- API Docs (REST Docs + Rest Assured) ----
+    testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-asciidoctor {
-    group = 'documentation'
-    description = 'Converts AsciiDoc files to HTML, including REST Docs snippets.'
-    dependsOn test
-    baseDirFollowsSourceDir()
-    sourceDir = file('src/docs')
-    sources {
-        include '**/*.adoc'
-    }
-    inputs.dir snippetsDir
-    attributes 'snippets': snippetsDir
-    resources {
-        from(snippetsDir) { into 'snippets' }
-    }
-    outputDir = layout.buildDirectory.dir("docs/asciidoc").get().asFile
-}
+/**
+ * Provider 기반 최신 문법: buildDir 대신 layout.buildDirectory 사용*/
+def snippetsDir = layout.buildDirectory.dir("generated-snippets")
+def generatedIndexDir = layout.buildDirectory.dir("tmp/asciidoc")
+def asciidocOutputDir = layout.buildDirectory.dir("asciidoc")
 
 tasks.named('test') {
     jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
-    outputs.dir snippetsDir
+    outputs.dir(snippetsDir)
+}
+
+tasks.register('generateIndexAdoc') {
+    dependsOn tasks.named('test')
+    outputs.file(generatedIndexDir.map { it.file("index.adoc") })
+    doLast {
+        def genDir = generatedIndexDir.get().asFile
+        def snip = snippetsDir.get().asFile
+
+        genDir.mkdirs()
+
+        def ops = snip.listFiles()?.findAll { it.isDirectory() } ?: []
+
+        def groupKey = { String name -> name.contains(' - ') ? name.substring(0, name.indexOf(' - ')) : name }
+
+        def grouped = ops.groupBy { dir -> groupKey(dir.name) }.sort { a, b -> a.key <=> b.key }
+
+        def includes = ['curl-request.adoc',
+                        'http-request.adoc',
+                        'http-response.adoc',
+                        'path-parameters.adoc',
+                        'query-parameters.adoc',
+                        'request-parameters.adoc',
+                        'request-fields.adoc',
+                        'response-fields.adoc',
+                        'links.adoc']
+
+        def sb = new StringBuilder()
+        sb << "= API 문서\n:toc: left\n:sectnums:\n\n"
+
+        grouped.each { grp, dirs ->
+            sb << "== ${grp}\n\n"
+
+            dirs.findAll { it.name == grp }.each { dir ->
+                includes.each { inc ->
+                    def f = new File(dir, inc)
+                    if (f.exists()) {
+                        def caption = inc.replace('.adoc', '').replace('-', ' ')
+                        sb << ".${caption}\ninclude::{snippets}/" << dir.name << "/" << inc << "[]\n\n"
+                    }
+                }
+            }
+
+            dirs.findAll { it.name != grp }
+                    .sort { it.name }
+                    .each { dir ->
+                        def methodTitle = dir.name.substring(grp.length() + " - ".length())
+                        sb << "=== ${methodTitle}\n\n"
+                        includes.each { inc ->
+                            def f = new File(dir, inc)
+                            if (f.exists()) {
+                                def caption = inc.replace('.adoc', '').replace('-', ' ')
+                                sb << ".${caption}\ninclude::{snippets}/" << dir.name << "/" << inc << "[]\n\n"
+                            }
+                        }
+                    }
+        }
+
+        new File(genDir, "index.adoc").text = sb.toString()
+    }
+}
+
+tasks.named('asciidoctor') {
+    dependsOn tasks.named('generateIndexAdoc')
+    inputs.dir(snippetsDir)
+    configurations = [project.configurations.asciidoctorExt]
+    sourceDir generatedIndexDir.get().asFile
+    sources { include 'index.adoc' }
+    baseDirFollowsSourceFile()
+    outputDir asciidocOutputDir.get().asFile
+    attributes 'snippets': snippetsDir.get().asFile.absolutePath
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('asciidoctor')
+}
+
+tasks.named('bootJar') {
+    dependsOn tasks.named('asciidoctor')
+    from(asciidocOutputDir) { into 'static/docs' }
+}
+
+tasks.named('clean') {
+    doFirst {
+        delete asciidocOutputDir.get().asFile
+        delete generatedIndexDir.get().asFile
+    }
 }
