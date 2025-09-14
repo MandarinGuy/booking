@@ -39,8 +39,6 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-/**
- * Provider 기반 최신 문법: buildDir 대신 layout.buildDirectory 사용*/
 def snippetsDir = layout.buildDirectory.dir("generated-snippets")
 def generatedIndexDir = layout.buildDirectory.dir("tmp/asciidoc")
 def asciidocOutputDir = layout.buildDirectory.dir("asciidoc")
