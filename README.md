@@ -38,9 +38,9 @@
 - 정책 문서: [docs/specs/policy](docs/specs/policy)
 - 레이어 테스트: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
 - 패키지 구조 예
-  - 도메인: `src/main/java/org/mandarin/booking/domain/*`
-  - 앱/포트/영속 어댑터: `src/main/java/org/mandarin/booking/app/*`
-  - 웹/보안 어댑터: `src/main/java/org/mandarin/booking/adapter/{webapi,security}/*`
+    - 도메인: `domain/src/main/java/org/mandarin/booking/domain/*`
+    - 앱/포트/영속 어댑터: `application/src/main/java/org/mandarin/booking/app/*`
+    - 웹/보안 어댑터: `application/src/main/java/org/mandarin/booking/adapter/{webapi,security}/*`
 
 텍스트 다이어그램: [Controllers/Security/External] → adapter → app(ports, services) → domain
 
