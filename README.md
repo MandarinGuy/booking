@@ -1,6 +1,4 @@
-# booking — 공연 예매 시스템 (개요 중심 README)
-
-- 저장소 루트: 단일 모듈(Spring Boot) 프로젝트
+# booking — 공연 예매 시스템
 
 ---
 
