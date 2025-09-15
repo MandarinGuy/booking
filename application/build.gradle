@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
 def snippetsDir = layout.buildDirectory.dir("generated-snippets")
