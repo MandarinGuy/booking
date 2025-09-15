@@ -1,7 +1,8 @@
-package org.mandarin.booking.app.member;
+package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
 import org.mandarin.booking.TokenHolder;
+import org.mandarin.booking.app.member.AuthUseCase;
 import org.mandarin.booking.domain.member.AuthRequest;
 import org.mandarin.booking.domain.member.ReissueRequest;
 import org.springframework.web.bind.annotation.PostMapping;

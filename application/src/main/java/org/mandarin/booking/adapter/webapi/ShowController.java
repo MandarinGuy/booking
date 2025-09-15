@@ -1,6 +1,7 @@
-package org.mandarin.booking.app.show;
+package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
+import org.mandarin.booking.app.show.ShowRegisterer;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
