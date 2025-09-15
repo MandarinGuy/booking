@@ -37,12 +37,18 @@ dependencies {
 
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.1.0'
 }
 
 def snippetsDir = layout.buildDirectory.dir("generated-snippets")
 def generatedIndexDir = layout.buildDirectory.dir("tmp/asciidoc")
 def asciidocOutputDir = layout.buildDirectory.dir("asciidoc")
+
+tasks.register('prepareSnippetsDir') {
+    doLast {
+        snippetsDir.get().asFile.mkdirs()
+    }
+}
 
 tasks.named('test') {
     jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"
@@ -50,7 +56,7 @@ tasks.named('test') {
 }
 
 tasks.register('generateIndexAdoc') {
-    dependsOn tasks.named('test')
+    dependsOn tasks.named('test'), tasks.named('prepareSnippetsDir')
     outputs.file(generatedIndexDir.map { it.file("index.adoc") })
     doLast {
         def genDir = generatedIndexDir.get().asFile
@@ -110,7 +116,7 @@ tasks.register('generateIndexAdoc') {
 }
 
 tasks.named('asciidoctor') {
-    dependsOn tasks.named('generateIndexAdoc')
+    dependsOn tasks.named('prepareSnippetsDir'), tasks.named('generateIndexAdoc')
     inputs.dir(snippetsDir)
     configurations = [project.configurations.asciidoctorExt]
     sourceDir generatedIndexDir.get().asFile
@@ -126,7 +132,7 @@ tasks.named('build') {
 
 tasks.named('bootJar') {
     dependsOn tasks.named('asciidoctor')
-    from(asciidocOutputDir) { into 'static/docs' }
+    from(asciidocOutputDir.get()) { into 'static/docs' }
 }
 
 tasks.named('clean') {
