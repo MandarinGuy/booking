@@ -36,7 +36,7 @@ _Aggregate Root_
 #### 행위
 
 - `create(command: ShowCreateCommand)`
-- `registerSchedule(hallId, startAt, endAt, runtimeOverride)`
+- `registerSchedule(hallId, startAt, endAt)`
 
 #### 관련 타입
 
