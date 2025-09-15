@@ -18,6 +18,7 @@ dependencies {
     api(project(':domain'))
     api(project(':internal'))
     api(project(':external'))
+    implementation project(':common')
 
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
