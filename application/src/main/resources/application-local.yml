@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/booking?useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: qweasd123
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+  docker:
+    compose:
+      lifecycle-management: start_only
+      file: classpath:compose.yaml
+  web.resources.add-mappings: false
+jwt:
+  token:
+    secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGUtc3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWV4YW1wbGU
+    access: 600000
+    refresh: 1800000
+

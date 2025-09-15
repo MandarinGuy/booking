@@ -1,0 +1,15 @@
+package org.mandarin.booking.app.member;
+
+import java.util.Optional;
+import org.mandarin.booking.domain.member.Member;
+import org.springframework.data.repository.Repository;
+
+interface MemberRepository extends Repository<Member, Long> {
+    boolean existsByUserId(String userId);
+
+    boolean existsByEmail(String email);
+
+    Optional<Member> findByUserId(String userId);
+
+    Member save(Member member);
+}

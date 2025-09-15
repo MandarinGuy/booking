@@ -1,0 +1,22 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    implementation project(':common')
+
+    // ---- Spring Boot Web ----
+    api 'org.springframework.boot:spring-boot-starter-web'
+
+    // ---- Security & Auth ----
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.security:spring-security-test'
+    api 'io.jsonwebtoken:jjwt-api:0.12.6'
+    api 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+}
