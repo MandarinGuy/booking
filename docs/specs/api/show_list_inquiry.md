@@ -99,7 +99,7 @@
 
 ## 테스트
 
-- [ ] Authorization 헤더가 없더라도 접근 가능하다
+- [x] Authorization 헤더가 없더라도 접근하더라도 401 Unauthorized가 발생하지 않는다
 - [ ] 잘못된 토큰/만료 토큰을 전달해도 정상 응답을 반환한다
 - [ ] 기본 요청 시 첫번째 페이지의 10건이 반환된다
 - [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
