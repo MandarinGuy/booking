@@ -1,10 +1,10 @@
 package org.mandarin.booking.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -30,22 +30,22 @@ class SecurityConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public AuthorizationRequestMatcherConfigurer authorizationRequestMatcherConfigurer() {
+        return new DefaultAuthorizationRequestMatcherConfigurer();
+    }
+
+    @Bean
     @Order(1)
     public SecurityFilterChain apiChain(HttpSecurity http,
                                         AuthenticationProvider authenticationProvider,
                                         AuthenticationEntryPoint authenticationEntryPoint,
-                                        AccessDeniedHandler accessDeniedHandler)
+                                        AccessDeniedHandler accessDeniedHandler,
+                                        AuthorizationRequestMatcherConfigurer authorizationRequestMatcherConfigurer)
             throws Exception {
         http
                 .securityMatcher("/api/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/member").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/reissue").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/show/schedule").hasAuthority("ROLE_DISTRIBUTOR")
-                        .requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(authorizationRequestMatcherConfigurer::authorizeRequests)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
