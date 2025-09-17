@@ -16,13 +16,15 @@ import org.mandarin.booking.adapter.SuccessResponse;
 public class TestResult {
     private final String path;
     private final Object request;
+    private final Object[] requestParams;
     private final Map<String, String> headers = new HashMap<>();
     private Executor executor;
     private ObjectMapper objectMapper;
 
-    public TestResult(String path, Object request) {
+    public TestResult(String path, Object request, Object... requestParams) {
         this.path = path;
         this.request = request;
+        this.requestParams = requestParams;
     }
 
     public <T> ApiResponse<T> assertSuccess(Class<T> responseType) {
@@ -162,7 +164,7 @@ public class TestResult {
     private String getResponse() {
         if (executor != null) {
             try {
-                return executor.execute(path, request, headers);
+                return executor.execute(path, request, headers, requestParams);
             } catch (Exception e) {
                 throw new AssertionError("Request execution failed: " + e.getMessage(), e);
             }
@@ -173,6 +175,7 @@ public class TestResult {
 
     @FunctionalInterface
     public interface Executor {
-        String execute(String path, Object request, Map<String, String> headers) throws Exception;
+        String execute(String path, Object request, Map<String, String> headers, Object... requestParams)
+                throws Exception;
     }
 }

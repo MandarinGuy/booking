@@ -32,7 +32,8 @@ public record DocsUtils(Environment environment,
 
     private static volatile boolean started = false;
 
-    public String execute(String method, String path, Object requestBody, Map<String, String> headers)
+    public String execute(String method, String path, Object requestBody, Map<String, String> headers,
+                          Object... pathParams)
             throws Exception {
         var baseSnippet = sanitize(method, path, false);
         var methodSpecificSnippet = sanitize(method, path, true);
@@ -55,11 +56,11 @@ public record DocsUtils(Environment environment,
         }
 
         var resp = switch (method.toUpperCase()) {
-            case "GET" -> spec.when().get(path);
-            case "POST" -> spec.when().post(path);
-            case "PUT" -> spec.when().put(path);
-            case "PATCH" -> spec.when().patch(path);
-            case "DELETE" -> spec.when().delete(path);
+            case "GET" -> spec.when().get(path, pathParams);
+            case "POST" -> spec.when().post(path, pathParams);
+            case "PUT" -> spec.when().put(path, pathParams);
+            case "PATCH" -> spec.when().patch(path, pathParams);
+            case "DELETE" -> spec.when().delete(path, pathParams);
             default -> throw new IllegalArgumentException("Unsupported method: " + method);
         };
         return resp.then().extract().asString();
