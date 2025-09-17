@@ -62,7 +62,7 @@
         {
           "status": "SUCCESS",
           "data": {
-            "content": [
+            "contents": [
               {
                 "showId": 1,
                 "title": "라라랜드",
@@ -104,10 +104,10 @@
 - [ ] 기본 요청 시 첫번째 페이지의 10건이 반환된다
 - [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
 - [ ] 각 항목은 showId, title, type, rating, posterUrl, performanceStartDate, performanceEndDate만 포함한다
-- [ ] 공연이 존재하지 않을 경우 빈 content, totalElements=0, hasNext=false를 반환한다
+- [ ] 공연이 존재하지 않을 경우 빈 contents, totalElements=0, hasNext=false를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
-- [ ] 초과 페이지 요청 시 빈 content, hasNext=false를 반환한다
+- [ ] 초과 페이지 요청 시 빈 contents, hasNext=false를 반환한다
 - [ ] size > 100 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] page=-1 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] size=0 요청 시 400 BAD_REQUEST를 반환한다
@@ -118,7 +118,7 @@
 - [ ] from=2025-10-01&to=2025-10-31 -> 이 기간과 겹치는 공연만 조회된다
 - [ ] from만 지정 시 해당 일자 이후 공연만 조회된다
 - [ ] to만 지정 시 해당 일자 이전 공연만 조회된다
-- [ ] 기간이 서로 맞물리지 않는 경우 빈 content를 반환한다
+- [ ] 기간이 서로 맞물리지 않는 경우 빈 contents를 반환한다
 - [ ] type/rating에 허용되지 않는 값 입력 시 400 BAD_REQUEST를 반환한다
 - [ ] from 또는 to 형식이 잘못된 경우 400 BAD_REQUEST를 반환한다
 - [ ] from > to인 경우 400 BAD_REQUEST를 반환한다
