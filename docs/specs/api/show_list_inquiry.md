@@ -42,7 +42,7 @@
 
     - 페이지네이션:
         - page는 0-기반 인덱스다.
-        - hasNext = (page < totalPages - 1)
+      - hasNext = 존재성 여부만 확인
 
 - curl 명령 예시
 
@@ -62,37 +62,35 @@
         {
           "status": "SUCCESS",
           "data": {
-            "contents": [
-              {
-                "showId": 1,
-                "title": "라라랜드",
-                "type": "MUSICAL",
-                "rating": "ALL",
-                "posterUrl": "https://example.com/posters/lalaland.jpg",
-                "venueName": "샤롯데씨어터",
-                "performanceStartDate": "2025-10-05",
-                "performanceEndDate": "2025-11-05"
-              },
-              {
-                "showId": 2,
-                "title": "라라랜드 2",
-                "type": "MUSICAL",
-                "rating": "AGE12",
-                "posterUrl": "https://example.com/posters/lalaland2.jpg",
-                "venueName": "샤롯데씨어터",
-                "performanceStartDate": "2025-10-10",
-                "performanceEndDate": "2025-11-10"
-              }
-            ],
-            "page": 0,
-            "size": 5,
-            "totalElements": 2,
-            "totalPages": 1,
-            "hasNext": false
+          "contents": [
+            {
+              "showId": 1,
+              "title": "라라랜드",
+              "type": "MUSICAL",
+              "rating": "ALL",
+              "posterUrl": "https://example.com/posters/lalaland.jpg",
+              "venueName": "샤롯데씨어터",
+              "performanceStartDate": "2025-10-05",
+              "performanceEndDate": "2025-11-05"
+            },
+            {
+              "showId": 2,
+              "title": "라라랜드 2",
+              "type": "MUSICAL",
+              "rating": "AGE12",
+              "posterUrl": "https://example.com/posters/lalaland2.jpg",
+              "venueName": "샤롯데씨어터",
+              "performanceStartDate": "2025-10-10",
+              "performanceEndDate": "2025-11-10"
+            }
+          ],
+          "page": 0,
+          "size": 5,
+          "hasNext": false
           },
           "timestamp": "2025-09-17T12:34:56.789Z"
-      }
-  
+          }
+        
       ```
 
 ---
@@ -101,10 +99,10 @@
 
 - [x] Authorization 헤더가 없더라도 접근하더라도 401 Unauthorized가 발생하지 않는다
 - [x] 잘못된 토큰/만료 토큰을 전달해도 정상 응답을 반환한다
-- [ ] 기본 요청 시 첫번째 페이지의 10건이 반환된다
+- [x] 기본 요청 시 첫번째 페이지의 10건이 반환된다
 - [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
 - [ ] 각 항목은 showId, title, type, rating, posterUrl, performanceStartDate, performanceEndDate만 포함한다
-- [ ] 공연이 존재하지 않을 경우 빈 contents, totalElements=0, hasNext=false를 반환한다
+- [ ] 공연이 존재하지 않을 경우 빈 contents, hasNext=false를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
 - [ ] 초과 페이지 요청 시 빈 contents, hasNext=false를 반환한다
