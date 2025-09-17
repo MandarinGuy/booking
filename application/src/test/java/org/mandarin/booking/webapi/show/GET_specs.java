@@ -1,5 +1,8 @@
 package org.mandarin.booking.webapi.show;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.utils.IntegrationTest;
@@ -17,10 +20,10 @@ public class GET_specs {
         // Arrange
 
         // Act
-        testUtils.get("/api/show")
+        var response = testUtils.get("/api/show")
                 .assertSuccess(Void.class);
 
         // Assert
-
+        assertThat(response.getStatus()).isNotEqualTo(UNAUTHORIZED);
     }
 }
