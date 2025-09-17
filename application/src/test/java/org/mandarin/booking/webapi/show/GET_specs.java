@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,5 +26,21 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getStatus()).isNotEqualTo(UNAUTHORIZED);
+    }
+
+    @Test
+    void 잘못된_토큰이나_만료_토큰을_전달해도_정상_응답을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var wrongToken = "wrong_token";
+
+        // Act
+        var response = testUtils.get("/api/show")
+                .withAuthorization(wrongToken)
+                .assertSuccess(Void.class);
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
 }
