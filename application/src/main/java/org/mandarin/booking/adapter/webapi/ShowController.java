@@ -6,6 +6,8 @@ import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/show")
 record ShowController(ShowRegisterer showRegisterer) {
+
+    @GetMapping
+    Page<?> inquire() {
+        return null;
+    }
 
     @PostMapping
     ShowRegisterResponse register(@RequestBody @Valid ShowRegisterRequest request) {
