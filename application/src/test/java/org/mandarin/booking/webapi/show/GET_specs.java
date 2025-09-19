@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.SliceView;
-import org.mandarin.booking.domain.show.ShowRegisterResponse;
+import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -85,7 +85,7 @@ public class GET_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        List<ShowRegisterResponse> showRegisterResponses = testUtils.generateShows();
+        List<Show> showRegisterResponses = testUtils.generateShows();
 
         // Act
         var response = testUtils.get("/api/show")
@@ -93,9 +93,9 @@ public class GET_specs {
                 });
 
         // Assert
-        for (ShowRegisterResponse res : showRegisterResponses) {
+        for (Show res : showRegisterResponses) {
             assertThat(response.getData().contents().stream()
-                    .anyMatch(show -> show.showId().equals(res.showId())))
+                    .anyMatch(show -> show.showId().equals(res.getId())))
                     .isTrue();
         }
     }

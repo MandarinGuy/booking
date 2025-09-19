@@ -1,6 +1,5 @@
 package org.mandarin.booking.utils;
 
-import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.utils.EnumFixture.randomEnum;
 import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
@@ -28,7 +27,6 @@ import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
-import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -134,20 +132,6 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
         return hallRepository.insert(hall);
     }
 
-    public ShowRegisterResponse generateShow() {
-        var authToken = getAuthToken(ADMIN);
-        var request = validShowRegisterRequest();
-
-        // Act
-        var response = post(
-                "/api/show",
-                request
-        )
-                .withAuthorization(authToken)
-                .assertSuccess(ShowRegisterResponse.class);
-        return response.getData();
-    }
-
     private ShowRegisterRequest validShowRegisterRequest() {
         return new ShowRegisterRequest(
                 UUID.randomUUID().toString().substring(0, 10),
@@ -160,10 +144,16 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
         );
     }
 
-    public List<ShowRegisterResponse> generateShows() {
+    public List<Show> generateShows() {
         return IntStream.range(0, 10)
                 .mapToObj(i -> generateShow())
                 .toList();
+    }
+
+    private Show generateShow() {
+        var request = validShowRegisterRequest();
+        var show = Show.create(ShowCreateCommand.from(request));
+        return showRepository.insert(show);
     }
 }
 
