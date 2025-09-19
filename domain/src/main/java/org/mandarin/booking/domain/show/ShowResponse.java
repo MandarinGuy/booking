@@ -1,5 +1,6 @@
 package org.mandarin.booking.domain.show;
 
+import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.Type;
@@ -14,4 +15,8 @@ public record ShowResponse(
         LocalDate performanceStartDate,
         LocalDate performanceEndDate
 ) {
+
+    @QueryProjection
+    public ShowResponse {
+    }
 }

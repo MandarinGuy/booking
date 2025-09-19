@@ -2,11 +2,9 @@ package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.show.ShowFetcher;
 import org.mandarin.booking.app.show.ShowRegisterer;
-import org.mandarin.booking.domain.show.Show.Rating;
-import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
@@ -22,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/show")
-record ShowController(ShowRegisterer showRegisterer) {
+record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
     SliceView<ShowResponse> inquire(@RequestParam(required = false) Integer page,
@@ -32,19 +30,7 @@ record ShowController(ShowRegisterer showRegisterer) {
                                     @RequestParam(required = false) String q,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return new SliceView<>(List.of(
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now()),
-                new ShowResponse(0L, "", Type.MUSICAL, Rating.ALL, "", "", LocalDate.now(), LocalDate.now())
-        ),
-                0);
+        return showFetcher.fetchShows(page, size, type, rating, q, from, to);
     }
 
     @PostMapping

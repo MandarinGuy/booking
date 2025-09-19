@@ -1,5 +1,7 @@
 package org.mandarin.booking.utils;
 
+import static org.mandarin.booking.MemberAuthority.ADMIN;
+import static org.mandarin.booking.utils.EnumFixture.randomEnum;
 import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
@@ -21,8 +23,11 @@ import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.mandarin.booking.domain.show.Show;
+import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
+import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -126,6 +131,32 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
     public Hall insertDummyHall() {
         var hall = Hall.create();
         return hallRepository.insert(hall);
+    }
+
+    public ShowRegisterResponse generateShow() {
+        var authToken = getAuthToken(ADMIN);
+        var request = validShowRegisterRequest();
+
+        // Act
+        var response = post(
+                "/api/show",
+                request
+        )
+                .withAuthorization(authToken)
+                .assertSuccess(ShowRegisterResponse.class);
+        return response.getData();
+    }
+
+    private ShowRegisterRequest validShowRegisterRequest() {
+        return new ShowRegisterRequest(
+                UUID.randomUUID().toString().substring(0, 10),
+                randomEnum(Type.class).name(),
+                randomEnum(Rating.class).name(),
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        );
     }
 }
 

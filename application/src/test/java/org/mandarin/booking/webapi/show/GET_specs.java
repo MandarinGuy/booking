@@ -5,9 +5,12 @@ import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -75,5 +78,27 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getData().hasNext()).isFalse();
+    }
+
+    @Test
+    void 실제로_저장된_공연_정보가_조회된다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        List<ShowRegisterResponse> showRegisterResponses = IntStream.range(0, 10)
+                .mapToObj(i -> testUtils.generateShow())
+                .toList();
+
+        // Act
+        var response = testUtils.get("/api/show")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        for (ShowRegisterResponse res : showRegisterResponses) {
+            assertThat(response.getData().contents().stream()
+                    .anyMatch(show -> show.showId().equals(res.showId())))
+                    .isTrue();
+        }
     }
 }
