@@ -61,4 +61,19 @@ public class GET_specs {
         // Assert
         assertThat(response.getData().contents().size()).isEqualTo(10);
     }
+
+    @Test
+    void 공연이_존재하지_않을_경우_빈_contents_hasNext는false를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().hasNext()).isFalse();
+    }
 }

@@ -93,16 +93,14 @@
         
       ```
 
----
+---고
 
 ## 테스트
 
 - [x] Authorization 헤더가 없더라도 접근하더라도 401 Unauthorized가 발생하지 않는다
 - [x] 잘못된 토큰/만료 토큰을 전달해도 정상 응답을 반환한다
 - [x] 기본 요청 시 첫번째 페이지의 10건이 반환된다
-- [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
-- [ ] 각 항목은 showId, title, type, rating, posterUrl, performanceStartDate, performanceEndDate만 포함한다
-- [ ] 공연이 존재하지 않을 경우 빈 contents, hasNext=false를 반환한다
+- [x] 공연이 존재하지 않을 경우 빈 contents, hasNext=false를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
 - [ ] 초과 페이지 요청 시 빈 contents, hasNext=false를 반환한다
@@ -113,6 +111,7 @@
 - [ ] rating=AGE12 -> AGE12 공연만 조회된다
 - [ ] 부적절한 rating으로 요청하는 경우 400 BAD_REQUEST를 반환한다
 - [ ] q=라라 -> 제목에 "라라"가 포함된 공연만 조회된다
+- [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
 - [ ] from=2025-10-01&to=2025-10-31 -> 이 기간과 겹치는 공연만 조회된다
 - [ ] from만 지정 시 해당 일자 이후 공연만 조회된다
 - [ ] to만 지정 시 해당 일자 이전 공연만 조회된다
