@@ -41,14 +41,15 @@ public class IntegrationTestUtilsSpecs {
     @Test
     @DisplayName("insertDummyMember로 저장한 회원을 test-only endpoint(/test/member/exists)로 검증한다")
     void insertDummyMember_and_verify_exists(
-            @Autowired IntegrationTestUtils integrationUtils
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         String userId = "it_utils_user" + System.currentTimeMillis();
         String password = "P@ssw0rd!";
 
         // save member using utils
-        var saved = integrationUtils.insertDummyMember(userId, password);
+        var saved = testFixture.insertDummyMember(userId, password);
         assertThat(saved).isNotNull();
 
         // Act

@@ -14,6 +14,7 @@ import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("GET /api/show")
@@ -82,10 +83,11 @@ public class GET_specs {
 
     @Test
     void 실제로_저장된_공연_정보가_조회된다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        List<Show> showRegisterResponses = testUtils.generateShows();
+        List<Show> showRegisterResponses = testFixture.generateShows();
 
         // Act
         var response = testUtils.get("/api/show")

@@ -23,6 +23,7 @@ import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.domain.member.ReissueRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
@@ -103,10 +104,11 @@ public class POST_specs {
 
     @Test
     void 요청_토큰의_서명이_잘못된_경우_401_Unauthorized가_발생한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        testUtils.insertDummyMember(generateUserId(), generatePassword());
+        testFixture.insertDummyMember(generateUserId(), generatePassword());
         var invalidRefresh = "invalid_refresh_token";
         var request = new ReissueRequest(invalidRefresh);
 

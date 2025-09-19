@@ -22,6 +22,7 @@ import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.AuthRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -30,13 +31,14 @@ import org.springframework.beans.factory.annotation.Value;
 public class POST_specs {
     @Test
     void 올바른_요청을_보내면_200_OK_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils integrationUtils
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var request = new AuthRequest(generateUserId(), generatePassword());
 
         // save member
-        integrationUtils.insertDummyMember(request.userId(), request.password());
+        testFixture.insertDummyMember(request.userId(), request.password());
 
         // Act
         var response = integrationUtils.post(
@@ -107,7 +109,8 @@ public class POST_specs {
 
     @Test
     void 요청_본문의_password가_userId에_해당하는_password가_일치하지_않으면_401_Unauthorized_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils integrationUtils
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var userId = generateUserId();
@@ -116,7 +119,7 @@ public class POST_specs {
         var request = new AuthRequest(userId, invalidPassword);
 
         //save member
-        integrationUtils.insertDummyMember(userId, generatePassword());
+        testFixture.insertDummyMember(userId, generatePassword());
 
         // Act
         var response = integrationUtils.post(
@@ -131,11 +134,12 @@ public class POST_specs {
 
     @Test
     void 성공적인_로그인_후_응답에_accessToken과_refreshToken가_포함되어야_한다(
-            @Autowired IntegrationTestUtils integrationUtils
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var request = new AuthRequest(generateUserId(), generatePassword());
-        integrationUtils.insertDummyMember(request.userId(), request.password());
+        testFixture.insertDummyMember(request.userId(), request.password());
 
         // Act
         var response = integrationUtils.post(
@@ -151,12 +155,13 @@ public class POST_specs {
 
     @Test
     void 전달된_토큰은_유효한_JWT_형식이어야_한다(
-            @Autowired IntegrationTestUtils integrationUtils
+            @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var userId = generateUserId();
         var password = generatePassword();
-        integrationUtils.insertDummyMember(userId, password);
+        testFixture.insertDummyMember(userId, password);
 
         var request = new AuthRequest(userId, password);
 
@@ -177,11 +182,12 @@ public class POST_specs {
     @Test
     void 전달된_토큰은_만료되지_않아야한다(
             @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture,
             @Value("${jwt.token.secret}") String secretKey) {
         // Arrange
         var userId = generateUserId();
         var password = generatePassword();
-        integrationUtils.insertDummyMember(userId, password);
+        testFixture.insertDummyMember(userId, password);
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
         var request = new AuthRequest(userId, password);
@@ -207,13 +213,14 @@ public class POST_specs {
     @Test
     void 전달된_토큰에는_사용자의_userId가_포함되어야_한다(
             @Autowired IntegrationTestUtils integrationUtils,
+            @Autowired TestFixture testFixture,
             @Value("${jwt.token.secret}") String secretKey,
             @Autowired MemberQueryRepository memberRepository
     ) {
         // Arrange
         var userId = generateUserId();
         var password = generatePassword();
-        integrationUtils.insertDummyMember(userId, password);
+        testFixture.insertDummyMember(userId, password);
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
         var request = new AuthRequest(userId, password);

@@ -20,6 +20,7 @@ import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -28,11 +29,12 @@ public class POST_specs {
 
     @Test
     void 올바른_접근_토큰과_유효한_요청을_보내면_SUCCESS_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testUtils.insertDummyHall();
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
                 show, requireNonNull(hall.getId()),
                 LocalDateTime.of(2025, 9, 10, 19, 0),
@@ -49,11 +51,12 @@ public class POST_specs {
 
     @Test
     void ADMIN_권한을_가진_사용자가_올바른_요청을_하는_경우_SUCCESS_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testUtils.insertDummyHall();
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
                 show, requireNonNull(hall.getId()),
                 LocalDateTime.of(2025, 9, 10, 19, 0),
@@ -70,11 +73,12 @@ public class POST_specs {
 
     @Test
     void 응답_본문에_scheduleId가_포함된다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testUtils.insertDummyHall();
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
                 show, requireNonNull(hall.getId()),
                 LocalDateTime.of(2025, 9, 10, 19, 0),
@@ -91,10 +95,11 @@ public class POST_specs {
 
     @Test
     void 권한이_없는_사용자_토큰으로_요청하면_FORBIDDEN_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show);
 
         // Act
@@ -109,10 +114,11 @@ public class POST_specs {
 
     @Test
     void startAt이_endAt보다_늦은_경우_BAD_REQUEST를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
                 LocalDateTime.of(2025, 9, 10, 19, 0), 10L
@@ -130,10 +136,11 @@ public class POST_specs {
 
     @Test
     void 존재하지_않는_showId를_보내면_NOT_FOUND_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
                 10L,
@@ -153,10 +160,11 @@ public class POST_specs {
 
     @Test
     void 존재하지_않는_hallId를_보내면_NOT_FOUND_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 9999L,// 존재하지 않는 hallId
@@ -176,11 +184,12 @@ public class POST_specs {
 
     @Test
     void 공연_기간_범위를_벗어나는_startAt_또는_endAt을_보낼_경우_BAD_REQUEST를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testUtils.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
-        var hall = testUtils.insertDummyHall();
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
+        var hall = testFixture.insertDummyHall();
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 requireNonNull(hall.getId()),
@@ -200,12 +209,13 @@ public class POST_specs {
 
     @Test
     void 동일한_hallId와_시간이_겹치는_회차를_등록하려_하면_INTERNAL_SERVER_ERROR를_반환한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var hall = testUtils.insertDummyHall();
+        var hall = testFixture.insertDummyHall();
 
-        var show = testUtils.insertDummyShow(
+        var show = testFixture.insertDummyShow(
                 LocalDate.now().minusDays(1),
                 LocalDate.now().plusDays(10)
         );
@@ -214,7 +224,7 @@ public class POST_specs {
                 LocalDateTime.now().plusHours(2)
         );
 
-        var anotherShow = testUtils.insertDummyShow(
+        var anotherShow = testFixture.insertDummyShow(
                 LocalDate.now().minusDays(2),
                 LocalDate.now().plusDays(30)
         );

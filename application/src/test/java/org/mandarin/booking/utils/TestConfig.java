@@ -13,14 +13,18 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class TestConfig {
     @Bean
-    public IntegrationTestUtils integrationTestUtils(@Autowired MemberCommandRepository memberRepository,
-                                                     @Autowired ShowCommandRepository showRepository,
-                                                     @Autowired HallCommandRepository hallRepository,
+    public IntegrationTestUtils integrationTestUtils(@Autowired TestFixture testFixture,
                                                      @Autowired TokenUtils tokenUtils,
-                                                     @Autowired SecurePasswordEncoder securePasswordEncoder,
                                                      @Autowired ObjectMapper objectMapper,
                                                      @Autowired DocsUtils docsUtils) {
-        return new IntegrationTestUtils(memberRepository, showRepository, hallRepository,
-                tokenUtils, securePasswordEncoder, objectMapper, docsUtils);
+        return new IntegrationTestUtils(testFixture, tokenUtils, objectMapper, docsUtils);
+    }
+
+    @Bean
+    public TestFixture testFixture(@Autowired MemberCommandRepository memberRepository,
+                                   @Autowired ShowCommandRepository showRepository,
+                                   @Autowired HallCommandRepository hallRepository,
+                                   @Autowired SecurePasswordEncoder securePasswordEncoder) {
+        return new TestFixture(memberRepository, showRepository, hallRepository, securePasswordEncoder);
     }
 }

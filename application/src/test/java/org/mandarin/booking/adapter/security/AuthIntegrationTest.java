@@ -14,6 +14,7 @@ import org.mandarin.booking.adapter.security.AuthIntegrationTest.TestAuthControl
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.NoRestDocs;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -94,9 +95,10 @@ class AuthIntegrationTest {
     }
 
     @Test
-    void lackOfAuthorityMustReturnAccessDenied(@Autowired IntegrationTestUtils testUtils) {
+    void lackOfAuthorityMustReturnAccessDenied(@Autowired IntegrationTestUtils testUtils,
+                                               @Autowired TestFixture testFixture) {
         // Arrange
-        var member = testUtils.insertDummyMember("dummy", "dummy", List.of());
+        var member = testFixture.insertDummyMember("dummy", "dummy", List.of());
         var accessToken = testUtils.getAuthToken(member);
 
         // Act
