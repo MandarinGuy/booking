@@ -26,7 +26,7 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
     SliceView<ShowResponse> inquire(@RequestParam(required = false) @Min(0) Integer page,
-                                    @RequestParam(required = false) @Max(value = 100) Integer size,
+                                    @RequestParam(required = false) @Min(1) @Max(value = 100) Integer size,
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) String rating,
                                     @RequestParam(required = false) String q,

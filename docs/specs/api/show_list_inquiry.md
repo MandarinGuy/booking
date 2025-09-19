@@ -105,7 +105,7 @@
 - [x] 초과 페이지 요청 시 빈 contents와 hasNext=false를 반환한다
 - [x] size가 100보다 큰 요청 시 BAD_REQUEST를 반환한다
 - [x] page가 0보다 작은 요청 시 BAD_REQUEST를 반환한다
-- [ ] size=0 요청 시 BAD_REQUEST를 반환한다
+- [x] size가 1보다 작은 요청 시 BAD_REQUEST를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
 - [ ] type=MUSICAL -> MUSICAL만 조회된다
