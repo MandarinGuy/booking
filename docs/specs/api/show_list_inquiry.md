@@ -102,10 +102,10 @@
 - [x] 기본 요청 시 첫번째 페이지의 10건이 반환된다
 - [x] 공연이 존재하지 않을 경우 빈 contents, hasNext=false를 반환한다
 - [x] 실제로 저장된 공연 정보가 조회된다
+- [x] 초과 페이지 요청 시 빈 contents와 hasNext=false를 반환한다
+- [x] size가 100보다 큰 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
-- [ ] 초과 페이지 요청 시 빈 contents, hasNext=false를 반환한다
-- [ ] size > 100 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] page=-1 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] size=0 요청 시 400 BAD_REQUEST를 반환한다
 - [ ] type=MUSICAL -> MUSICAL만 조회된다

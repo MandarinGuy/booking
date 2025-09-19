@@ -1,6 +1,7 @@
 package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import java.time.LocalDate;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
@@ -24,7 +25,7 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
     SliceView<ShowResponse> inquire(@RequestParam(required = false) Integer page,
-                                    @RequestParam(required = false) Integer size,
+                                    @RequestParam(required = false) @Max(value = 100) Integer size,
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) String rating,
                                     @RequestParam(required = false) String q,

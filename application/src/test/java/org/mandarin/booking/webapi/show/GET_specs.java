@@ -1,12 +1,12 @@
 package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.SliceView;
@@ -85,9 +85,7 @@ public class GET_specs {
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
-        List<ShowRegisterResponse> showRegisterResponses = IntStream.range(0, 10)
-                .mapToObj(i -> testUtils.generateShow())
-                .toList();
+        List<ShowRegisterResponse> showRegisterResponses = testUtils.generateShows();
 
         // Act
         var response = testUtils.get("/api/show")
@@ -100,5 +98,35 @@ public class GET_specs {
                     .anyMatch(show -> show.showId().equals(res.showId())))
                     .isTrue();
         }
+    }
+
+    @Test
+    void 초과_페이지_요청_시_빈_contents와_hasNext는_false를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show?page=2")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().contents()).isEmpty();
+        assertThat(response.getData().hasNext()).isFalse();
+    }
+
+    @Test
+    void size가_100보다_큰_요청_시_400_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show?size=101")
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 }

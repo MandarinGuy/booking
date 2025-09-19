@@ -11,6 +11,7 @@ import org.mandarin.booking.DomainException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @Slf4j
@@ -34,6 +35,12 @@ class GlobalExceptionHandler {
         var defaultMessage = requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage();
         return new ErrorResponse(BAD_REQUEST, requireNonNull(defaultMessage));
     }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ErrorResponse handleHandlerMethodValidationException(HandlerMethodValidationException ex) {
+        return new ErrorResponse(BAD_REQUEST, ex.getMessage());
+    }
+
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException ex) {

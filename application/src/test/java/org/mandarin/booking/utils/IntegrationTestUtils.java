@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.TokenHolder;
 import org.mandarin.booking.adapter.TokenUtils;
@@ -157,6 +158,12 @@ public record IntegrationTestUtils(MemberCommandRepository memberRepository,
                 LocalDate.now(),
                 LocalDate.now().plusDays(30)
         );
+    }
+
+    public List<ShowRegisterResponse> generateShows() {
+        return IntStream.range(0, 10)
+                .mapToObj(i -> generateShow())
+                .toList();
     }
 }
 
