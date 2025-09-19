@@ -87,7 +87,7 @@ public class GET_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        List<Show> showRegisterResponses = testFixture.generateShows();
+        List<Show> showRegisterResponses = testFixture.generateShows(10);
 
         // Act
         var response = testUtils.get("/api/show")
@@ -119,13 +119,27 @@ public class GET_specs {
     }
 
     @Test
-    void size가_100보다_큰_요청_시_400_BAD_REQUEST를_반환한다(
+    void size가_100보다_큰_요청_시_BAD_REQUEST를_반환한다(
             @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
 
         // Act
         var response = testUtils.get("/api/show?size=101")
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void page가_0보다_작은_요청_시_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show?page=-1")
                 .assertFailure();
 
         // Assert

@@ -82,8 +82,8 @@ public record TestFixture(
         return hallRepository.insert(hall);
     }
 
-    public List<Show> generateShows() {
-        return IntStream.range(0, 10)
+    public List<Show> generateShows(int showCount) {
+        return IntStream.range(0, showCount)
                 .mapToObj(i -> generateShow())
                 .toList();
     }

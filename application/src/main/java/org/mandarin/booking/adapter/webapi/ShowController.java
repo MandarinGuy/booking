@@ -2,6 +2,7 @@ package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
-    SliceView<ShowResponse> inquire(@RequestParam(required = false) Integer page,
+    SliceView<ShowResponse> inquire(@RequestParam(required = false) @Min(0) Integer page,
                                     @RequestParam(required = false) @Max(value = 100) Integer size,
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) String rating,
