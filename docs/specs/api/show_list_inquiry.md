@@ -111,11 +111,11 @@
 - [x] 지정된 rating이 존재한다면 해당 rating 공연만 조회된다
 - [x] q값이 비어있지 않다면 제목에 q가 포함된 공연만 조회된다
 - [x] 여러 건이 존재할 경우 performanceStartDate DESC, title ASC 순으로 정렬된다
-- [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
-- [ ] page=1&size=1 -> 두 번째 건이 반환된다
-- [ ] from에서 to까지 기간과 겹치는 공연만 조회된다
+- [x] from에서 to까지 기간과 겹치는 공연만 조회된다
 - [ ] from만 지정 시 해당 일자 이후 공연만 조회된다
 - [ ] to만 지정 시 해당 일자 이전 공연만 조회된다
+- [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
+- [ ] page=1&size=1 -> 두 번째 건이 반환된다
 - [ ] 기간이 서로 맞물리지 않는 경우 빈 contents를 반환한다
 - [ ] from 또는 to 형식이 잘못된 경우 BAD_REQUEST를 반환한다
 - [ ] from > to인 경우 BAD_REQUEST를 반환한다

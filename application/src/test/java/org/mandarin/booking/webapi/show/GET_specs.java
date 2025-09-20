@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -250,5 +251,26 @@ public class GET_specs {
         assertThatStream(response.getData().contents().stream())
                 .isSortedAccordingTo(Comparator.comparing(ShowResponse::performanceStartDate)
                         .thenComparing(ShowResponse::title));
+    }
+
+    @Test
+    void from에서_to까지_기간과_겹치는_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+        var from = LocalDate.now().minusDays(1).toString();
+        var to = LocalDate.now().plusDays(1).toString();
+        // Act
+        var response = testUtils.get("/api/show?from=" + from + "&to=" + to)
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().contents().stream())
+                .allMatch(show -> !show.performanceStartDate().isAfter(LocalDate.parse(to))// 결과의 시작일은 요청 종요일보다 이후가 아니며
+                                  && !show.performanceEndDate()
+                        .isBefore(LocalDate.parse(from)));//결과의 종료일은 요청 시작일보다 이전이 아니다
     }
 }

@@ -112,6 +112,24 @@ public record TestFixture(
                 });
     }
 
+    public void generateShows(int showCount, int before, int after) {
+        Random random = new Random();
+        IntStream.range(0, showCount)
+                .forEach(i -> {
+                    var request = new ShowRegisterRequest(
+                            UUID.randomUUID().toString().substring(0, 10),
+                            randomEnum(Type.class).name(),
+                            randomEnum(Rating.class).name(),
+                            "공연 줄거리",
+                            "https://example.com/poster.jpg",
+                            LocalDate.now().minusDays(random.nextInt(before)),
+                            LocalDate.now().plusDays(random.nextInt(after))
+                    );
+                    var show = Show.create(ShowCreateCommand.from(request));
+                    showRepository.insert(show);
+                });
+    }
+
     private void generateShow(Type type) {
         var request = validShowRegisterRequest(type.name(), randomEnum(Rating.class).name());
         var show = Show.create(ShowCreateCommand.from(request));
