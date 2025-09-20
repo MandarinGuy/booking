@@ -357,4 +357,22 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void from이_to이후인_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+        var from = LocalDate.now().plusDays(1).toString();
+        var to = LocalDate.now().minusDays(1).toString();
+
+        // Act
+        var response = testUtils.get("/api/show?from=" + from + "&to=" + to)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }

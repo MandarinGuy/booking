@@ -56,6 +56,9 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
     @Override
     public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating, String q,
                                               LocalDate from, LocalDate to) {
+        if (from.isAfter(to)) {
+            throw new ShowException("BAD_REQUEST", "from 는 to 보다 과거만 가능합니다.");
+        }
         return queryRepository.fetch(page, size,
                 nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
                 q, from, to);
