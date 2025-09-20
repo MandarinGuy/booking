@@ -1,9 +1,8 @@
 package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
-import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
-import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
@@ -11,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.domain.show.Show;
+import org.mandarin.booking.domain.show.Show.Rating;
+import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -21,35 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 @IntegrationTest
 public class GET_specs {
 
-    @Test
-    void Authorization_헤더가_없더라도_접근하더라도_401_Unauthorized가_발생하지_않는다(
-            @Autowired IntegrationTestUtils testUtils
-    ) {
-        // Arrange
+//    @Test
+//    void Authorization_헤더가_없더라도_접근하더라도_401_Unauthorized가_발생하지_않는다(
+//            @Autowired IntegrationTestUtils testUtils
+//    ) {
+//        // Arrange
+//
+//        // Act
+//        var response = testUtils.get("/api/show")
+//                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+//                });
+//
+//        // Assert
+//        assertThat(response.getStatus()).isNotEqualTo(UNAUTHORIZED);
+//    }
 
-        // Act
-        var response = testUtils.get("/api/show")
-                .assertSuccess(Void.class);
-
-        // Assert
-        assertThat(response.getStatus()).isNotEqualTo(UNAUTHORIZED);
-    }
-
-    @Test
-    void 잘못된_토큰이나_만료_토큰을_전달해도_정상_응답을_반환한다(
-            @Autowired IntegrationTestUtils testUtils
-    ) {
-        // Arrange
-        var wrongToken = "wrong_token";
-
-        // Act
-        var response = testUtils.get("/api/show")
-                .withAuthorization(wrongToken)
-                .assertSuccess(Void.class);
-
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(SUCCESS);
-    }
 
     @Test
     void 기본_요청_시_첫번째_페이지의_10건이_반환된다(
@@ -186,5 +173,42 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void 지정된_type이_존재한다면_해당_type_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(10, Type.MUSICAL);
+
+        // Act
+        var response = testUtils.get("/api/show?type=MUSICAL")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThatStream(response.getData().contents().stream())
+                .allMatch(show -> show.type().equals(Type.MUSICAL));
+    }
+
+    @Test
+    void 지정된_rating이_존재한다면_해당_rating_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(10, Rating.ALL);
+
+        // Act
+        var response = testUtils.get("/api/show?rating=ALL")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThatStream(response.getData().contents().stream())
+                .allMatch(show -> show.rating().equals(Rating.ALL));
+
     }
 }

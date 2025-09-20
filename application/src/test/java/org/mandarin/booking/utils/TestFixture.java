@@ -88,17 +88,39 @@ public record TestFixture(
                 .toList();
     }
 
+    public void generateShows(int showCount, Type type) {
+        IntStream.range(0, showCount)
+                .forEach(i -> generateShow(type));
+    }
+
+    public void generateShows(int showCount, Rating rating) {
+        IntStream.range(0, showCount)
+                .forEach(i -> generateShow(rating));
+    }
+
+    private void generateShow(Type type) {
+        var request = validShowRegisterRequest(type.name(), randomEnum(Rating.class).name());
+        var show = Show.create(ShowCreateCommand.from(request));
+        showRepository.insert(show);
+    }
+
+    private void generateShow(Rating rating) {
+        var request = validShowRegisterRequest(randomEnum(Type.class).name(), rating.name());
+        var show = Show.create(ShowCreateCommand.from(request));
+        showRepository.insert(show);
+    }
+
     private Show generateShow() {
-        var request = validShowRegisterRequest();
+        var request = validShowRegisterRequest(randomEnum(Type.class).name(), randomEnum(Rating.class).name());
         var show = Show.create(ShowCreateCommand.from(request));
         return showRepository.insert(show);
     }
 
-    private ShowRegisterRequest validShowRegisterRequest() {
+    private ShowRegisterRequest validShowRegisterRequest(String type, String rating) {
         return new ShowRegisterRequest(
                 UUID.randomUUID().toString().substring(0, 10),
-                randomEnum(Type.class).name(),
-                randomEnum(Rating.class).name(),
+                type,
+                rating,
                 "공연 줄거리",
                 "https://example.com/poster.jpg",
                 LocalDate.now(),

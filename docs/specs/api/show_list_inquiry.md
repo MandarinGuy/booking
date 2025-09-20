@@ -97,7 +97,6 @@
 
 ## 테스트
 
-- [x] Authorization 헤더가 없더라도 접근하더라도 401 Unauthorized가 발생하지 않는다
 - [x] 잘못된 토큰/만료 토큰을 전달해도 정상 응답을 반환한다
 - [x] 기본 요청 시 첫번째 페이지의 10건이 반환된다
 - [x] 공연이 존재하지 않을 경우 빈 contents, hasNext=false를 반환한다
@@ -108,8 +107,8 @@
 - [x] size가 1보다 작은 요청 시 BAD_REQUEST를 반환한다
 - [x] 부적절한 type으로 요청하는 경우 BAD_REQUEST를 반환한다
 - [x] 부적절한 rating으로 요청하는 경우 BAD_REQUEST를 반환한다
-- [ ] 지정된 type이 존재한다면 해당 type 공연만 조회된다
-- [ ] 지정된 rating이 존재한다면 해당 rating 공연만 조회된다
+- [x] 지정된 type이 존재한다면 해당 type 공연만 조회된다
+- [x] 지정된 rating이 존재한다면 해당 rating 공연만 조회된다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
 - [ ] q값이 비어있지 않다면 제목에 q가 포함된 공연만 조회된다

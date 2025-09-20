@@ -23,7 +23,8 @@ jwt:
     access: 600000
     refresh: 1800000
 
-#logging:
-#  level:
-#    org.springframework.security: TRACE
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: TRACE
 

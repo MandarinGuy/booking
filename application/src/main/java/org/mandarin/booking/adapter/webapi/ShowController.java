@@ -28,10 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
+    @Valid
     SliceView<ShowResponse> inquire(@RequestParam(required = false) @Min(0) Integer page,
                                     @RequestParam(required = false) @Min(1) @Max(value = 100) Integer size,
-                                    @RequestParam(required = false) @EnumRequest(Type.class) String type,
-                                    @RequestParam(required = false) @EnumRequest(Rating.class) String rating,
+                                    @RequestParam(required = false) @EnumRequest(value = Type.class, nullable = true) String type,
+                                    @RequestParam(required = false) @EnumRequest(value = Rating.class, nullable = true) String rating,
                                     @RequestParam(required = false) String q,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {

@@ -22,16 +22,16 @@ public record IntegrationTestUtils(
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    public TestResult get(String path, Object... requestParams) {
-        return new TestResult(path, null, requestParams)
+    public TestResult get(String path) {
+        return new TestResult(path, null)
                 .setContext(objectMapper)
-                .setExecutor((p, req, headers, params) -> docsUtils.execute("GET", p, null, headers, params));
+                .setExecutor((p, req, headers) -> docsUtils.execute("GET", p, null, headers));
     }
 
     public <T> TestResult post(String path, T request) {
         return new TestResult(path, request)
                 .setContext(objectMapper)
-                .setExecutor((p, req, headers, params) -> docsUtils.execute("POST", p, req, headers, params));
+                .setExecutor((p, req, headers) -> docsUtils.execute("POST", p, req, headers));
     }
 
     public String getValidRefreshToken() {
