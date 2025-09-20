@@ -211,4 +211,24 @@ public class GET_specs {
                 .allMatch(show -> show.rating().equals(Rating.ALL));
 
     }
+
+    @Test
+    void q값이_비어있지_않다면_제목에_q가_포함된_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var titlePart = "titlePart";
+        testFixture.generateShows(10, titlePart);
+
+        // Act
+        var response = testUtils.get("/api/show?q=titlePart")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThatStream(response.getData().contents().stream().map(ShowResponse::title))
+                .allMatch(title -> title.contains(titlePart));
+
+    }
 }

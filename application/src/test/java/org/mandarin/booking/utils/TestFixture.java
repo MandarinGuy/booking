@@ -8,6 +8,7 @@ import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateU
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
@@ -96,6 +97,19 @@ public record TestFixture(
     public void generateShows(int showCount, Rating rating) {
         IntStream.range(0, showCount)
                 .forEach(i -> generateShow(rating));
+    }
+
+    public void generateShows(int showCount, String titlePart) {
+        Random random = new Random();
+        IntStream.range(0, showCount)
+                .forEach(i -> {
+                    var request = validShowRegisterRequest(randomEnum(Type.class).name(),
+                            randomEnum(Rating.class).name());
+                    var show = Show.create(ShowCreateCommand.from(request));
+                    ReflectionTestUtils.setField(show, "title",
+                            (char) random.nextInt('a', 'z') + titlePart + (char) random.nextInt('a', 'z'));
+                    showRepository.insert(show);
+                });
     }
 
     private void generateShow(Type type) {
