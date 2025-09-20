@@ -318,4 +318,24 @@ public class GET_specs {
         assertThat(response.getData().contents().stream().map(ShowResponse::performanceEndDate))
                 .allMatch(date -> date.isBefore(LocalDate.now().minusDays(3)));
     }
+
+    @Test
+    void 기간이_서로_맞물리지_않는_경우_빈_contents를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+        var from = LocalDate.now().plusDays(11).toString();
+        var to = LocalDate.now().plusDays(21).toString();
+
+        // Act
+        var response = testUtils.get("/api/show?from=" + from + "&to=" + to)
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().hasNext()).isFalse();
+        assertThat(response.getData().contents()).isEmpty();
+    }
 }
