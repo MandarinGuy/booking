@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.adapter.SliceView;
@@ -40,11 +41,18 @@ public class GET_specs {
 //    }
 
 
+    @BeforeEach
+    void setUp(@Autowired TestFixture testFixture) {
+        testFixture.removeShows();
+    }
+
     @Test
     void 기본_요청_시_첫번째_페이지의_10건이_반환된다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
+        testFixture.generateShows(10);
 
         // Act
         var response = testUtils.get("/api/show")
@@ -68,6 +76,7 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getData().hasNext()).isFalse();
+        assertThat(response.getData().contents()).isEmpty();
     }
 
     @Test
@@ -103,8 +112,8 @@ public class GET_specs {
                 });
 
         // Assert
-        assertThat(response.getData().contents()).isEmpty();
         assertThat(response.getData().hasNext()).isFalse();
+        assertThat(response.getData().contents()).isEmpty();
     }
 
     @Test
@@ -290,5 +299,23 @@ public class GET_specs {
         // Assert
         assertThat(response.getData().contents().stream())
                 .allMatch(show -> show.performanceStartDate().isAfter(LocalDate.now().plusDays(1)));
+    }
+
+    @Test
+    void to만_지정_시_해당_일자_이전_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+
+        // Act
+        var response = testUtils.get("/api/show?to=" + LocalDate.now().minusDays(3))
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().contents().stream().map(ShowResponse::performanceEndDate))
+                .allMatch(date -> date.isBefore(LocalDate.now().minusDays(3)));
     }
 }

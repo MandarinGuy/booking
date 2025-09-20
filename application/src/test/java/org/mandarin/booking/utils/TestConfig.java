@@ -1,6 +1,8 @@
 package org.mandarin.booking.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.app.member.MemberCommandRepository;
 import org.mandarin.booking.app.show.ShowCommandRepository;
@@ -12,6 +14,9 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class TestConfig {
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Bean
     public IntegrationTestUtils integrationTestUtils(@Autowired TestFixture testFixture,
                                                      @Autowired TokenUtils tokenUtils,
@@ -25,6 +30,6 @@ public class TestConfig {
                                    @Autowired ShowCommandRepository showRepository,
                                    @Autowired HallCommandRepository hallRepository,
                                    @Autowired SecurePasswordEncoder securePasswordEncoder) {
-        return new TestFixture(memberRepository, showRepository, hallRepository, securePasswordEncoder);
+        return new TestFixture(entityManager, memberRepository, showRepository, hallRepository, securePasswordEncoder);
     }
 }

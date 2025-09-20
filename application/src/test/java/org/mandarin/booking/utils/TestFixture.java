@@ -6,6 +6,7 @@ import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generat
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
@@ -25,13 +26,25 @@ import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
-public record TestFixture(
-        MemberCommandRepository memberRepository,
-        ShowCommandRepository showRepository,
-        HallCommandRepository hallRepository,
-        SecurePasswordEncoder securePasswordEncoder
-) {
+public class TestFixture {
+    private final EntityManager entityManager;
+    private final MemberCommandRepository memberRepository;
+    private final ShowCommandRepository showRepository;
+    private final HallCommandRepository hallRepository;
+    private final SecurePasswordEncoder securePasswordEncoder;
+
+    public TestFixture(EntityManager entityManager, MemberCommandRepository memberRepository,
+                       ShowCommandRepository showRepository, HallCommandRepository hallRepository,
+                       SecurePasswordEncoder securePasswordEncoder) {
+        this.entityManager = entityManager;
+        this.memberRepository = memberRepository;
+        this.showRepository = showRepository;
+        this.hallRepository = hallRepository;
+        this.securePasswordEncoder = securePasswordEncoder;
+    }
+
     public Member insertDummyMember(String userId, String password) {
         var command = new MemberCreateCommand(
                 generateNickName(),
@@ -146,6 +159,11 @@ public record TestFixture(
         var request = validShowRegisterRequest(randomEnum(Type.class).name(), randomEnum(Rating.class).name());
         var show = Show.create(ShowCreateCommand.from(request));
         return showRepository.insert(show);
+    }
+
+    @Transactional
+    public void removeShows() {
+        entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 
     private ShowRegisterRequest validShowRegisterRequest(String type, String rating) {

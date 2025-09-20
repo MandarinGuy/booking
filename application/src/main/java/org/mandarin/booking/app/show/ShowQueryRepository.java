@@ -71,11 +71,12 @@ public class ShowQueryRepository {
             builder.and(show.title.containsIgnoreCase(q));
         }
         if (from != null && to != null) {
-            builder.and(show.performanceStartDate.between(from, to));
+            builder.and(show.performanceStartDate.after(from))
+                    .and(show.performanceEndDate.before(to));
         } else if (from != null) {
-            builder.and(show.performanceStartDate.goe(from));
+            builder.and(show.performanceStartDate.after(from));
         } else if (to != null) {
-            builder.and(show.performanceStartDate.loe(to));
+            builder.and(show.performanceEndDate.before(to));
         }
 
         List<ShowResponse> results = queryFactory
@@ -96,9 +97,6 @@ public class ShowQueryRepository {
                 .fetch();
 
         boolean hasNext = results.size() > pageSize;
-        if (hasNext) {
-            results.remove(pageSize);
-        }
 
         return new SliceView<>(results, pageNo, pageSize, hasNext);
     }
