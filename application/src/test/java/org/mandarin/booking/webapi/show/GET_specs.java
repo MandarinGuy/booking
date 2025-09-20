@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -230,5 +231,24 @@ public class GET_specs {
         assertThatStream(response.getData().contents().stream().map(ShowResponse::title))
                 .allMatch(title -> title.contains(titlePart));
 
+    }
+
+    @Test
+    void 여러_건이_존재할_경우_performanceStartDate_DESC_title_ASC_순으로_정렬된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20);
+
+        // Act
+        var response = testUtils.get("/api/show?size=20")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThatStream(response.getData().contents().stream())
+                .isSortedAccordingTo(Comparator.comparing(ShowResponse::performanceStartDate)
+                        .thenComparing(ShowResponse::title));
     }
 }

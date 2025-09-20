@@ -90,7 +90,7 @@ public class ShowQueryRepository {
                         show.performanceEndDate))
                 .from(show)
                 .where(builder)
-                .orderBy(show.performanceStartDate.asc())
+                .orderBy(show.performanceStartDate.desc(), show.title.asc())
                 .offset((long) pageNo * pageSize)
                 .limit(pageSize + 1)
                 .fetch();
