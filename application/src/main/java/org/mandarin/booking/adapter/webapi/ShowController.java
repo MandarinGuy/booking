@@ -7,6 +7,9 @@ import java.time.LocalDate;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
 import org.mandarin.booking.app.show.ShowRegisterer;
+import org.mandarin.booking.domain.EnumRequest;
+import org.mandarin.booking.domain.show.Show.Rating;
+import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
@@ -27,8 +30,8 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
     @GetMapping
     SliceView<ShowResponse> inquire(@RequestParam(required = false) @Min(0) Integer page,
                                     @RequestParam(required = false) @Min(1) @Max(value = 100) Integer size,
-                                    @RequestParam(required = false) String type,
-                                    @RequestParam(required = false) String rating,
+                                    @RequestParam(required = false) @EnumRequest(Type.class) String type,
+                                    @RequestParam(required = false) @EnumRequest(Rating.class) String rating,
                                     @RequestParam(required = false) String q,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {

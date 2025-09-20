@@ -159,4 +159,32 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void 부적절한_type으로_요청하는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show?type=AAA")// invalid type
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void 부적절한_rating으로_요청하는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+
+        // Act
+        var response = testUtils.get("/api/show?rating=AAA")
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }

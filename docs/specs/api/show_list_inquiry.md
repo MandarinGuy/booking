@@ -106,17 +106,17 @@
 - [x] size가 100보다 큰 요청 시 BAD_REQUEST를 반환한다
 - [x] page가 0보다 작은 요청 시 BAD_REQUEST를 반환한다
 - [x] size가 1보다 작은 요청 시 BAD_REQUEST를 반환한다
+- [x] 부적절한 type으로 요청하는 경우 BAD_REQUEST를 반환한다
+- [x] 부적절한 rating으로 요청하는 경우 BAD_REQUEST를 반환한다
+- [ ] 지정된 type이 존재한다면 해당 type 공연만 조회된다
+- [ ] 지정된 rating이 존재한다면 해당 rating 공연만 조회된다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다
-- [ ] type=MUSICAL -> MUSICAL만 조회된다
-- [ ] rating=AGE12 -> AGE12 공연만 조회된다
-- [ ] 부적절한 rating으로 요청하는 경우 BAD_REQUEST를 반환한다
-- [ ] q=라라 -> 제목에 "라라"가 포함된 공연만 조회된다
-- [ ] 여러 건이 존재할 경우 performanceStartDate ASC -> title ASC 순으로 정렬된다
-- [ ] from=2025-10-01&to=2025-10-31 -> 이 기간과 겹치는 공연만 조회된다
+- [ ] q값이 비어있지 않다면 제목에 q가 포함된 공연만 조회된다
+- [ ] 여러 건이 존재할 경우 performanceStartDate ASC, title ASC 순으로 정렬된다
+- [ ] from에서 to까지 기간과 겹치는 공연만 조회된다
 - [ ] from만 지정 시 해당 일자 이후 공연만 조회된다
 - [ ] to만 지정 시 해당 일자 이전 공연만 조회된다
 - [ ] 기간이 서로 맞물리지 않는 경우 빈 contents를 반환한다
-- [ ] type/rating에 허용되지 않는 값 입력 시 BAD_REQUEST를 반환한다
 - [ ] from 또는 to 형식이 잘못된 경우 BAD_REQUEST를 반환한다
 - [ ] from > to인 경우 BAD_REQUEST를 반환한다
