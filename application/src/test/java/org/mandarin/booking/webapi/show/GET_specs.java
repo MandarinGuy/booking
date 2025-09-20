@@ -273,4 +273,22 @@ public class GET_specs {
                                   && !show.performanceEndDate()
                         .isBefore(LocalDate.parse(from)));//결과의 종료일은 요청 시작일보다 이전이 아니다
     }
+
+    @Test
+    void from만_지정_시_해당_일자_이후_공연만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+
+        // Act
+        var response = testUtils.get("/api/show?from=" + LocalDate.now().plusDays(1))
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().contents().stream())
+                .allMatch(show -> show.performanceStartDate().isAfter(LocalDate.now().plusDays(1)));
+    }
 }
