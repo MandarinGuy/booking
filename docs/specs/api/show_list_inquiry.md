@@ -115,7 +115,7 @@
 - [x] from만 지정 시 해당 일자 이후 공연만 조회된다
 - [x] to만 지정 시 해당 일자 이전 공연만 조회된다
 - [x] 기간이 서로 맞물리지 않는 경우 빈 contents를 반환한다
-- [ ] from 또는 to 형식이 잘못된 경우 BAD_REQUEST를 반환한다
+- [x] from 또는 to 형식이 잘못된 경우 BAD_REQUEST를 반환한다
 - [ ] from > to인 경우 BAD_REQUEST를 반환한다
 - [ ] page=0&size=1 -> 첫 페이지 한 건만 반환한다
 - [ ] page=1&size=1 -> 두 번째 건이 반환된다

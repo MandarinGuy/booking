@@ -6,6 +6,7 @@ import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -337,5 +338,23 @@ public class GET_specs {
         // Assert
         assertThat(response.getData().hasNext()).isFalse();
         assertThat(response.getData().contents()).isEmpty();
+    }
+
+    @Test
+    void from_또는_to_형식이_잘못된_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, 10, 10);
+        var from = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        var to = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        // Act
+        var response = testUtils.get("/api/show?from=" + from + "&to=" + to)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 }
