@@ -61,7 +61,7 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
         }
         return queryRepository.fetch(page, size,
                 nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
-                q, from, to);
+                q.trim(), from, to);
     }
 
     private void checkDuplicateTitle(String title) {

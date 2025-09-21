@@ -3,6 +3,7 @@ package org.mandarin.booking.adapter.webapi;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
@@ -33,7 +34,7 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
                                     @RequestParam(required = false) @Min(1) @Max(value = 100) Integer size,
                                     @RequestParam(required = false) @EnumRequest(value = Type.class, nullable = true) String type,
                                     @RequestParam(required = false) @EnumRequest(value = Rating.class, nullable = true) String rating,
-                                    @RequestParam(required = false) String q,
+                                    @RequestParam(required = false) @NotBlank String q,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return showFetcher.fetchShows(page, size, type, rating, q, from, to);

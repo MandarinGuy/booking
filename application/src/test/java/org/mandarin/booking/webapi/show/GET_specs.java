@@ -375,4 +375,21 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void q가_공백인_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20, "title");
+        var q = " ";
+
+        // Act
+        var response = testUtils.get("/api/show?q=" + q)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }
