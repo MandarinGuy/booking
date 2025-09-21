@@ -11,7 +11,7 @@ public record ShowResponse(
         Type type,
         Rating rating,
         String posterUrl,
-        String venueName,
+        String hallName,
         LocalDate performanceStartDate,
         LocalDate performanceEndDate
 ) {

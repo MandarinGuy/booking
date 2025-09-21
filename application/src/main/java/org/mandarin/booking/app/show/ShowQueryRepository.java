@@ -1,11 +1,12 @@
 package org.mandarin.booking.app.show;
 
 
+import static com.querydsl.jpa.JPAExpressions.select;
 import static org.mandarin.booking.domain.show.QShow.show;
 import static org.mandarin.booking.domain.show.QShowSchedule.showSchedule;
+import static org.mandarin.booking.domain.venue.QHall.hall;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,14 +40,13 @@ public class ShowQueryRepository {
     }
 
     public boolean canScheduleOn(Long hallId, LocalDateTime startAt, LocalDateTime endAt) {
-        var fetchFirst = queryFactory
-                .selectOne()
-                .from(showSchedule)
-                .where(showSchedule.hallId.eq(hallId))
-                .where(showSchedule.startAt.before(endAt))
-                .where(showSchedule.endAt.after(startAt))
-                .fetchFirst();
-        return fetchFirst == null;
+        return queryFactory
+                       .selectOne()
+                       .from(show)
+                       .leftJoin(show.schedules, showSchedule)
+                       .where(show.hallId.eq(hallId))
+                       .where(showSchedule.startAt.before(endAt), showSchedule.endAt.after(startAt))
+                       .fetchFirst() == null;
     }
 
     public SliceView<ShowResponse> fetch(@Nullable Integer page,
@@ -64,7 +64,7 @@ public class ShowQueryRepository {
             builder.and(show.rating.eq(rating));
         }
         if (q != null) {
-            builder.and(show.title.like(q));
+            builder.and(show.title.containsIgnoreCase(q));
         }
         if (from != null && to != null) {
             builder.and(show.performanceStartDate.after(from))
@@ -82,7 +82,9 @@ public class ShowQueryRepository {
                         show.type,
                         show.rating,
                         show.posterUrl,
-                        Expressions.nullExpression(), // venueName
+                        select(hall.hallName)
+                                .from(hall)
+                                .where(hall.id.eq(show.hallId)),
                         show.performanceStartDate,
                         show.performanceEndDate))
                 .from(show)

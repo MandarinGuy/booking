@@ -20,8 +20,6 @@ class ShowSchedule extends AbstractEntity {
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
-    private Long hallId;
-
     private LocalDateTime startAt;
 
     private LocalDateTime endAt;
@@ -30,22 +28,19 @@ class ShowSchedule extends AbstractEntity {
 
     private ShowSchedule(
             Show show,
-            Long hallId,
             LocalDateTime startAt,
             LocalDateTime endAt,
             Integer runtimeMinutes
     ) {
         this.show = show;
-        this.hallId = hallId;
         this.startAt = startAt;
         this.endAt = endAt;
         this.runtimeMinutes = runtimeMinutes;
     }
 
-    static ShowSchedule create(Show show, Long hallId, ShowScheduleCreateCommand command) {
+    static ShowSchedule create(Show show, ShowScheduleCreateCommand command) {
         return new ShowSchedule(
                 show,
-                hallId,
                 command.startAt(),
                 command.endAt(),
                 command.getRuntimeMinutes()

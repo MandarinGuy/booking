@@ -76,8 +76,10 @@ public class TestFixture {
     }
 
     public Show insertDummyShow(LocalDate performanceStartDate, LocalDate performanceEndDate) {
+        var hall = insertDummyHall();
         var command = ShowCreateCommand.from(
                 new ShowRegisterRequest(
+                        hall.getId(),
                         UUID.randomUUID().toString().substring(0, 5),
                         "MUSICAL",
                         "AGE12",
@@ -87,38 +89,43 @@ public class TestFixture {
                         performanceEndDate
                 )
         );
-        var show = Show.create(command);
+        var show = Show.create(hall.getId(), command);
         return showRepository.insert(show);
     }
 
     public Hall insertDummyHall() {
-        var hall = Hall.create();
+        var hall = Hall.create("hall name");
         return hallRepository.insert(hall);
     }
 
     public List<Show> generateShows(int showCount) {
+        var hall = insertDummyHall();
         return IntStream.range(0, showCount)
-                .mapToObj(i -> generateShow())
+                .mapToObj(i -> generateShow(hall.getId()))
                 .toList();
     }
 
     public void generateShows(int showCount, Type type) {
+        var hall = insertDummyHall();
         IntStream.range(0, showCount)
-                .forEach(i -> generateShow(type));
+                .forEach(i -> generateShow(hall.getId(), type));
     }
 
     public void generateShows(int showCount, Rating rating) {
+        var hall = insertDummyHall();
         IntStream.range(0, showCount)
-                .forEach(i -> generateShow(rating));
+                .forEach(i -> generateShow(hall.getId(), rating));
     }
 
     public void generateShows(int showCount, String titlePart) {
         Random random = new Random();
+        var hall = insertDummyHall();
         IntStream.range(0, showCount)
                 .forEach(i -> {
-                    var request = validShowRegisterRequest(randomEnum(Type.class).name(),
+                    var request = validShowRegisterRequest(hall.getId(),
+                            randomEnum(Type.class).name(),
                             randomEnum(Rating.class).name());
-                    var show = Show.create(ShowCreateCommand.from(request));
+                    var show = Show.create(hall.getId(), ShowCreateCommand.from(request));
                     ReflectionTestUtils.setField(show, "title",
                             (char) random.nextInt('a', 'z') + titlePart + (char) random.nextInt('a', 'z'));
                     showRepository.insert(show);
@@ -127,9 +134,12 @@ public class TestFixture {
 
     public void generateShows(int showCount, int before, int after) {
         Random random = new Random();
+        var hall = insertDummyHall();
+        var hallId = hall.getId();
         IntStream.range(0, showCount)
                 .forEach(i -> {
                     var request = new ShowRegisterRequest(
+                            hallId,
                             UUID.randomUUID().toString().substring(0, 10),
                             randomEnum(Type.class).name(),
                             randomEnum(Rating.class).name(),
@@ -138,27 +148,27 @@ public class TestFixture {
                             LocalDate.now().minusDays(random.nextInt(before)),
                             LocalDate.now().plusDays(random.nextInt(after))
                     );
-                    var show = Show.create(ShowCreateCommand.from(request));
+                    var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showRepository.insert(show);
                 });
     }
 
-    private void generateShow(Type type) {
-        var request = validShowRegisterRequest(type.name(), randomEnum(Rating.class).name());
-        var show = Show.create(ShowCreateCommand.from(request));
+    public boolean existsVenueName(String hallName) {
+        return (entityManager.createQuery("SELECT COUNT(v) FROM Hall v WHERE v.hallName = :hallName")
+                .setParameter("hallName", hallName)
+                .getSingleResult() instanceof Long count) && count > 0;
+    }
+
+    private void generateShow(Long hallId, Type type) {
+        var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
         showRepository.insert(show);
     }
 
-    private void generateShow(Rating rating) {
-        var request = validShowRegisterRequest(randomEnum(Type.class).name(), rating.name());
-        var show = Show.create(ShowCreateCommand.from(request));
+    private void generateShow(Long hallId, Rating rating) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
         showRepository.insert(show);
-    }
-
-    private Show generateShow() {
-        var request = validShowRegisterRequest(randomEnum(Type.class).name(), randomEnum(Rating.class).name());
-        var show = Show.create(ShowCreateCommand.from(request));
-        return showRepository.insert(show);
     }
 
     @Transactional
@@ -166,8 +176,15 @@ public class TestFixture {
         entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 
-    private ShowRegisterRequest validShowRegisterRequest(String type, String rating) {
+    private Show generateShow(Long hallId) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showRepository.insert(show);
+    }
+
+    private ShowRegisterRequest validShowRegisterRequest(Long hallId, String type, String rating) {
         return new ShowRegisterRequest(
+                hallId,
                 UUID.randomUUID().toString().substring(0, 10),
                 type,
                 rating,

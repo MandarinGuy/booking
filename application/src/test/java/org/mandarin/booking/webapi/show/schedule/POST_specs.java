@@ -34,9 +34,8 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
-                show, requireNonNull(hall.getId()),
+                show,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -56,9 +55,8 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
-                show, requireNonNull(hall.getId()),
+                show,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -78,9 +76,8 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var hall = testFixture.insertDummyHall();
         var request = generateShowScheduleRegisterRequest(
-                show, requireNonNull(hall.getId()),
+                show,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -121,7 +118,7 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = generateShowScheduleRegisterRequest(show,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                LocalDateTime.of(2025, 9, 10, 19, 0), 10L
+                LocalDateTime.of(2025, 9, 10, 19, 0)
         );
 
         // Act
@@ -143,7 +140,6 @@ public class POST_specs {
         testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
-                10L,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30)
         );
@@ -159,40 +155,14 @@ public class POST_specs {
     }
 
     @Test
-    void 존재하지_않는_hallId를_보내면_NOT_FOUND_상태코드를_반환한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TestFixture testFixture
-    ) {
-        // Arrange
-        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = new ShowScheduleRegisterRequest(
-                requireNonNull(show.getId()),
-                9999L,// 존재하지 않는 hallId
-                LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30)
-        );
-
-        // Act
-        var response = testUtils.post("/api/show/schedule", request)
-                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
-                .assertFailure();
-
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
-        assertThat(response.getData()).contains("해당 공연장을 찾을 수 없습니다.");
-    }
-
-    @Test
     void 공연_기간_범위를_벗어나는_startAt_또는_endAt을_보낼_경우_BAD_REQUEST를_반환한다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
-        var hall = testFixture.insertDummyHall();
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
-                requireNonNull(hall.getId()),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
                 LocalDateTime.of(2023, 9, 10, 21, 30)
         );
@@ -213,22 +183,18 @@ public class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var hall = testFixture.insertDummyHall();
-
         var show = testFixture.insertDummyShow(
                 LocalDate.now().minusDays(1),
                 LocalDate.now().plusDays(10)
         );
-        var request = generateShowScheduleRegisterRequest(show, requireNonNull(hall.getId()),
+        var request = generateShowScheduleRegisterRequest(
+                show,
                 LocalDateTime.now(),
                 LocalDateTime.now().plusHours(2)
         );
 
-        var anotherShow = testFixture.insertDummyShow(
-                LocalDate.now().minusDays(2),
-                LocalDate.now().plusDays(30)
-        );
-        var nextRequest = generateShowScheduleRegisterRequest(anotherShow, hall.getId(),
+        var nextRequest = generateShowScheduleRegisterRequest(
+                show,
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(3)
         );
@@ -255,23 +221,15 @@ public class POST_specs {
 
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
         return generateShowScheduleRegisterRequest(show, LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30), 10L);
+                LocalDateTime.of(2025, 9, 10, 21, 30));
     }
 
-
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
-                                                                            long hallId,
-                                                                            LocalDateTime startAt,
-                                                                            LocalDateTime endAt) {
-        return generateShowScheduleRegisterRequest(show, startAt, endAt, hallId);
-    }
 
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
                                                                             LocalDateTime startAt,
-                                                                            LocalDateTime endAt, long hallId) {
+                                                                            LocalDateTime endAt) {
         return new ShowScheduleRegisterRequest(
-                requireNonNull(show.getId()),
-                hallId,
+                show.getId(),
                 startAt,
                 endAt
         );

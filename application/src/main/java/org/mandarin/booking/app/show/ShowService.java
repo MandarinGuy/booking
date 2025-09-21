@@ -29,8 +29,11 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
+        var hallId = request.hallId();
+
+        hallValidator.checkHallExist(hallId);
         var command = ShowCreateCommand.from(request);
-        var show = Show.create(command);
+        var show = Show.create(hallId, command);
 
         checkDuplicateTitle(show.getTitle());
 
@@ -41,14 +44,11 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
-        var hallId = request.hallId();
 
-        hallValidator.checkHallExist(hallId);
-        checkConflictSchedule(hallId, request);
-
+        checkConflictSchedule(show.getHallId(), request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());
 
-        show.registerSchedule(hallId, command);
+        show.registerSchedule(command);
         var saved = commandRepository.insert(show);
         return new ShowScheduleRegisterResponse(requireNonNull(saved.getId()));
     }
@@ -79,6 +79,5 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
             throw new ShowException("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
         }
     }
-
 }
 

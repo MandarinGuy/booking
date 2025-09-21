@@ -9,6 +9,9 @@ import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.Type;
 
 public record ShowRegisterRequest(
+        @NotNull(message = "venue id is required")
+        Long hallId,
+
         @NotBlank(message = "title is required")
         String title,
 

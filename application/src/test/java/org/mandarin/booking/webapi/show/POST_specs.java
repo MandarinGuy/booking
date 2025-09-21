@@ -18,6 +18,7 @@ import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -25,31 +26,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class POST_specs {
 
     static List<?> nullOrBlankElementRequests() {
+        var hallId = 1L;
         return List.of(
-                new ShowRegisterRequest("", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                new ShowRegisterRequest(hallId, "", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg", LocalDate.now(),
+                new ShowRegisterRequest(hallId, "공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        LocalDate.now(),
                         LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
+                new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
+                new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
+                new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
                         LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg", null,
+                new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                        null,
                         LocalDate.now().plusDays(1)),
-                new ShowRegisterRequest("공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
+                new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), null)
         );
     }
 
     @Test
     void 올바른_요청을_보내면_status가_SUCCESS이다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var request = validShowRegisterRequest();
+        var request = validShowRegisterRequest(testFixture.insertDummyHall().getId());
 
         // Act
         var response = testUtils.post(
@@ -65,10 +70,12 @@ public class POST_specs {
 
     @Test
     void Authorization_헤더에_유효한_accessToken이_없으면_status가_UNAUTHORIZED이다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var request = validShowRegisterRequest();
+        var hallId = testFixture.insertDummyHall().getId();
+        var request = validShowRegisterRequest(hallId);
 
         // Act
         var response = testUtils.post(
@@ -104,11 +111,14 @@ public class POST_specs {
 
     @Test
     void 허용되지_않은_type이면_BAD_REQUEST이다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
+        var hallId = testFixture.insertDummyHall().getId();
         var request = new ShowRegisterRequest(
+                hallId,
                 "공연 제목",
                 "MOVIE", // invalid type
                 "AGE12",
@@ -132,11 +142,13 @@ public class POST_specs {
 
     @Test
     void 올바른_요청을_보내면_응답_본문에_showId가_존재한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var request = validShowRegisterRequest();
+        var hallId = testFixture.insertDummyHall().getId();
+        var request = validShowRegisterRequest(hallId);
 
         // Act
         var response = testUtils.post(
@@ -152,11 +164,14 @@ public class POST_specs {
 
     @Test
     void 공연_시작일은_공연_종료일_이후면_INTERNAL_SERVER_ERROR이다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
+        var hallId = testFixture.insertDummyHall().getId();
         var request = new ShowRegisterRequest(
+                hallId,
                 "공연 제목",
                 "MUSICAL",
                 "AGE12",
@@ -183,11 +198,12 @@ public class POST_specs {
     @SuppressWarnings("NonAsciiCharacters")
     @Test
     void 중복된_제목의_공연을_등록하면_INTERNAL_SERVER_ERROR가_발생한다(
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var request = validShowRegisterRequest();
+        var request = validShowRegisterRequest(testFixture.insertDummyHall().getId());
         testUtils.post(
                         "/api/show",
                         request
@@ -195,7 +211,7 @@ public class POST_specs {
                 .withAuthorization(authToken)
                 .assertSuccess(ShowRegisterResponse.class);
 
-        var duplicateTitleRequest = validShowRegisterRequest(request.title());
+        var duplicateTitleRequest = validShowRegisterRequest(request.hallId(), request.title());
 
         // Act
         var response = testUtils.post(
@@ -210,8 +226,9 @@ public class POST_specs {
         assertThat(response.getData()).contains("이미 존재하는 공연 이름입니다:");
     }
 
-    private ShowRegisterRequest validShowRegisterRequest() {
+    private ShowRegisterRequest validShowRegisterRequest(Long hallId) {
         return new ShowRegisterRequest(
+                hallId,
                 UUID.randomUUID().toString().substring(0, 10),
                 "MUSICAL",
                 "AGE12",
@@ -222,8 +239,9 @@ public class POST_specs {
         );
     }
 
-    private ShowRegisterRequest validShowRegisterRequest(String title) {
+    private ShowRegisterRequest validShowRegisterRequest(Long hallId, String title) {
         return new ShowRegisterRequest(
+                hallId,
                 title,
                 "MUSICAL",
                 "AGE12",
