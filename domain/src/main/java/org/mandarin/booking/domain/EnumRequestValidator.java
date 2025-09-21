@@ -20,7 +20,6 @@ public class EnumRequestValidator implements ConstraintValidator<EnumRequest, St
 
     @Override
     public boolean isValid(@Nullable String value, ConstraintValidatorContext context) {
-        // nullable=true && 값이 null이면 검증 스킵
         if (value == null) {
             return nullable;
         }
