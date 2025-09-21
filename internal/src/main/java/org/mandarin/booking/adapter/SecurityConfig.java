@@ -1,7 +1,6 @@
 package org.mandarin.booking.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -29,11 +28,6 @@ class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public AuthorizationRequestMatcherConfigurer authorizationRequestMatcherConfigurer() {
-        return new DefaultAuthorizationRequestMatcherConfigurer();
-    }
 
     @Bean
     @Order(1)
