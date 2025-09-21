@@ -23,12 +23,15 @@ public record ShowInquiryRequest(
         @EnumRequest(value = Rating.class, nullable = true)
         String rating,
 
+        @Nullable
         String q,
 
         @DateTimeFormat(iso = ISO.DATE)
+        @Nullable
         LocalDate from,
 
         @DateTimeFormat(iso = ISO.DATE)
+        @Nullable
         LocalDate to
 ) {
     public ShowInquiryRequest {
@@ -37,6 +40,14 @@ public record ShowInquiryRequest(
         }
         if (size == null) {
             size = 10;
+        }
+
+        if ((from != null && to != null) && from.isAfter(to)) {
+            throw new ShowException("BAD_REQUEST", "from 는 to 보다 과거만 가능합니다.");
+        }
+        q = (q == null) ? null : q.trim();
+        if (q != null && q.isEmpty()) {
+            throw new ShowException("BAD_REQUEST", "q는 공백일 수 없습니다.");
         }
     }
 }

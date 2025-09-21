@@ -54,18 +54,11 @@ public class ShowService implements ShowRegisterer, ShowFetcher {
     }
 
     @Override
-    public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating, String q,
-                                              LocalDate from, LocalDate to) {
-        if ((from != null && to != null) && from.isAfter(to)) {
-            throw new ShowException("BAD_REQUEST", "from 는 to 보다 과거만 가능합니다.");
-        }
-        String searchQuery = (q == null) ? null : q.trim();
-        if (searchQuery != null && searchQuery.isEmpty()) {
-            throw new ShowException("BAD_REQUEST", "q는 공백일 수 없습니다.");
-        }
+    public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating,
+                                              String q, LocalDate from, LocalDate to) {
         return queryRepository.fetch(page, size,
                 nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
-                searchQuery, from, to);
+                q, from, to);
     }
 
     private void checkDuplicateTitle(String title) {
