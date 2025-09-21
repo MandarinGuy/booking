@@ -119,5 +119,5 @@
 - [x] from이 to이후인 경우 BAD_REQUEST를 반환한다
 - [x] q가 공백인 경우 BAD_REQUEST를 반환한다
 - [x] 마지막 페이지에서 hasNext가 거짓으로 반환된다
-- [ ] 마지막 페이지가 아닌 경우 hasNext가 참으로 반환된다
+- [x] 마지막 페이지가 아닌 경우 hasNext가 참으로 반환된다
 - [ ] venueName은 존재하는 공연장 이름이 조회된다
