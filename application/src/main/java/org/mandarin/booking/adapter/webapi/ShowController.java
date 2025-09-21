@@ -29,8 +29,8 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
 
     @GetMapping
     @Valid
-    SliceView<ShowResponse> inquire(@RequestParam(required = false) @Min(0) Integer page,
-                                    @RequestParam(required = false) @Min(1) @Max(value = 100) Integer size,
+    SliceView<ShowResponse> inquire(@RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                                    @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(value = 100) Integer size,
                                     @RequestParam(required = false) @EnumRequest(value = Type.class, nullable = true) String type,
                                     @RequestParam(required = false) @EnumRequest(value = Rating.class, nullable = true) String rating,
                                     @RequestParam(required = false) String q,

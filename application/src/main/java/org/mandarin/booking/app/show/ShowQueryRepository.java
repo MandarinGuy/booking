@@ -56,10 +56,6 @@ public class ShowQueryRepository {
                                          @Nullable String q,
                                          @Nullable LocalDate from,
                                          @Nullable LocalDate to) {
-
-        int pageNo = (page != null && page >= 0) ? page : 0;
-        int pageSize = (size != null && size > 0) ? size : 10;
-
         BooleanBuilder builder = new BooleanBuilder();
         if (type != null) {
             builder.and(show.type.eq(type));
@@ -67,8 +63,8 @@ public class ShowQueryRepository {
         if (rating != null) {
             builder.and(show.rating.eq(rating));
         }
-        if (q != null && !q.isBlank()) {
-            builder.and(show.title.containsIgnoreCase(q));
+        if (q != null) {
+            builder.and(show.title.like(q));
         }
         if (from != null && to != null) {
             builder.and(show.performanceStartDate.after(from))
@@ -92,12 +88,12 @@ public class ShowQueryRepository {
                 .from(show)
                 .where(builder)
                 .orderBy(show.performanceStartDate.desc(), show.title.asc())
-                .offset((long) pageNo * pageSize)
-                .limit(pageSize + 1)
+                .offset((long) page * size)
+                .limit(size + 1)
                 .fetch();
 
-        boolean hasNext = results.size() > pageSize;
+        boolean hasNext = results.size() > size;
 
-        return new SliceView<>(results, pageNo, pageSize, hasNext);
+        return new SliceView<>(results, page, size, hasNext);
     }
 }

@@ -409,4 +409,21 @@ public class GET_specs {
         // Assert
         assertThat(response.getData().hasNext()).isFalse();
     }
+
+    @Test
+    void 마지막_페이지가_아닌_경우_hasNext가_참으로_반환된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20);
+
+        // Act
+        var response = testUtils.get("/api/show?page=0")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().hasNext()).isTrue();
+    }
 }
