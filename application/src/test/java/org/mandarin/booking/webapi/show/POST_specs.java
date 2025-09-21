@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
+import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
@@ -224,6 +225,27 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
         assertThat(response.getData()).contains("이미 존재하는 공연 이름입니다:");
+    }
+
+    @Test
+    void 존재하지_않는_hallId를_보내면_NOT_FOUND_상태코드를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(ADMIN);
+        var hallId = 1000L;
+        var request = validShowRegisterRequest(hallId);
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 
     private ShowRegisterRequest validShowRegisterRequest(Long hallId) {
