@@ -392,4 +392,21 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void 마지막_페이지에서_hasNext가_거짓으로_반환된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(20);
+
+        // Act
+        var response = testUtils.get("/api/show?page=1")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().hasNext()).isFalse();
+    }
 }

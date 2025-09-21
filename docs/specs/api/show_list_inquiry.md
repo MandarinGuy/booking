@@ -118,3 +118,4 @@
 - [x] from 또는 to 형식이 잘못된 경우 BAD_REQUEST를 반환한다
 - [x] from이 to이후인 경우 BAD_REQUEST를 반환한다
 - [x] q가 공백인 경우 BAD_REQUEST를 반환한다
+- [x] 마지막 페이지에서 hasNext가 거짓으로 반환된다
