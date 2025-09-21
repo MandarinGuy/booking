@@ -426,4 +426,24 @@ public class GET_specs {
         // Assert
         assertThat(response.getData().hasNext()).isTrue();
     }
+
+    @Test
+    void hallName은_존재하는_공연장_이름이_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        testFixture.generateShows(10);
+
+        // Act
+        var response = testUtils.get("/api/show")
+                .assertSuccess(new TypeReference<SliceView<ShowResponse>>() {
+                });
+
+        // Assert
+        assertThat(response.getData().contents()).isNotEmpty();
+        assertThatStream(response.getData().contents().stream())
+                .allMatch(show -> !show.hallName().equals("null"))
+                .allMatch(showResponse -> testFixture.existsVenueName(showResponse.hallName()));
+    }
 }
