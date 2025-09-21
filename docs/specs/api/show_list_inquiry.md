@@ -69,7 +69,7 @@
               "type": "MUSICAL",
               "rating": "ALL",
               "posterUrl": "https://example.com/posters/lalaland.jpg",
-              "venueName": "샤롯데씨어터",
+              "hallName": "샤롯데씨어터",
               "performanceStartDate": "2025-10-05",
               "performanceEndDate": "2025-11-05"
             },
@@ -79,7 +79,7 @@
               "type": "MUSICAL",
               "rating": "AGE12",
               "posterUrl": "https://example.com/posters/lalaland2.jpg",
-              "venueName": "샤롯데씨어터",
+              "hallName": "샤롯데씨어터",
               "performanceStartDate": "2025-10-10",
               "performanceEndDate": "2025-11-10"
             }

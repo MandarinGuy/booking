@@ -2,9 +2,9 @@ package org.mandarin.booking.app.show;
 
 
 import static com.querydsl.jpa.JPAExpressions.select;
+import static org.mandarin.booking.domain.hall.QHall.hall;
 import static org.mandarin.booking.domain.show.QShow.show;
 import static org.mandarin.booking.domain.show.QShowSchedule.showSchedule;
-import static org.mandarin.booking.domain.venue.QHall.hall;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -82,7 +82,7 @@ public class ShowQueryRepository {
                         show.type,
                         show.rating,
                         show.posterUrl,
-                        select(hall.hallName)
+                        select(hall.name)
                                 .from(hall)
                                 .where(hall.id.eq(show.hallId)),
                         show.performanceStartDate,

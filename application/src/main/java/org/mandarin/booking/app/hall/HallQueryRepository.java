@@ -1,4 +1,4 @@
-package org.mandarin.booking.app.venue;
+package org.mandarin.booking.app.hall;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,7 @@
-package org.mandarin.booking.app.venue;
+package org.mandarin.booking.app.hall;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.domain.venue.Hall;
+import org.mandarin.booking.domain.hall.Hall;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

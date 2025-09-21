@@ -29,6 +29,4 @@
 
 ---
 
-- [ ] venue register
 - [ ] hall register
-- [ ] 누가 AR인가? venue vs hall

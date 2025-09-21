@@ -1,7 +1,7 @@
-package org.mandarin.booking.app.venue;
+package org.mandarin.booking.app.hall;
 
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.domain.venue.HallException;
+import org.mandarin.booking.domain.hall.HallException;
 import org.springframework.stereotype.Service;
 
 @Service

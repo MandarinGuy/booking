@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.venue;
+package org.mandarin.booking.domain.hall;
 
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -12,9 +12,9 @@ import org.mandarin.booking.domain.AbstractEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Hall extends AbstractEntity {
-    private String hallName;
+    private String name;
 
-    public static Hall create(String hallName) {
-        return new Hall(hallName);
+    public static Hall create(String name) {
+        return new Hall(name);
     }
 }

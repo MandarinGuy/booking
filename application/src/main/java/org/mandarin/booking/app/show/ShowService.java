@@ -6,7 +6,7 @@ import static org.mandarin.booking.domain.EnumUtils.nullableEnum;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.SliceView;
-import org.mandarin.booking.app.venue.HallValidator;
+import org.mandarin.booking.app.hall.HallValidator;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;

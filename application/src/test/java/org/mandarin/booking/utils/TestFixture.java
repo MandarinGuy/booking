@@ -13,9 +13,10 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
+import org.mandarin.booking.app.hall.HallCommandRepository;
 import org.mandarin.booking.app.member.MemberCommandRepository;
 import org.mandarin.booking.app.show.ShowCommandRepository;
-import org.mandarin.booking.app.venue.HallCommandRepository;
+import org.mandarin.booking.domain.hall.Hall;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
@@ -24,7 +25,6 @@ import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
-import org.mandarin.booking.domain.venue.Hall;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -153,9 +153,9 @@ public class TestFixture {
                 });
     }
 
-    public boolean existsVenueName(String hallName) {
-        return (entityManager.createQuery("SELECT COUNT(v) FROM Hall v WHERE v.hallName = :hallName")
-                .setParameter("hallName", hallName)
+    public boolean existsHallName(String name) {
+        return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.name = :name")
+                .setParameter("name", name)
                 .getSingleResult() instanceof Long count) && count > 0;
     }
 

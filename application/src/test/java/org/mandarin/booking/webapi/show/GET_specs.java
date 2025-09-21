@@ -444,6 +444,6 @@ public class GET_specs {
         assertThat(response.getData().contents()).isNotEmpty();
         assertThatStream(response.getData().contents().stream())
                 .allMatch(show -> !show.hallName().equals("null"))
-                .allMatch(showResponse -> testFixture.existsVenueName(showResponse.hallName()));
+                .allMatch(showResponse -> testFixture.existsHallName(showResponse.hallName()));
     }
 }
