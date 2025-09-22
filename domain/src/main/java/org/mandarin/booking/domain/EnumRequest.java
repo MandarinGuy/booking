@@ -7,16 +7,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = EnumRequestValidator.class)
 public @interface EnumRequest {
 
     Class<? extends Enum<?>> value();
 
-    String message() default "invalid value, must be one of valid enum types";
+    String message() default "invalid value, must be one from valid enum types";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    boolean nullable() default false;
 }

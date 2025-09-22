@@ -76,34 +76,13 @@ _Entity_
 
 ---
 
-## 공연장(Venue)
-
-_Aggregate Root_
+### 홀(Hall)
 
 - 공연 시설
 
-#### 속성
-
-- 이름(name)
-- 주소(address)
-
-#### 행위
-
-- `create(show,hallId,command)`
-
-#### 관련 타입
-
----
-
-### 홀(Hall)
-
-_Entity_
-
-- 공연장 내부의 개별 공간
 
 #### 속성
 
-- venueId(FK)
 - 이름(name)
 
 ---
@@ -300,8 +279,7 @@ erDiagram
     ShowSchedule ||--o{ Casting : has
 %% UNIQUE(scheduleId, roleName) on Casting
 
-%% Venue AR (Venue 내부에 Hall/Seat/TicketGrade)
-    Venue ||--o{ Hall : has
+%% Hall AR (Hall 내부에 Seat/TicketGrade)
     Hall ||--o{ Seat : has
     Hall ||--o{ TicketGrade : has
 
@@ -327,6 +305,7 @@ erDiagram
 
     Show {
         BIGINT id PK
+        BIGINT hallId
         string title
         enum type "MUSICAL|PLAY|CONCERT|OPERA|DANCE|CLASSICAL|ETC"
         enum rating "ALL|AGE12|AGE15|AGE18"
@@ -339,7 +318,6 @@ erDiagram
     ShowSchedule {
         BIGINT id PK
         BIGINT showId FK
-        BIGINT hallId
         datetime startAt
         datetime endAt
         int runtimeMinutes
@@ -353,15 +331,8 @@ erDiagram
     %% UNIQUE(schedule_id, role_name)
     }
 
-    Venue {
-        BIGINT id PK
-        string name
-        string address
-    }
-
     Hall {
         BIGINT id PK
-        BIGINT venueId FK
         string name
     }
 

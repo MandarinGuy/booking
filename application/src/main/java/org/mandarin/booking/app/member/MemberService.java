@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService implements MemberRegisterer {
+class MemberService implements MemberRegisterer {
     private final MemberRegisterValidator validator;
     private final MemberCommandRepository command;
     private final SecurePasswordEncoder securePasswordEncoder;

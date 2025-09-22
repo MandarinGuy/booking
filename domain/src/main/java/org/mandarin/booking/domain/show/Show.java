@@ -24,19 +24,29 @@ import org.mandarin.booking.domain.AbstractEntity;
 public class Show extends AbstractEntity {
     @OneToMany(mappedBy = "show", fetch = LAZY, cascade = MERGE)
     private final List<ShowSchedule> schedules = new ArrayList<>();
+
+    private Long hallId;
+
     private String title;
+
     @Enumerated(EnumType.STRING)
     private Type type;
+
     @Enumerated(EnumType.STRING)
     private Rating rating;
+
     private String synopsis;
+
     private String posterUrl;
+
     private LocalDate performanceStartDate;
+
     private LocalDate performanceEndDate;
 
-    private Show(String title, Type type, Rating rating, String synopsis, String posterUrl,
+    private Show(Long hallId, String title, Type type, Rating rating, String synopsis, String posterUrl,
                  LocalDate performanceStartDate,
                  LocalDate performanceEndDate) {
+        this.hallId = hallId;
         this.title = title;
         this.type = type;
         this.rating = rating;
@@ -46,16 +56,16 @@ public class Show extends AbstractEntity {
         this.performanceEndDate = performanceEndDate;
     }
 
-    public void registerSchedule(Long hallId, ShowScheduleCreateCommand command) {
+    public void registerSchedule(ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
         }
 
-        var schedule = ShowSchedule.create(this, hallId, command);
+        var schedule = ShowSchedule.create(this, command);
         this.schedules.add(schedule);
     }
 
-    public static Show create(ShowCreateCommand command) {
+    public static Show create(Long hallId, ShowCreateCommand command) {
         var startDate = command.getPerformanceStartDate();
         var endDate = command.getPerformanceEndDate();
 
@@ -64,6 +74,7 @@ public class Show extends AbstractEntity {
         }
 
         return new Show(
+                hallId,
                 command.getTitle(),
                 command.getType(),
                 command.getRating(),

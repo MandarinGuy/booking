@@ -1,4 +1,4 @@
-package org.mandarin.booking.domain.venue;
+package org.mandarin.booking.domain.hall;
 
 import org.mandarin.booking.DomainException;
 

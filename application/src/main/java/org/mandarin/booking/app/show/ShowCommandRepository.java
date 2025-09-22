@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class ShowCommandRepository {
+class ShowCommandRepository {
     private final ShowRepository jpaRepository;
 
-    public Show insert(Show show) {
+    Show insert(Show show) {
         return jpaRepository.save(show);
     }
 }

@@ -1,14 +1,20 @@
 package org.mandarin.booking.app.show;
 
 import static java.util.Objects.requireNonNull;
+import static org.mandarin.booking.domain.EnumUtils.nullableEnum;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
-import org.mandarin.booking.app.venue.HallValidator;
+import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.hall.HallValidator;
 import org.mandarin.booking.domain.show.Show;
+import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
+import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
+import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
@@ -16,15 +22,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShowService implements ShowRegisterer {
+class ShowService implements ShowRegisterer, ShowFetcher {
     private final ShowCommandRepository commandRepository;
     private final ShowQueryRepository queryRepository;
     private final HallValidator hallValidator;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
+        var hallId = request.hallId();
+
+        hallValidator.checkHallExist(hallId);
         var command = ShowCreateCommand.from(request);
-        var show = Show.create(command);
+        var show = Show.create(hallId, command);
 
         checkDuplicateTitle(show.getTitle());
 
@@ -35,16 +44,21 @@ public class ShowService implements ShowRegisterer {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
-        var hallId = request.hallId();
 
-        hallValidator.checkHallExist(hallId);
-        checkConflictSchedule(hallId, request);
-
+        checkConflictSchedule(show.getHallId(), request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());
 
-        show.registerSchedule(hallId, command);
+        show.registerSchedule(command);
         var saved = commandRepository.insert(show);
         return new ShowScheduleRegisterResponse(requireNonNull(saved.getId()));
+    }
+
+    @Override
+    public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating,
+                                              String q, LocalDate from, LocalDate to) {
+        return queryRepository.fetch(page, size,
+                nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
+                q, from, to);
     }
 
     private void checkDuplicateTitle(String title) {

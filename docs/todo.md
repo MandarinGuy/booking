@@ -27,8 +27,11 @@
     - [x] public 떡칠하지 말고 기본 접근제어자 적극 활용
     - [x] Spring Modulith 사용 가능한지 점검
 
+2025.09.23
+- [ ] hall register
+    - [ ] register with registerer name
+    - [ ] register with seats
+
 ---
 
-- [ ] venue register
-- [ ] hall register
-- [ ] 누가 AR인가? venue vs hall
+- [ ] show register에 grade 추가 고민

@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class MemberCommandRepository {
+class MemberCommandRepository {
     private final MemberRepository jpaRepository;
 
-    public Member insert(Member member) {
+    Member insert(Member member) {
         return jpaRepository.save(member);
     }
 }

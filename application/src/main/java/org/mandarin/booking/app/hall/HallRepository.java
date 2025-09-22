@@ -1,6 +1,6 @@
-package org.mandarin.booking.app.venue;
+package org.mandarin.booking.app.hall;
 
-import org.mandarin.booking.domain.venue.Hall;
+import org.mandarin.booking.domain.hall.Hall;
 import org.springframework.data.repository.Repository;
 
 interface HallRepository extends Repository<Hall, Long> {

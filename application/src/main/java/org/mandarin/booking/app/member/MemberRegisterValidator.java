@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MemberRegisterValidator {
+class MemberRegisterValidator {
     private final MemberQueryRepository queryRepository;
 
     void checkDuplicateEmail(String email) {

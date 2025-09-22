@@ -13,6 +13,7 @@
 
     ```json
     {
+        "hallId": 1,
         "title": "인셉션",
         "type": "MUSICAL",
         "rating": "AGE12",
@@ -31,6 +32,7 @@
       -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9BRE1JTiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU3MzExNDc5LCJleHAiOjE3NTczMTIwNzl9.xhEkuZEF0gZlvyX_F2kiAMEMGw_C2ZtGL8PmzLxhZQW32A9hmr6M0nauYEejXOFrZAb3nMdU3jFLxuhDWDbE2g' \
       -H 'Content-Type: application/json' \
       -d '{
+            "hallId": 1,
             "title": "인셉션",
             "type": "MUSICAL",
             "rating": "AGE12",
@@ -65,3 +67,4 @@
 - [x] 올바른 요청을 보내면 응답 본문에 showId가 존재한다
 - [x] 공연 시작일은 공연 종료일 이후면 INTERNAL_SERVER_ERROR이다
 - [x] 중복된 제목의 공연을 등록하면 INTERNAL_SERVER_ERROR가 발생한다
+- [x] 존재하지 않는 hallId를 보내면 NOT_FOUND 상태코드를 반환한다

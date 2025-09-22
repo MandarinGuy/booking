@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService implements AuthUseCase {
+class AuthService implements AuthUseCase {
     private final SecurePasswordEncoder securePasswordEncoder;
     private final MemberQueryRepository queryRepository;
     private final TokenUtils tokenUtils;

@@ -138,9 +138,13 @@ public class TestResult {
     }
 
     private <T> SuccessResponse<@NonNull T> readSuccessResponse(String raw, TypeReference<T> typeRef) {
+        if (isErrorEnvelope(raw)) {
+            fail("Expected SuccessResponse but got ErrorResponse: " + raw);
+        }
         try {
             var inner = objectMapper.getTypeFactory().constructType(typeRef);
             var wrapper = objectMapper.getTypeFactory().constructParametricType(SuccessResponse.class, inner);
+
             return objectMapper.readValue(raw, wrapper);
         } catch (JsonProcessingException primary) {
             try {
@@ -173,6 +177,7 @@ public class TestResult {
 
     @FunctionalInterface
     public interface Executor {
-        String execute(String path, Object request, Map<String, String> headers) throws Exception;
+        String execute(String path, Object request, Map<String, String> headers)
+                throws Exception;
     }
 }
