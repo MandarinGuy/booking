@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShowService implements ShowRegisterer, ShowFetcher {
+class ShowService implements ShowRegisterer, ShowFetcher {
     private final ShowCommandRepository commandRepository;
     private final ShowQueryRepository queryRepository;
     private final HallValidator hallValidator;

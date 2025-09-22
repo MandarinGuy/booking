@@ -25,20 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ShowQueryRepository {
+class ShowQueryRepository {
     private final ShowRepository jpaRepository;
     private final JPAQueryFactory queryFactory;
 
-    public boolean existsByName(String title) {
+    boolean existsByName(String title) {
         return jpaRepository.existsByTitle(title);
     }
 
-    public Show findById(Long showId) {
+    Show findById(Long showId) {
         return jpaRepository.findById(showId)
                 .orElseThrow(() -> new ShowException("NOT_FOUND", "존재하지 않는 공연입니다."));
     }
 
-    public boolean canScheduleOn(Long hallId, LocalDateTime startAt, LocalDateTime endAt) {
+    boolean canScheduleOn(Long hallId, LocalDateTime startAt, LocalDateTime endAt) {
         return queryFactory
                        .selectOne()
                        .from(show)
@@ -49,7 +49,7 @@ public class ShowQueryRepository {
                        .fetchFirst() == null;
     }
 
-    public SliceView<ShowResponse> fetch(@Nullable Integer page,
+    SliceView<ShowResponse> fetch(@Nullable Integer page,
                                          @Nullable Integer size,
                                          @Nullable Type type,
                                          @Nullable Rating rating,

@@ -9,18 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberQueryRepository {
+class MemberQueryRepository {
     private final MemberRepository jpaRepository;
 
-    public boolean existsByEmail(String email) {
+    Optional<Member> findByUserId(String userId) {
+        return jpaRepository.findByUserId(userId);
+    }
+
+    boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
     }
 
-    public boolean existsByUserId(String userId) {
+    boolean existsByUserId(String userId) {
         return jpaRepository.existsByUserId(userId);
-    }
-
-    public Optional<Member> findByUserId(String userId) {
-        return jpaRepository.findByUserId(userId);
     }
 }

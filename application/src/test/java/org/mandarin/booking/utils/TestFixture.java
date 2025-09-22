@@ -13,9 +13,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
-import org.mandarin.booking.app.hall.HallCommandRepository;
-import org.mandarin.booking.app.member.MemberCommandRepository;
-import org.mandarin.booking.app.show.ShowCommandRepository;
 import org.mandarin.booking.domain.hall.Hall;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
@@ -28,20 +25,13 @@ import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class TestFixture {
     private final EntityManager entityManager;
-    private final MemberCommandRepository memberRepository;
-    private final ShowCommandRepository showRepository;
-    private final HallCommandRepository hallRepository;
     private final SecurePasswordEncoder securePasswordEncoder;
 
-    public TestFixture(EntityManager entityManager, MemberCommandRepository memberRepository,
-                       ShowCommandRepository showRepository, HallCommandRepository hallRepository,
-                       SecurePasswordEncoder securePasswordEncoder) {
+    public TestFixture(EntityManager entityManager, SecurePasswordEncoder securePasswordEncoder) {
         this.entityManager = entityManager;
-        this.memberRepository = memberRepository;
-        this.showRepository = showRepository;
-        this.hallRepository = hallRepository;
         this.securePasswordEncoder = securePasswordEncoder;
     }
 
@@ -52,7 +42,7 @@ public class TestFixture {
                 password,
                 generateEmail()
         );
-        return memberRepository.insert(
+        return memberInsert(
                 Member.create(command, securePasswordEncoder)
         );
     }
@@ -66,7 +56,7 @@ public class TestFixture {
         );
         var member = Member.create(command, securePasswordEncoder);
         ReflectionTestUtils.setField(member, "authorities", authorities);
-        return memberRepository.insert(
+        return memberInsert(
                 member
         );
     }
@@ -90,12 +80,13 @@ public class TestFixture {
                 )
         );
         var show = Show.create(hall.getId(), command);
-        return showRepository.insert(show);
+        return showInsert(show);
     }
 
     public Hall insertDummyHall() {
         var hall = Hall.create("hall name");
-        return hallRepository.insert(hall);
+        entityManager.persist(hall);
+        return hall;
     }
 
     public List<Show> generateShows(int showCount) {
@@ -128,7 +119,7 @@ public class TestFixture {
                     var show = Show.create(hall.getId(), ShowCreateCommand.from(request));
                     ReflectionTestUtils.setField(show, "title",
                             (char) random.nextInt('a', 'z') + titlePart + (char) random.nextInt('a', 'z'));
-                    showRepository.insert(show);
+                    showInsert(show);
                 });
     }
 
@@ -149,7 +140,7 @@ public class TestFixture {
                             LocalDate.now().plusDays(random.nextInt(after))
                     );
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
-                    showRepository.insert(show);
+                    showInsert(show);
                 });
     }
 
@@ -159,27 +150,20 @@ public class TestFixture {
                 .getSingleResult() instanceof Long count) && count > 0;
     }
 
-    private void generateShow(Long hallId, Type type) {
-        var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        showRepository.insert(show);
-    }
-
-    private void generateShow(Long hallId, Rating rating) {
-        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        showRepository.insert(show);
-    }
-
-    @Transactional
     public void removeShows() {
         entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 
-    private Show generateShow(Long hallId) {
-        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
+    public Member findMemberByUserId(String userId) {
+        return entityManager.createQuery("SELECT m FROM Member m WHERE m.userId = :userId", Member.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
+    private void generateShow(Long hallId, Type type) {
+        var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
-        return showRepository.insert(show);
+        showInsert(show);
     }
 
     private ShowRegisterRequest validShowRegisterRequest(Long hallId, String type, String rating) {
@@ -193,5 +177,27 @@ public class TestFixture {
                 LocalDate.now(),
                 LocalDate.now().plusDays(30)
         );
+    }
+
+    private void generateShow(Long hallId, Rating rating) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        showInsert(show);
+    }
+
+    private Show generateShow(Long hallId) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showInsert(show);
+    }
+
+    private Show showInsert(Show show) {
+        entityManager.persist(show);
+        return show;
+    }
+
+    private Member memberInsert(Member member) {
+        entityManager.persist(member);
+        return member;
     }
 }

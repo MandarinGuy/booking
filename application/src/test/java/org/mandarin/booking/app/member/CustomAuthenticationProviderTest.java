@@ -1,4 +1,4 @@
-package org.mandarin.booking.adapter.security;
+package org.mandarin.booking.app.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

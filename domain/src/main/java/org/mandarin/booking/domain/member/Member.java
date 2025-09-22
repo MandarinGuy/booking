@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
 import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.domain.AbstractEntity;
 
@@ -16,6 +17,7 @@ public class Member extends AbstractEntity {
 
     private String nickName;
 
+    @NaturalId
     private String userId;
 
     private String passwordHash;

@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.TokenHolder;
-import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.AuthRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -214,8 +213,7 @@ public class POST_specs {
     void 전달된_토큰에는_사용자의_userId가_포함되어야_한다(
             @Autowired IntegrationTestUtils integrationUtils,
             @Autowired TestFixture testFixture,
-            @Value("${jwt.token.secret}") String secretKey,
-            @Autowired MemberQueryRepository memberRepository
+            @Value("${jwt.token.secret}") String secretKey
     ) {
         // Arrange
         var userId = generateUserId();
@@ -242,7 +240,7 @@ public class POST_specs {
         assertThat(refreshTokenClaims.getPayload().get("userId")).isNotNull();
 
         var currentUserId = accessTokenClaims.getPayload().get("userId").toString();
-        var savedMember = memberRepository.findByUserId(currentUserId).orElseThrow();
+        var savedMember = testFixture.findMemberByUserId(currentUserId);
         assertThat(savedMember).isNotNull();
     }
 

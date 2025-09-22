@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mandarin.booking.app.member.MemberQueryRepository;
 import org.mandarin.booking.domain.member.MemberRegisterRequest;
 import org.mandarin.booking.domain.member.MemberRegisterResponse;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
@@ -16,6 +15,7 @@ import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.MemberFixture.NicknameGenerator;
 import org.mandarin.booking.utils.MemberFixture.PasswordGenerator;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -43,7 +43,7 @@ public class POST_specs {
     @Test
     void 올바른_회원가입_요청을_하면_데이터베이스에_회원_정보가_저장된다(
             @Autowired IntegrationTestUtils testUtils,
-            @Autowired MemberQueryRepository memberRepository
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         var request = generateRequest();
@@ -55,7 +55,7 @@ public class POST_specs {
         ).assertSuccess(MemberRegisterResponse.class);
 
         // Assert
-        var matchingMember = memberRepository.findByUserId(request.userId()).orElseThrow();
+        var matchingMember = testFixture.findMemberByUserId(request.userId());
 
         assertThat(matchingMember).isNotNull();
     }
@@ -187,9 +187,9 @@ public class POST_specs {
 
     @Test
     void 비밀번호가_올바르게_암호화_된다(
-            @Autowired MemberQueryRepository memberRepository,
             @Autowired SecurePasswordEncoder securePasswordEncoder,
-            @Autowired IntegrationTestUtils testUtils
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
     ) {
         // Arrange
         String rawPassword = PasswordGenerator.generatePassword();
@@ -207,7 +207,7 @@ public class POST_specs {
         ).assertSuccess(MemberRegisterResponse.class);
 
         // Assert
-        var savedMember = memberRepository.findByUserId(request.userId()).orElseThrow();
+        var savedMember = testFixture.findMemberByUserId(request.userId());
 
         assertThat(securePasswordEncoder.matches(rawPassword, savedMember.getPasswordHash())).isTrue();
     }
