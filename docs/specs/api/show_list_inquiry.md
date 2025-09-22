@@ -22,7 +22,7 @@
 
 - 쿼리 파라미터
     - page (선택, 기본=0, 정수 >= 0): 페이지 번호
-    - size (선택, 기본=10, 1~100): 페이지 크기
+  - size (선택, 기본=10): 페이지 크기
     - type (선택): 공연 유형 (MUSICAL, PLAY, CONCERT, OPERA, DANCE, CLASSICAL, ETC)
     - rating (선택): 관람 등급 (ALL, AGE12, AGE15, AGE18)
     - q (선택): 공연 제목 검색 키워드
@@ -37,8 +37,7 @@
 
     - 정렬:
         1) performanceStartDate ASC
-        2) title ASC
-        3) showId ASC (타이 브레이커 최종)
+      2) title ASC(title이 unique기 때문에 마지막 정렬조건으로 충분)
 
     - 페이지네이션:
         - page는 0-기반 인덱스다.

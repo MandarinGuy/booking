@@ -305,6 +305,7 @@ erDiagram
 
     Show {
         BIGINT id PK
+        BIGINT hallId
         string title
         enum type "MUSICAL|PLAY|CONCERT|OPERA|DANCE|CLASSICAL|ETC"
         enum rating "ALL|AGE12|AGE15|AGE18"
@@ -317,7 +318,6 @@ erDiagram
     ShowSchedule {
         BIGINT id PK
         BIGINT showId FK
-        BIGINT hallId
         datetime startAt
         datetime endAt
         int runtimeMinutes
