@@ -1,12 +1,10 @@
 package org.mandarin.booking.app.show;
 
-
 import static com.querydsl.jpa.JPAExpressions.select;
 import static org.mandarin.booking.domain.hall.QHall.hall;
 import static org.mandarin.booking.domain.show.QShow.show;
 import static org.mandarin.booking.domain.show.QShowSchedule.showSchedule;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +12,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.NullableQueryFilterBuilder;
 import org.mandarin.booking.domain.show.QShowResponse;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
@@ -45,7 +44,8 @@ public class ShowQueryRepository {
                        .from(show)
                        .leftJoin(show.schedules, showSchedule)
                        .where(show.hallId.eq(hallId))
-                       .where(showSchedule.startAt.before(endAt), showSchedule.endAt.after(startAt))
+                       .where(showSchedule.startAt.before(endAt),
+                               showSchedule.endAt.after(startAt))
                        .fetchFirst() == null;
     }
 
@@ -56,24 +56,13 @@ public class ShowQueryRepository {
                                          @Nullable String q,
                                          @Nullable LocalDate from,
                                          @Nullable LocalDate to) {
-        BooleanBuilder builder = new BooleanBuilder();
-        if (type != null) {
-            builder.and(show.type.eq(type));
-        }
-        if (rating != null) {
-            builder.and(show.rating.eq(rating));
-        }
-        if (q != null) {
-            builder.and(show.title.containsIgnoreCase(q));
-        }
-        if (from != null && to != null) {
-            builder.and(show.performanceStartDate.after(from))
-                    .and(show.performanceEndDate.before(to));
-        } else if (from != null) {
-            builder.and(show.performanceStartDate.after(from));
-        } else if (to != null) {
-            builder.and(show.performanceEndDate.before(to));
-        }
+
+        var builder = NullableQueryFilterBuilder.builder()
+                .when(type, show.type::eq)
+                .when(rating, show.rating::eq)
+                .whenHasText(q, show.title::containsIgnoreCase)
+                .whenInPeriod(from, to, show.performanceStartDate, show.performanceEndDate)
+                .build();
 
         List<ShowResponse> results = queryFactory
                 .select(new QShowResponse(
