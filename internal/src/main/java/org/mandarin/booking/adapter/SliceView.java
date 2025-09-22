@@ -11,4 +11,7 @@ public record SliceView<T>(
         @JsonProperty("size") int size,
         @JsonProperty("hasNext") boolean hasNext
 ) {
+    public SliceView(List<T> contents, int page, int size) {
+        this(contents, page, size, contents.size() > size);
+    }
 }

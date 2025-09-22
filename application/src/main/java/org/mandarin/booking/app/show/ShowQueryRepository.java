@@ -50,12 +50,12 @@ class ShowQueryRepository {
     }
 
     SliceView<ShowResponse> fetch(@Nullable Integer page,
-                                         @Nullable Integer size,
-                                         @Nullable Type type,
-                                         @Nullable Rating rating,
-                                         @Nullable String q,
-                                         @Nullable LocalDate from,
-                                         @Nullable LocalDate to) {
+                                  @Nullable Integer size,
+                                  @Nullable Type type,
+                                  @Nullable Rating rating,
+                                  @Nullable String q,
+                                  @Nullable LocalDate from,
+                                  @Nullable LocalDate to) {
 
         var builder = NullableQueryFilterBuilder.builder()
                 .when(type, show.type::eq)
@@ -83,8 +83,6 @@ class ShowQueryRepository {
                 .limit(size + 1)
                 .fetch();
 
-        boolean hasNext = results.size() > size;
-
-        return new SliceView<>(results, page, size, hasNext);
+        return new SliceView<>(results, page, size);
     }
 }
