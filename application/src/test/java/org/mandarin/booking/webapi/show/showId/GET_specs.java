@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show.showId;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
@@ -46,5 +47,21 @@ class GET_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void 양의_정수가_아닌_showId_요청_시_BAD_REQUEST을_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + -show.getId())// 음수
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 }

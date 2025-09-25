@@ -1,6 +1,7 @@
 package org.mandarin.booking.adapter.webapi;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
 import org.mandarin.booking.app.show.ShowRegisterer;
@@ -28,7 +29,7 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
     }
 
     @GetMapping("/{showId}")
-    ShowDetailResponse inquireDetail(@PathVariable Long showId) {
+    ShowDetailResponse inquireDetail(@PathVariable @Positive(message = "show Id는 음수일 수 없습니다.") Long showId) {
         return showFetcher.fetchShowDetail(showId);
     }
 
