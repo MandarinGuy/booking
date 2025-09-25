@@ -29,7 +29,9 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
     }
 
     @GetMapping("/{showId}")
-    ShowDetailResponse inquireDetail(@PathVariable @Positive(message = "show Id는 음수일 수 없습니다.") Long showId) {
+    ShowDetailResponse inquireDetail(@PathVariable
+                                     @Positive(message = "show Id는 음수일 수 없습니다.")
+                                     Long showId) {
         return showFetcher.fetchShowDetail(showId);
     }
 

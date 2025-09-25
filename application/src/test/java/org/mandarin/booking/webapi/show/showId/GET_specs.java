@@ -7,6 +7,8 @@ import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -49,16 +51,18 @@ class GET_specs {
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "abc", "1.5", "@#$%", "-10"})
     void 양의_정수가_아닌_showId_요청_시_BAD_REQUEST을_반환한다(
+            String invalidShowId,
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var show = testFixture.generateShow(5);
+        testFixture.generateShow(5);
 
         // Act
-        var response = testUtils.get("/api/show/" + -show.getId())// 음수
+        var response = testUtils.get("/api/show/" + invalidShowId)
                 .assertFailure();
 
         // Assert
