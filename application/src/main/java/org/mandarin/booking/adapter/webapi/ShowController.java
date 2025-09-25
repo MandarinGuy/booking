@@ -1,9 +1,14 @@
 package org.mandarin.booking.adapter.webapi;
 
+import static org.mandarin.booking.domain.show.ShowDetailResponse.HallResponse;
+
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import org.mandarin.booking.adapter.SliceView;
 import org.mandarin.booking.app.show.ShowFetcher;
 import org.mandarin.booking.app.show.ShowRegisterer;
+import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowInquiryRequest;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
@@ -23,6 +28,22 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
     @GetMapping
     SliceView<ShowResponse> inquire(@Valid ShowInquiryRequest req) {
         return showFetcher.fetchShows(req.page(), req.size(), req.type(), req.rating(), req.q(), req.from(), req.to());
+    }
+
+    @GetMapping("/{showId}")
+    ShowDetailResponse inquireDetail(Long showId) {
+        return new ShowDetailResponse(
+                showId,
+                "title",
+                "type",
+                "rating",
+                "synopsis",
+                "posterUrl",
+                LocalDate.now(),
+                LocalDate.now(),
+                new HallResponse(1L, "hallName"),
+                List.of()
+        );
     }
 
     @PostMapping

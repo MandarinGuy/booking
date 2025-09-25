@@ -8,6 +8,7 @@ import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateU
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +89,23 @@ public class TestFixture {
         var hall = Hall.create("hall name");
         entityManager.persist(hall);
         return hall;
+    }
+
+    public Show generateShow(int scheduleCount) {
+        var hall = insertDummyHall();
+        var show = generateShow(hall.getId());
+
+        IntStream.range(0, scheduleCount).forEach(i -> {
+            Random random = new Random();
+            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
+            var command = new ShowScheduleCreateCommand(show.getId(),
+                    startAt,
+                    startAt.plusHours(random.nextInt(2, 5))
+            );
+            show.registerSchedule(command);
+        });
+
+        return showInsert(show);
     }
 
     public List<Show> generateShows(int showCount) {

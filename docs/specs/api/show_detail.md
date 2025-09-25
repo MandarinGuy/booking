@@ -23,42 +23,40 @@ GET /api/show/1
 ## 응답 본문
 
 ```json
+
 {
   "status": "SUCCESS",
   "data": {
-    "contents": [
+    "showId": 1,
+    "title": "라라랜드",
+    "type": "MUSICAL",
+    "rating": "ALL",
+    "synopsis": "꿈을 좇는 두 청춘의 사랑과 음악 이야기",
+    "posterUrl": "https://cdn.example.com/posters/la_la_land.jpg",
+    "performanceStartDate": "2025-10-05",
+    "performanceEndDate": "2025-11-05",
+    "hall": {
+      "hallId": 3,
+      "hallName": "샤롯데씨어터"
+    },
+    "schedules": [
       {
-        "showId": 1,
-        "title": "라라랜드",
-        "type": "MUSICAL",
-        "rating": "ALL",
-        "synopsis": "꿈을 좇는 두 청춘의 사랑과 음악 이야기",
-        "posterUrl": "https://example.com/posters/lalaland.jpg",
-        "hallName": "샤롯데씨어터",
-        "performanceStartDate": "2025-10-05",
-        "performanceEndDate": "2025-11-05",
-        "schedules": [
-          {
-            "scheduleId": 10,
-            "startAt": "2025-10-10T19:00:00",
-            "endAt": "2025-10-10T21:30:00",
-            "runtimeMinutes": 150
-          },
-          {
-            "scheduleId": 11,
-            "startAt": "2025-10-11T14:00:00",
-            "endAt": "2025-10-11T16:30:00",
-            "runtimeMinutes": 150
-          }
-        ]
+        "scheduleId": 10,
+        "startAt": "2025-10-10T19:00:00",
+        "endAt": "2025-10-10T21:30:00",
+        "runtimeMinutes": 150
+      },
+      {
+        "scheduleId": 11,
+        "startAt": "2025-10-11T14:00:00",
+        "endAt": "2025-10-11T16:30:00",
+        "runtimeMinutes": 150
       }
-    ],
-    "page": 0,
-    "size": 1,
-    "hasNext": false
+    ]
   },
   "timestamp": "2025-09-25T00:00:00Z"
 }
+
 ```
 
 응답 코드
@@ -74,12 +72,12 @@ GET /api/show/1
 
 테스트 시나리오
 
-- [] 존재하는 showId를 요청하면 200과 함께 공연 상세 정보가 반환된다
-- [] 존재하지 않는 showId 요청 시 NOT_FOUND를 반환한다
-- [] 양의 정수가 아닌 showId 요청 시 BAD_REQUEST을 반환한다
-- [] 공연에 회차가 없는 경우 schedules는 빈 배열이다
-- [] 존재하는 공연장 ID가 조회된다
-- [] 공연 일정은 마감 이전의 일정만 조회된다
-- [] 공연 일정의 런타임은 시작 시간과 종료 시간의 차이와 일치한다
-- [] hall 정보는 hallId와 hallName을 모두 포함한다
-- [] schedules는 startAt ASC, 이름 순으로 정렬되어 반환된다
+- [x] 존재하는 showId를 요청하면 200과 함께 공연 상세 정보가 반환된다
+- [ ] 존재하지 않는 showId 요청 시 NOT_FOUND를 반환한다
+- [ ] 양의 정수가 아닌 showId 요청 시 BAD_REQUEST을 반환한다
+- [ ] 공연에 회차가 없는 경우 schedules는 빈 배열이다
+- [ ] 존재하는 공연장 ID가 조회된다
+- [ ] 공연 일정은 마감 이전의 일정만 조회된다
+- [ ] 공연 일정의 런타임은 시작 시간과 종료 시간의 차이와 일치한다
+- [ ] hall 정보는 hallId와 hallName을 모두 포함한다
+- [ ] schedules는 startAt ASC, 이름 순으로 정렬되어 반환된다
