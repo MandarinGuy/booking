@@ -11,6 +11,7 @@ import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
+import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
@@ -59,6 +60,12 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         return queryRepository.fetch(page, size,
                 nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
                 q, from, to);
+    }
+
+    @Override
+    public ShowDetailResponse fetchShowDetail(Long showId) {
+        var show = queryRepository.findById(showId);
+        return null;
     }
 
     private void checkDuplicateTitle(String title) {

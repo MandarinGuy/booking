@@ -73,7 +73,7 @@ GET /api/show/1
 테스트 시나리오
 
 - [x] 존재하는 showId를 요청하면 200과 함께 공연 상세 정보가 반환된다
-- [ ] 존재하지 않는 showId 요청 시 NOT_FOUND를 반환한다
+- [x] 존재하지 않는 showId 요청 시 NOT_FOUND를 반환한다
 - [ ] 양의 정수가 아닌 showId 요청 시 BAD_REQUEST을 반환한다
 - [ ] 공연에 회차가 없는 경우 schedules는 빈 배열이다
 - [ ] 존재하는 공연장 ID가 조회된다

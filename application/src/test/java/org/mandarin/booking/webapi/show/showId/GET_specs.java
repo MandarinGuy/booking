@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show.showId;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import org.junit.jupiter.api.DisplayName;
@@ -28,5 +29,22 @@ class GET_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
+    }
+
+    @Test
+    void 존재하지_않는_showId_요청_시_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+        var invalidShowId = show.getId() + 9999;
+        
+        // Act
+        var response = testUtils.get("/api/show/" + invalidShowId)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 }
