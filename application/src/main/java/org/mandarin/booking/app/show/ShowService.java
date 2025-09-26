@@ -70,12 +70,12 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         var show = queryRepository.findById(showId);
         var hall = hallFetcher.fetch(show.getHallId());
         return new ShowDetailResponse(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                show.getId(),
+                show.getTitle(),
+                show.getType(),
+                show.getRating(),
+                show.getSynopsis(),
+                show.getPosterUrl(),
                 show.getPerformanceStartDate(),
                 show.getPerformanceEndDate(),
                 new HallResponse(hall.getId(), hall.getName()),

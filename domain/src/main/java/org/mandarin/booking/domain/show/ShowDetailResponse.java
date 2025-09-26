@@ -5,12 +5,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
+import org.mandarin.booking.domain.show.Show.Rating;
+import org.mandarin.booking.domain.show.Show.Type;
 
 public record ShowDetailResponse(
         Long showId,
         String title,
-        String type,
-        String rating,
+        Type type,
+        Rating rating,
         String synopsis,
         String posterUrl,
         LocalDate performanceStartDate,

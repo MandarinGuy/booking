@@ -22,6 +22,7 @@ import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
+import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -183,6 +184,14 @@ public class TestFixture {
         return entityManager.createQuery("SELECT h FROM Hall h WHERE h.id = :hallId", Hall.class)
                 .setParameter("hallId", hallId)
                 .getSingleResult();
+    }
+
+    public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
+        return !entityManager.createQuery(
+                        "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
+                .setParameter("scheduleId", res.getScheduleId())
+                .setParameter("showId", show.getId())
+                .getResultList().isEmpty();
     }
 
     private void generateShow(Long hallId, Type type) {

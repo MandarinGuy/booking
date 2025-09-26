@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show.showId;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
@@ -152,5 +153,36 @@ class GET_specs {
         var schedules = response.getData().schedules();
         assertThat(schedules).isNotEmpty();
         assertThat(schedules).isSortedAccordingTo(Comparator.comparing(ShowScheduleResponse::getEndAt));
+    }
+
+    @Test
+    void 영속화된_정보가_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var data = response.getData();
+        assertThat(data.showId()).isEqualTo(show.getId());
+        assertThat(data.title()).isEqualTo(show.getTitle());
+        assertThat(data.type()).isEqualTo(show.getType());
+        assertThat(data.rating()).isEqualTo(show.getRating());
+        assertThat(data.synopsis()).isEqualTo(show.getSynopsis());
+        assertThat(data.posterUrl()).isEqualTo(show.getPosterUrl());
+        assertThat(data.performanceStartDate()).isEqualTo(show.getPerformanceStartDate());
+        assertThat(data.performanceEndDate()).isEqualTo(show.getPerformanceEndDate());
+
+        var schedules = data.schedules();
+        assertThat(schedules).hasSize(show.getSchedules().size());
+        assertThatStream(schedules.stream())
+                .allMatch(res ->
+                        testFixture.isMatchingScheduleInShow(res, show)
+                );
     }
 }
