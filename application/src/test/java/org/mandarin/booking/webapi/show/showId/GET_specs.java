@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -67,5 +68,28 @@ class GET_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void 존재하는_공연장_ID가_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var hall = response.getData().hall();
+        var hallId = hall.hallId();
+        var hallName = hall.hallName();
+        var fetched = testFixture.findHallById(hallId);
+
+        assertThat(fetched).isNotNull();
+        assertThat(fetched.getName()).isEqualTo(hallName);
+        assertThat(fetched.getId()).isEqualTo(hallId);
     }
 }

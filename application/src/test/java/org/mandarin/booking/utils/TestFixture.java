@@ -179,6 +179,12 @@ public class TestFixture {
                 .getSingleResult();
     }
 
+    public Hall findHallById(Long hallId) {
+        return entityManager.createQuery("SELECT h FROM Hall h WHERE h.id = :hallId", Hall.class)
+                .setParameter("hallId", hallId)
+                .getSingleResult();
+    }
+
     private void generateShow(Long hallId, Type type) {
         var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));

@@ -6,12 +6,14 @@ import static org.mandarin.booking.domain.EnumUtils.nullableEnum;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.hall.HallFetcher;
 import org.mandarin.booking.app.hall.HallValidator;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse;
+import org.mandarin.booking.domain.show.ShowDetailResponse.HallResponse;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
@@ -27,6 +29,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     private final ShowCommandRepository commandRepository;
     private final ShowQueryRepository queryRepository;
     private final HallValidator hallValidator;
+    private final HallFetcher hallFetcher;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
@@ -65,7 +68,19 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     @Override
     public ShowDetailResponse fetchShowDetail(Long showId) {
         var show = queryRepository.findById(showId);
-        return null;
+        var hall = hallFetcher.fetch(show.getHallId());
+        return new ShowDetailResponse(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                new HallResponse(hall.getId(), hall.getName()),
+                null
+        );
     }
 
     private void checkDuplicateTitle(String title) {
