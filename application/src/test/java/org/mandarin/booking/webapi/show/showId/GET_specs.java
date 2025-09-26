@@ -5,6 +5,7 @@ import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
+import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -111,5 +112,25 @@ class GET_specs {
                 .allMatch(schedule -> schedule.getEndAt()
                         .isBefore(response.getData().performanceEndDate().atStartOfDay()));
 
+    }
+
+    @Test
+    void 공연_일정의_런타임은_시작_시간과_종료_시간의_차이와_일치한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var schedules = response.getData().schedules();
+
+        assertThat(schedules)
+                .allMatch(schedule -> schedule.getRuntimeMinutes() == Duration.between(schedule.getStartAt(),
+                        schedule.getEndAt()).toMinutes());
     }
 }
