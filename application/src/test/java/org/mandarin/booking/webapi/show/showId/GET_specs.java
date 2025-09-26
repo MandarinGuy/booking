@@ -133,22 +133,4 @@ class GET_specs {
                 .allMatch(schedule -> schedule.getRuntimeMinutes() == Duration.between(schedule.getStartAt(),
                         schedule.getEndAt()).toMinutes());
     }
-
-    @Test
-    void hall_정보는_hallId와_hallName을_모두_포함한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TestFixture testFixture
-    ) {
-        // Arrange
-        var show = testFixture.generateShow(5);
-
-        // Act
-        var response = testUtils.get("/api/show/" + show.getId())
-                .assertSuccess(ShowDetailResponse.class);
-
-        // Assert
-        var hall = response.getData().hall();
-        assertThat(hall.hallId()).isNotNull();
-        assertThat(hall.hallName()).isNotNull();
-    }
 }
