@@ -81,4 +81,4 @@ GET /api/show/1
 - [x] 공연 일정의 런타임은 시작 시간과 종료 시간의 차이와 일치한다
 - [x] schedules는 endAt ASC 순으로 정렬되어 반환된다
 - [x] 영속화된 정보가 조회된다
-- [ ] synopsis가 null인 경우 빈 문자열로 반환된다
+- [x] synopsis가 없는 경우 빈 문자열로 반환된다

@@ -185,4 +185,23 @@ class GET_specs {
                         testFixture.isMatchingScheduleInShow(res, show)
                 );
     }
+
+    @Test
+    void synopsis가_없는_경우_빈_문자열로_반환된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShowWithNoSynopsis(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var data = response.getData();
+
+        assertThat(data.synopsis()).isNotNull();
+        assertThat(data.synopsis()).isEmpty();
+    }
 }

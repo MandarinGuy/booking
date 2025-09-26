@@ -164,6 +164,33 @@ public class TestFixture {
                 });
     }
 
+    public Show generateShowWithNoSynopsis(int scheduleCount) {
+        var hall = insertDummyHall();
+        var show = Show.create(hall.getId(), ShowCreateCommand.from(new ShowRegisterRequest(
+                hall.getId(),
+                UUID.randomUUID().toString().substring(0, 10),
+                randomEnum(Type.class).name(),
+                randomEnum(Rating.class).name(),
+                null,
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        )));
+
+        for (int i = 0; i < scheduleCount; i++) {
+            Random random = new Random();
+            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
+            var command = new ShowScheduleCreateCommand(show.getId(),
+                    startAt,
+                    startAt.plusHours(random.nextInt(2, 5))
+            );
+            show.registerSchedule(command);
+        }
+
+        ReflectionTestUtils.setField(show, "synopsis", "");
+        return showInsert(show);
+    }
+
     public boolean existsHallName(String name) {
         return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.name = :name")
                 .setParameter("name", name)
