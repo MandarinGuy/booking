@@ -95,7 +95,7 @@ public class TestFixture {
         var hall = insertDummyHall();
         var show = generateShow(hall.getId());
 
-        IntStream.range(0, scheduleCount).forEach(i -> {
+        for (int i = 0; i < scheduleCount; i++) {
             Random random = new Random();
             var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
             var command = new ShowScheduleCreateCommand(show.getId(),
@@ -103,7 +103,7 @@ public class TestFixture {
                     startAt.plusHours(random.nextInt(2, 5))
             );
             show.registerSchedule(command);
-        });
+        }
 
         return showInsert(show);
     }
@@ -210,7 +210,7 @@ public class TestFixture {
         showInsert(show);
     }
 
-    private Show generateShow(Long hallId) {
+    public Show generateShow(Long hallId) {
         var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
         return showInsert(show);

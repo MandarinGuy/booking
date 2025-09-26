@@ -6,11 +6,13 @@ import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.time.Duration;
+import java.util.Comparator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.domain.show.ShowDetailResponse;
+import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -132,5 +134,23 @@ class GET_specs {
         assertThat(schedules)
                 .allMatch(schedule -> schedule.getRuntimeMinutes() == Duration.between(schedule.getStartAt(),
                         schedule.getEndAt()).toMinutes());
+    }
+
+    @Test
+    void schedules는_endAt_ASC_순으로_정렬되어_반환된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var schedules = response.getData().schedules();
+        assertThat(schedules).isNotEmpty();
+        assertThat(schedules).isSortedAccordingTo(Comparator.comparing(ShowScheduleResponse::getEndAt));
     }
 }

@@ -1,6 +1,6 @@
 package org.mandarin.booking.domain.show;
 
-import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.Entity;
@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Show extends AbstractEntity {
-    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = MERGE)
+    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
     private final List<ShowSchedule> schedules = new ArrayList<>();
 
     private Long hallId;
@@ -68,6 +69,7 @@ public class Show extends AbstractEntity {
 
     public List<ShowScheduleResponse> getScheduleResponses() {
         return this.schedules.stream()
+                .sorted(Comparator.comparing(ShowSchedule::getEndAt))
                 .map(
                         schedule -> new ShowScheduleResponse(
                                 schedule.getId(),

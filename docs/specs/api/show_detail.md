@@ -79,4 +79,4 @@ GET /api/show/1
 - [x] 존재하는 공연장 ID가 조회된다
 - [x] 공연 일정은 마감 이전의 일정만 조회된다
 - [x] 공연 일정의 런타임은 시작 시간과 종료 시간의 차이와 일치한다
-- [ ] schedules는 startAt ASC, 이름 순으로 정렬되어 반환된다
+- [ ] schedules는 endAt ASC 순으로 정렬되어 반환된다
