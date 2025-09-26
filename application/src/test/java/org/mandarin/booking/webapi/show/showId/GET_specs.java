@@ -92,4 +92,24 @@ class GET_specs {
         assertThat(fetched.getName()).isEqualTo(hallName);
         assertThat(fetched.getId()).isEqualTo(hallId);
     }
+
+    @Test
+    void 공연_일정은_마감_이전의_일정만_조회된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var schedules = response.getData().schedules();
+        assertThat(schedules)
+                .allMatch(schedule -> schedule.getEndAt()
+                        .isBefore(response.getData().performanceEndDate().atStartOfDay()));
+
+    }
 }

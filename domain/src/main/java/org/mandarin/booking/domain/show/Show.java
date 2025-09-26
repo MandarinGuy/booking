@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 
 @Entity
 @Table(name = "shows")
@@ -63,6 +64,18 @@ public class Show extends AbstractEntity {
 
         var schedule = ShowSchedule.create(this, command);
         this.schedules.add(schedule);
+    }
+
+    public List<ShowScheduleResponse> getScheduleResponses() {
+        return this.schedules.stream()
+                .map(
+                        schedule -> new ShowScheduleResponse(
+                                schedule.getId(),
+                                schedule.getStartAt(),
+                                schedule.getEndAt()
+                        )
+                )
+                .toList();
     }
 
     public static Show create(Long hallId, ShowCreateCommand command) {
