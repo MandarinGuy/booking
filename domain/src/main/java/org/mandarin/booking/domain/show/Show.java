@@ -67,7 +67,7 @@ public class Show extends AbstractEntity {
         this.schedules.add(schedule);
     }
 
-    public List<ShowScheduleResponse> getScheduleResponses() {
+    public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
         return this.schedules.stream()
                 .sorted(Comparator.comparing(ShowSchedule::getEndAt))
                 .map(

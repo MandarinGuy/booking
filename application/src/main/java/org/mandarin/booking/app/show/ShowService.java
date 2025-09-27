@@ -13,7 +13,6 @@ import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse;
-import org.mandarin.booking.domain.show.ShowDetailResponse.HallResponse;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
@@ -78,7 +77,8 @@ class ShowService implements ShowRegisterer, ShowFetcher {
                 show.getPosterUrl(),
                 show.getPerformanceStartDate(),
                 show.getPerformanceEndDate(),
-                new HallResponse(hall.getId(), hall.getName()),
+                hall.getId(),
+                hall.getName(),
                 show.getScheduleResponses()
         );
     }

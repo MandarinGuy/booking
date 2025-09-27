@@ -87,9 +87,8 @@ class GET_specs {
                 .assertSuccess(ShowDetailResponse.class);
 
         // Assert
-        var hall = response.getData().hall();
-        var hallId = hall.hallId();
-        var hallName = hall.hallName();
+        var hallId = response.getData().hallId();
+        var hallName = response.getData().hallName();
         var fetched = testFixture.findHallById(hallId);
 
         assertThat(fetched).isNotNull();
