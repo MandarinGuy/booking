@@ -8,6 +8,7 @@ import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateU
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -21,7 +22,9 @@ import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
+import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +92,23 @@ public class TestFixture {
         return hall;
     }
 
+    public Show generateShow(int scheduleCount) {
+        var hall = insertDummyHall();
+        var show = generateShow(hall.getId());
+
+        for (int i = 0; i < scheduleCount; i++) {
+            Random random = new Random();
+            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
+            var command = new ShowScheduleCreateCommand(show.getId(),
+                    startAt,
+                    startAt.plusHours(random.nextInt(2, 5))
+            );
+            show.registerSchedule(command);
+        }
+
+        return showInsert(show);
+    }
+
     public List<Show> generateShows(int showCount) {
         var hall = insertDummyHall();
         return IntStream.range(0, showCount)
@@ -144,6 +164,33 @@ public class TestFixture {
                 });
     }
 
+    public Show generateShowWithNoSynopsis(int scheduleCount) {
+        var hall = insertDummyHall();
+        var show = Show.create(hall.getId(), ShowCreateCommand.from(new ShowRegisterRequest(
+                hall.getId(),
+                UUID.randomUUID().toString().substring(0, 10),
+                randomEnum(Type.class).name(),
+                randomEnum(Rating.class).name(),
+                null,
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        )));
+
+        for (int i = 0; i < scheduleCount; i++) {
+            Random random = new Random();
+            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
+            var command = new ShowScheduleCreateCommand(show.getId(),
+                    startAt,
+                    startAt.plusHours(random.nextInt(2, 5))
+            );
+            show.registerSchedule(command);
+        }
+
+        ReflectionTestUtils.setField(show, "synopsis", "");
+        return showInsert(show);
+    }
+
     public boolean existsHallName(String name) {
         return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.name = :name")
                 .setParameter("name", name)
@@ -158,6 +205,20 @@ public class TestFixture {
         return entityManager.createQuery("SELECT m FROM Member m WHERE m.userId = :userId", Member.class)
                 .setParameter("userId", userId)
                 .getSingleResult();
+    }
+
+    public Hall findHallById(Long hallId) {
+        return entityManager.createQuery("SELECT h FROM Hall h WHERE h.id = :hallId", Hall.class)
+                .setParameter("hallId", hallId)
+                .getSingleResult();
+    }
+
+    public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
+        return !entityManager.createQuery(
+                        "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
+                .setParameter("scheduleId", res.getScheduleId())
+                .setParameter("showId", show.getId())
+                .getResultList().isEmpty();
     }
 
     private void generateShow(Long hallId, Type type) {
@@ -185,7 +246,7 @@ public class TestFixture {
         showInsert(show);
     }
 
-    private Show generateShow(Long hallId) {
+    public Show generateShow(Long hallId) {
         var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
         return showInsert(show);

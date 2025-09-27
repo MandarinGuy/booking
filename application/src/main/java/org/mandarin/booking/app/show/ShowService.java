@@ -6,11 +6,13 @@ import static org.mandarin.booking.domain.EnumUtils.nullableEnum;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.hall.HallFetcher;
 import org.mandarin.booking.app.hall.HallValidator;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
+import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowException;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
@@ -26,6 +28,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     private final ShowCommandRepository commandRepository;
     private final ShowQueryRepository queryRepository;
     private final HallValidator hallValidator;
+    private final HallFetcher hallFetcher;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
@@ -59,6 +62,25 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         return queryRepository.fetch(page, size,
                 nullableEnum(Type.class, type), nullableEnum(Rating.class, rating),
                 q, from, to);
+    }
+
+    @Override
+    public ShowDetailResponse fetchShowDetail(Long showId) {
+        var show = queryRepository.findById(showId);
+        var hall = hallFetcher.fetch(show.getHallId());
+        return new ShowDetailResponse(
+                show.getId(),
+                show.getTitle(),
+                show.getType(),
+                show.getRating(),
+                show.getSynopsis(),
+                show.getPosterUrl(),
+                show.getPerformanceStartDate(),
+                show.getPerformanceEndDate(),
+                hall.getId(),
+                hall.getName(),
+                show.getScheduleResponses()
+        );
     }
 
     private void checkDuplicateTitle(String title) {
