@@ -42,7 +42,7 @@
 
     ```json
     {
-      "showId": 1
+      "scheduleId": 1
     }
     ```
 

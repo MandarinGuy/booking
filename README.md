@@ -40,7 +40,9 @@
 - 패키지 구조 예
     - 도메인: `domain/src/main/java/org/mandarin/booking/domain/*`
     - 앱/포트/영속 어댑터: `application/src/main/java/org/mandarin/booking/app/*`
-    - 웹/보안 어댑터: `application/src/main/java/org/mandarin/booking/adapter/{webapi,security}/*`
+  - 웹 어댑터: `application/src/main/java/org/mandarin/booking/adapter/webapi/*`
+  - 보안 설정: `internal/src/main/java/org/mandarin/booking/adapter/*`,
+    `application/src/main/java/org/mandarin/booking/adapter/security/ApplicationAuthorizationRequestMatcherConfigurer.java`
 
 텍스트 다이어그램: [Controllers/Security/External] → adapter → app(ports, services) → domain
 
@@ -74,7 +76,7 @@
 - 테스트 주도 개발(TDD) 지향: 테스트 우선, 기능 추가 시 관련 스펙 테스트 동반.
 - 테스트 정책 문서: [docs/specs/policy/test.md](docs/specs/policy/test.md)
 - 통합 테스트: Spring Context 기동, 보안 필터/컨트롤러/JPA 연동을 포함한 경로 검증.
-  - 예시: `src/test/java/org/mandarin/booking/webapi/**/POST_specs.java`
+    - 예시: `application/src/test/java/org/mandarin/booking/webapi/**/POST_specs.java`
 - 모듈 구조 테스트: 모듈간 의존관계 테스트
     - 예시: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
 
@@ -89,14 +91,15 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
     - 차후 추가 작성
 - 예외 처리: `CustomAuthenticationEntryPoint`, `CustomAccessDeniedHandler`
 
-근거: `src/main/java/org/mandarin/booking/adapter/security/*`
+근거: `internal/src/main/java/org/mandarin/booking/adapter/*`,
+`application/src/main/java/org/mandarin/booking/adapter/security/ApplicationAuthorizationRequestMatcherConfigurer.java`
 
 ---
 
 ## 8. 데이터/환경 구성
 
 - 프로필: `local`(기본), `test`, `prod(비어있음)`
-  - 근거: `src/main/resources/application.yml` 및 `application-*.yml`
+    - 근거: `application/src/main/resources/application.yml` 및 `application-*.yml`
 - local: MySQL + JPA `ddl-auto: create`, JWT 시크릿/TTL 설정
     - 근거: `application-local.yml`, Docker Compose: [compose.yaml](application/src/main/resources/compose.yaml)
 - test: H2 메모리 + MySQL 호환 모드 + JPA `ddl-auto: create`
@@ -133,9 +136,9 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 ## 11. 버전/도구 근거 링크
 
 - Spring Boot/Java/Gradle
-  버전: [build.gradle](application/build.gradle), [gradle-wrapper.properties](gradle/wrapper/gradle-wrapper.properties)
-- 애플리케이션 엔트리포인트: `src/main/java/org/mandarin/booking/BookingApplication.java`
-- 보안 설정/필터: `src/main/java/org/mandarin/booking/adapter/security/SecurityConfig.java`,
-  `src/main/java/org/mandarin/booking/adapter/security/JwtFilter.java`
+  버전: [root build.gradle](build.gradle), [gradle-wrapper.properties](gradle/wrapper/gradle-wrapper.properties)
+- 애플리케이션 엔트리포인트: `application/src/main/java/org/mandarin/booking/BookingApplication.java`
+- 보안 설정/필터: `internal/src/main/java/org/mandarin/booking/adapter/SecurityConfig.java`,
+  `internal/src/main/java/org/mandarin/booking/adapter/JwtFilter.java`
 - 아키텍처 규칙: [docs/specs/policy/application.md](docs/specs/policy/application.md)
 - 테스트 정책: [docs/specs/policy/test.md](docs/specs/policy/test.md)

@@ -36,8 +36,8 @@
     - from > to 인 경우: 400 BAD_REQUEST
 
     - 정렬:
-        1) performanceStartDate ASC
-      2) title ASC(title이 unique기 때문에 마지막 정렬조건으로 충분)
+        1) performanceStartDate DESC
+        2) title ASC (title이 unique이므로 마지막 정렬조건으로 충분)
 
     - 페이지네이션:
         - page는 0-기반 인덱스다.
