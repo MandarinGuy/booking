@@ -1,5 +1,6 @@
 package org.mandarin.booking.adapter.webapi;
 
+import jakarta.validation.Valid;
 import org.mandarin.booking.domain.hall.HallRegisterRequest;
 import org.mandarin.booking.domain.hall.HallRegisterResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/hall")
 class HallController {
     @PostMapping
-    HallRegisterResponse register(@RequestBody HallRegisterRequest request) {
+    HallRegisterResponse register(@RequestBody @Valid HallRegisterRequest request) {
         return null;
     }
 }

@@ -1,7 +1,11 @@
 package org.mandarin.booking.domain.hall;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
-public record HallRegisterRequest(String hallName, List<SectionRegisterRequest> sectionRegisterRequests) {
+public record HallRegisterRequest(
+        @NotBlank
+        String hallName,
+        List<SectionRegisterRequest> sectionRegisterRequests) {
 }
 
