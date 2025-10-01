@@ -5,6 +5,7 @@ import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.USER;
 import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
+import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -71,5 +72,26 @@ class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
+    }
+
+    @Test
+    void 토큰이_무효하면_UNAUTHORIZED을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("hallName", List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "B")
+                ))
+        ));
+        var invalidToken = "";
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(invalidToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
     }
 }
