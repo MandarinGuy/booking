@@ -8,6 +8,7 @@ import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.mandarin.booking.domain.hall.SeatRegisterRequest;
 import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -106,6 +108,23 @@ class POST_specs {
                         new SeatRegisterRequest("A", "B")
                 ))
         ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void sections_빈_배열이면_BAD_REQUEST을_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", Collections.emptyList());
 
         // Act
         var response = testUtils.post("/api/hall", request)

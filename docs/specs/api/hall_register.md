@@ -68,7 +68,7 @@
 - [x] 비ADMIN 토큰으로 요청하면 ACCESS_DENIED을 반환한다
 - [x] 토큰이 무효하면 UNAUTHORIZED을 반환한다
 - [x] name이 비어있으면 BAD_REQUEST을 반환한다
-- [ ] sections 빈 배열이면 BAD_REQUEST을 반환한다
+- [x] sections 빈 배열이면 BAD_REQUEST을 반환한다
 - [ ] 섹션 name이 비어있으면 BAD_REQUEST을 반환한다
 - [ ] seats 빈 배열이면 BAD_REQUEST을 반환한다
 - [ ] rowNumber 또는 seatNumber가 1 미만이면 BAD_REQUEST을 반환한다
