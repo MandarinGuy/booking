@@ -2,6 +2,8 @@ package org.mandarin.booking.webapi.hall;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
+import static org.mandarin.booking.MemberAuthority.USER;
+import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.util.List;
@@ -53,5 +55,21 @@ class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(SUCCESS);
+    }
+
+    @Test
+    void 비ADMIN_토큰으로_요청하면_ACCESS_DENIED을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("hallName", List.of());
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(USER))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
     }
 }

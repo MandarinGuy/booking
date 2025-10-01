@@ -64,7 +64,7 @@
 
 ### 테스트
 
-- [ ] ADMIN 권한의 토큰과 유효 본문으로 요청하면 SUCCESS와 hallId를 반환한다
+- [x] ADMIN 권한의 토큰과 유효 본문으로 요청하면 SUCCESS와 hallId를 반환한다
 - [ ] 비ADMIN 토큰으로 요청하면 ACCESS_DENIED을 반환한다
 - [ ] 토큰 없거나 무효하면 UNAUTHORIZED을 반환한다
 - [ ] name이 비어있으면 BAD_REQUEST을 반환한다
@@ -79,7 +79,6 @@
 - [ ] section name이 중복되면 INTERNAL_SERVER_ERROR을 반환한다
 - [ ] 동일한 section 내에 중복된 죄석을 요청하면 BAD_REQUEST를 반환한다
 - [ ] hall 하위 정보가 잘못된 경우 hall도 저장되지 않는다
-- [ ] 요청자가 ADMIN 권한이 없는 경우 ACCESS_DENIED를 반환한다
 - [ ] 하나의 hall에 동일한 section name을 등록 요청하면 BAD_REQUEST가 발생한다
 - [ ] sections가 비어있으면 BAD_REQUEST를 반환한다
 - [ ] section의 seats가 비어있으면 BAD_REQUEST를 반환한다
