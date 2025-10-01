@@ -72,7 +72,7 @@
 - [x] section name이 비어있으면 BAD_REQUEST을 반환한다
 - [x] seats 빈 배열이면 BAD_REQUEST을 반환한다
 - [x] rowNumber 또는 seatNumber가 빈 문자인 경우 BAD_REQUEST을 반환한다
-- [ ] 동일 섹션 내 rowNumber와 seatNumber의 조합이 중복이면 BAD_REQUEST을 반환한다
+- [x] 동일 섹션 내 rowNumber와 seatNumber의 조합이 중복이면 BAD_REQUEST을 반환한다
 - [ ] 섹션 이름이 중복되면 BAD_REQUEST을 반환한다
 - [ ] hall을 등록하면 등록한 사용자 정보도 저장된다
 - [ ] hall name이 중복되면 INTERNAL_SERVER_ERROR을 반환한다

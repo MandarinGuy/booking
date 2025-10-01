@@ -201,4 +201,25 @@ class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void 동일_섹션_내_rowNumber와_seatNumber의_조합이_중복이면_BAD_REQUEST을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1"),
+                        new SeatRegisterRequest("A", "1")
+                ))
+        ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }
