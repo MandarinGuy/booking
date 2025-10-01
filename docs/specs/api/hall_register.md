@@ -80,3 +80,6 @@
 - [ ] 동일한 section 내에 중복된 죄석을 요청하면 BAD_REQUEST를 반환한다
 - [ ] hall 하위 정보가 잘못된 경우 hall도 저장되지 않는다
 - [ ] 요청자가 ADMIN 권한이 없는 경우 ACCESS_DENIED를 반환한다
+- [ ] 하나의 hall에 동일한 section name을 등록 요청하면 BAD_REQUEST가 발생한다
+- [ ] sections가 비어있으면 BAD_REQUEST를 반환한다
+- [ ] section의 seats가 비어있으면 BAD_REQUEST를 반환한다

@@ -87,7 +87,7 @@ public class TestFixture {
     }
 
     public Hall insertDummyHall() {
-        var hall = Hall.create("hall name");
+        var hall = Hall.create("hall name", 1L);
         entityManager.persist(hall);
         return hall;
     }
