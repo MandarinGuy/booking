@@ -222,4 +222,27 @@ class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void 섹션_이름이_중복되면_BAD_REQUEST을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1")
+                )),
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1")
+                ))
+        ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }
