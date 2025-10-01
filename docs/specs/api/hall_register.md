@@ -70,7 +70,7 @@
 - [x] name이 비어있으면 BAD_REQUEST을 반환한다
 - [x] sections 빈 배열이면 BAD_REQUEST을 반환한다
 - [x] section name이 비어있으면 BAD_REQUEST을 반환한다
-- [ ] seats 빈 배열이면 BAD_REQUEST을 반환한다
+- [x] seats 빈 배열이면 BAD_REQUEST을 반환한다
 - [ ] rowNumber 또는 seatNumber가 1 미만이면 BAD_REQUEST을 반환한다
 - [ ] 동일 섹션 내 rowNumber와 seatNumber의 조합이 중복이면 BAD_REQUEST을 반환한다
 - [ ] 섹션 이름이 중복되면 BAD_REQUEST을 반환한다
