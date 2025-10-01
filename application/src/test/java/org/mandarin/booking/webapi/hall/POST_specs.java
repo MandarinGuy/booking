@@ -18,7 +18,6 @@ import org.mandarin.booking.domain.hall.SeatRegisterRequest;
 import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
-import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -120,8 +119,7 @@ class POST_specs {
 
     @Test
     void sections_빈_배열이면_BAD_REQUEST을_반환한다(
-            @Autowired IntegrationTestUtils testUtils,
-            @Autowired TestFixture testFixture
+            @Autowired IntegrationTestUtils testUtils
     ) {
         // Arrange
         var request = new HallRegisterRequest("name", Collections.emptyList());
@@ -134,4 +132,25 @@ class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
+
+    @Test
+    void section_name이_비어있으면_BAD_REQUEST을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("", List.of(
+                        new SeatRegisterRequest("A", "B")
+                ))
+        ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
 }
