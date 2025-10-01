@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mandarin.booking.domain.hall.HallRegisterRequest;
 import org.mandarin.booking.domain.hall.HallRegisterResponse;
 import org.mandarin.booking.domain.hall.SeatRegisterRequest;
@@ -160,6 +162,35 @@ class POST_specs {
         // Arrange
         var request = new HallRegisterRequest("name", List.of(
                 new SectionRegisterRequest("sectionName", Collections.emptyList())
+        ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "'', '1'",
+            "'A', ''",
+            "' ', '1'",
+            "'A', ' '"
+    })
+    void rowNumber_또는_seatNumber가_빈_문자인_경우_BAD_REQUEST을_반환한다(
+            String rowNumber,
+            String seatNumber,
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest(rowNumber, seatNumber)
+                ))
         ));
 
         // Act

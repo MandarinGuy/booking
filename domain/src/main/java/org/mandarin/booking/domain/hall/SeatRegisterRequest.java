@@ -1,4 +1,10 @@
 package org.mandarin.booking.domain.hall;
 
-public record SeatRegisterRequest(String rowNumber, String seatNumber) {
+import jakarta.validation.constraints.NotBlank;
+
+public record SeatRegisterRequest(
+        @NotBlank
+        String rowNumber,
+        @NotBlank
+        String seatNumber) {
 }
