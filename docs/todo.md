@@ -28,6 +28,7 @@
     - [x] Spring Modulith 사용 가능한지 점검
 
 2025.09.23
+
 - [ ] hall register
     - [ ] register with registant name
     - [ ] register with seats

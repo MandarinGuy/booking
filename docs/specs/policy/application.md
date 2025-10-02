@@ -70,8 +70,8 @@
 - application -> domain (OK), adapter (금지)
 - adapter -> application 포트(OK), application 서비스/구현(금지), domain(읽기 전용 OK. 단, 비즈니스 수행은 application 경유)
 - DTO/엔티티 경계:
-  - webapi의 요청/응답 DTO는 한시적으로 domain에 존재. 추후 변경 가능성 있음.
-  - 영속성 엔티티는 domain에만 존재. domain 엔티티와 동일 클래스로 사용.
+    - webapi의 요청/응답 DTO는 한시적으로 domain에 존재. 추후 변경 가능성 있음.
+    - 영속성 엔티티는 domain에만 존재. domain 엔티티와 동일 클래스로 사용.
 
 ## 3. 포트와 어댑터
 
@@ -90,12 +90,12 @@
 
 - 트랜잭션 경계: application 계층의 유스케이스 서비스 메서드 수준에서 관리(`@Transactional`). 컨트롤러/어댑터에서는 트랜잭션을 시작하지 않습니다.
 - 검증:
-  - 형태/구문 검증: adapter(webapi)에서 기본적인 바인딩/형식 검증 허용.
-  - 비즈니스/정책 검증: application 또는 domain에서 수행. `Validator` 등의 컴포넌트는 application에 위치.
+    - 형태/구문 검증: adapter(webapi)에서 기본적인 바인딩/형식 검증 허용.
+    - 비즈니스/정책 검증: application 또는 domain에서 수행. `Validator` 등의 컴포넌트는 application에 위치.
 - 예외:
-  - 도메인 오류는 domain 예외(`DomainException`의 자식 클래스)로 표현.
-  - 어댑터/기술 오류는 해당 계층에서 포착하고 domain 의미의 예외로 변환 또는 적절히 매핑.
-  - webapi는 예외를 `GlobalExceptionHandler`로 공통 변환하여 `ErrorResponse`로 응답.
+    - 도메인 오류는 domain 예외(`DomainException`의 자식 클래스)로 표현.
+    - 어댑터/기술 오류는 해당 계층에서 포착하고 domain 의미의 예외로 변환 또는 적절히 매핑.
+    - webapi는 예외를 `GlobalExceptionHandler`로 공통 변환하여 `ErrorResponse`로 응답.
 - 로깅: 크로스커팅은 internal 계층의 AOP(`LoggingAspect`)에서 처리. 민감 정보(비밀번호, 토큰 등)는 로그 금지.
 
 ## 5. 모듈 구조 규칙

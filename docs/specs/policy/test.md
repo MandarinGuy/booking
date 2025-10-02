@@ -66,29 +66,29 @@
 - 각 테스트는 `IntegrationTestUtils`를 사용해 작성
   - `IntegrationTestUtils` 사용 방법은 다음과 같음
   - ```java
-    @Test
-    void withoutAuth(@Autowired IntegrationTestUtils testUtils) {
-    // Act & Assert
-    var response = testUtils.get("/test/without-auth")
-    .assertSuccess(String.class);
-    
-            assertThat(response.getData()).isEqualTo(PONG_WITHOUT_AUTH);
-    }
-    ```
-    - ```java
-    @Test
-    void failToAuth(@Autowired IntegrationTestUtils testUtils) {
-        // Arrange
-        var invalidToken = "invalid token";
+  @Test
+  void withoutAuth(@Autowired IntegrationTestUtils testUtils) {
+  // Act & Assert
+  var response = testUtils.get("/test/without-auth")
+  .assertSuccess(String.class);
 
-        // Act & Assert
-        var response = testUtils.get("/test/with-auth")
-                .withAuthorization(invalidToken)
-                .assertFailure();
-        assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
-        assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
-    }
+            assertThat(response.getData()).isEqualTo(PONG_WITHOUT_AUTH);
+  }
     ```
+        - ```java
+      @Test
+      void failToAuth(@Autowired IntegrationTestUtils testUtils) {
+      // Arrange
+      var invalidToken = "invalid token";
+
+          // Act & Assert
+          var response = testUtils.get("/test/with-auth")
+                  .withAuthorization(invalidToken)
+                  .assertFailure();
+          assertThat(response.getStatus()).isEqualTo(UNAUTHORIZED);
+          assertThat(response.getData()).isEqualTo("유효한 토큰이 없습니다.");
+      }
+      ```
 - 데이터 초기화는 테스트 메서드 단위로 독립되게 유지. H2 메모리 DB가 매 테스트 클래스/메서드 기준으로 깨끗한 상태를 갖도록 설계한다.
 - 인증이 필요한 엔드포인트는 `JwtTestUtils`로 유효 토큰을 발급하여 헤더 `Authorization: Bearer <token>`를 부착.
 - 예외/에러 응답은 `GlobalExceptionHandler` 정책에 맞춰 상태코드/본문을 검증.
@@ -177,8 +177,8 @@
   - 단위 테스트: 대상 패키지에 맞춰 배치, 클래스명 `*Test`
   - 통합 테스트: 시나리오 중심 폴더 구조 사용 가능
     - 예시)
-        - POST `/api/auth/login`: `application/src/test/java/org/mandarin/booking/webapi/auth/login/POST_specs.java`
-        - GET `/api/show`: `application/src/test/java/org/mandarin/booking/webapi/show/GET_specs.java`
+      - POST `/api/auth/login`: `application/src/test/java/org/mandarin/booking/webapi/auth/login/POST_specs.java`
+      - GET `/api/show`: `application/src/test/java/org/mandarin/booking/webapi/show/GET_specs.java`
   - 아키텍처 테스트: `arch/*`
 
 ---

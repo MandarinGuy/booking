@@ -23,25 +23,25 @@
 - 쿼리 파라미터
     - page (선택, 기본=0, 정수 >= 0): 페이지 번호
   - size (선택, 기본=10): 페이지 크기
-    - type (선택): 공연 유형 (MUSICAL, PLAY, CONCERT, OPERA, DANCE, CLASSICAL, ETC)
-    - rating (선택): 관람 등급 (ALL, AGE12, AGE15, AGE18)
-    - q (선택): 공연 제목 검색 키워드
-    - from (선택, yyyy-MM-dd): 조회 시작일
-    - to (선택, yyyy-MM-dd): 조회 종료일  
-      -> 공연 기간(performanceStartDate~performanceEndDate)이 [from, to] 구간과 겹치는 공연만 반환한다.
-    - 기간 필터링: 공연 기간 [performanceStartDate, performanceEndDate] 와 조회 기간 [from, to] 가 **겹치면** 포함한다.
-    - 경계 포함(폐구간): performanceStartDate <= to AND performanceEndDate >= from
-    - from만 지정 시: performanceEndDate >= from
-    - to만 지정 시: performanceStartDate <= to
-    - from > to 인 경우: 400 BAD_REQUEST
+      - type (선택): 공연 유형 (MUSICAL, PLAY, CONCERT, OPERA, DANCE, CLASSICAL, ETC)
+      - rating (선택): 관람 등급 (ALL, AGE12, AGE15, AGE18)
+      - q (선택): 공연 제목 검색 키워드
+      - from (선택, yyyy-MM-dd): 조회 시작일
+      - to (선택, yyyy-MM-dd): 조회 종료일  
+        -> 공연 기간(performanceStartDate~performanceEndDate)이 [from, to] 구간과 겹치는 공연만 반환한다.
+      - 기간 필터링: 공연 기간 [performanceStartDate, performanceEndDate] 와 조회 기간 [from, to] 가 **겹치면** 포함한다.
+      - 경계 포함(폐구간): performanceStartDate <= to AND performanceEndDate >= from
+      - from만 지정 시: performanceEndDate >= from
+      - to만 지정 시: performanceStartDate <= to
+      - from > to 인 경우: 400 BAD_REQUEST
 
-    - 정렬:
-        1) performanceStartDate DESC
-        2) title ASC (title이 unique이므로 마지막 정렬조건으로 충분)
+      - 정렬:
+          1) performanceStartDate DESC
+          2) title ASC (title이 unique이므로 마지막 정렬조건으로 충분)
 
-    - 페이지네이션:
-        - page는 0-기반 인덱스다.
-      - hasNext = 존재성 여부만 확인
+      - 페이지네이션:
+          - page는 0-기반 인덱스다.
+          - hasNext = 존재성 여부만 확인
 
 - curl 명령 예시
 

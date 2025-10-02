@@ -103,7 +103,7 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 - local: MySQL + JPA `ddl-auto: create`, JWT 시크릿/TTL 설정
     - 근거: `application-local.yml`, Docker Compose: [compose.yaml](application/src/main/resources/compose.yaml)
 - test: H2 메모리 + MySQL 호환 모드 + JPA `ddl-auto: create`
-  - 근거: `application-test.yml`
+    - 근거: `application-test.yml`
 
 민감정보는 운영 환경에서 환경변수로 주입하는 것을 권장합니다(로컬에 예시 값 존재).
 
@@ -125,11 +125,11 @@ Build/Test 구성 근거: `build.gradle`의 `tasks.named('test')` 설정(Profile
 - CI/CD, 코드 포매터, 마이그레이션 도구(Flyway/Liquibase)는 현재 문서/설정 부재로 "확인 불가" 상태입니다.
 - TODO/메모: [docs/devlog/*](docs/devlog), [docs/todo.md](docs/todo.md)
 - 권장 향후 작업
-  - prod 프로필 구성과 비밀 주입 전략 수립
-  - CI 파이프라인(.github/workflows) 도입
-  - DB 마이그레이션 도구 채택 및 규약 수립
-  - 인증/인가 정책 문서
-    구체화: [docs/specs/policy/authentication.md](docs/specs/policy/authentication.md), [docs/specs/policy/authorization.md](docs/specs/policy/authorization.md)
+    - prod 프로필 구성과 비밀 주입 전략 수립
+    - CI 파이프라인(.github/workflows) 도입
+    - DB 마이그레이션 도구 채택 및 규약 수립
+    - 인증/인가 정책 문서
+      구체화: [docs/specs/policy/authentication.md](docs/specs/policy/authentication.md), [docs/specs/policy/authorization.md](docs/specs/policy/authorization.md)
 
 ---
 
