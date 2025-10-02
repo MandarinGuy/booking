@@ -30,7 +30,7 @@ public class TestConfig {
 
     @Bean
     @Primary
-    public SecurePasswordEncoder fastTestPasswordEncoder() {
+    public SecurePasswordEncoder testPasswordEncoder() {
         return new SecurePasswordEncoder() {
             @Override
             public String encode(String password) {
