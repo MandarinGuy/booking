@@ -280,7 +280,9 @@ erDiagram
 %% UNIQUE(scheduleId, roleName) on Casting
 
 %% Hall AR (Hall 내부에 Seat/TicketGrade)
-    Hall ||--o{ Seat : has
+    Hall ||--o{ Section : has
+    Section ||--o{ Seat : has
+    Seat ||--o{ TicketGrade : has
     Hall ||--o{ TicketGrade : has
 
 %% Reservation AR (Payment/Attempt/Refund 내부 포함)
@@ -335,10 +337,16 @@ erDiagram
         BIGINT id PK
         string name
     }
+    
+    Section {
+        BIGINT id PK
+        BIGINT hallId FK
+        string name
+    }
 
     Seat {
         BIGINT id PK
-        BIGINT hallId FK
+        BIGINT sectionId FK
         string rowLabel
         int number
         enum viewGrade "NORMAL|PARTIAL_VIEW|OBSTRUCTED"

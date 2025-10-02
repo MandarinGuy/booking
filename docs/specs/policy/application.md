@@ -75,12 +75,10 @@
 
 ## 3. 포트와 어댑터
 
-- 입력 포트(inbound port): 유스케이스 인터페이스. 위치: `application/aggregate-root` 컨트롤러는 입력 포트를 통해서만 유스케이스 호출.
-- 출력 포트(outbound port): 외부 시스템/리포지토리에 대한 인터페이스. 위치: `application/aggregate-root` 또는 `application/aggregate-root` 하위에 정의
-  가능.
-- 어댑터(adapters): 포트 인터페이스의 구현체. 위치: adapter 하위. 현재 JPA 기반 구현은 `application/aggregate-root/*Repository`를 통해 동작하며, 해당 패키지는
-  어댑터 계층으로
-  간주합니다.
+- 입력 포트(inbound port): 유스케이스 인터페이스. 위치: `application/app/*`.
+- 출력 포트(outbound port): 외부 시스템/리포지토리에 대한 인터페이스. 위치: `application/app/*` 하위에 정의.
+- 어댑터(adapters): 포트 인터페이스의 구현체. 위치: `application/adapter/*` 등. 현재 JPA 기반 구현은 `application/app/*Repository`를 통해 동작하며 해당
+  패키지는 어댑터 계층으로 간주.
 
 권장 네이밍:
 
@@ -176,12 +174,16 @@ flowchart TB
 
 ## 8. 보안 규칙
 
-- 인증/인가 컴포넌트는 adapter/security에 위치: `JwtFilter`, `CustomAuthenticationProvider`, `SecurityConfig` 등.
-- 보안 컨텍스트와 토큰 파싱은 어댑터에서 처리하고, application 유스케이스에는 인증된 식별자/역할만 전달.
+- 인증/인가 컴포넌트 위치:
+    - `internal/adapter`: `SecurityConfig`, `JwtFilter`, `CustomAuthenticationEntryPoint`, `CustomAccessDeniedHandler`,
+      `TokenUtils`
+    - `application/adapter/security`: `ApplicationAuthorizationRequestMatcherConfigurer`
+    - `application/app/member`: `CustomAuthenticationProvider`
+- 보안 컨텍스트/토큰 파싱은 어댑터에서 처리하고, application 유스케이스에는 인증된 식별자/역할만 전달.
 
 ## 9. 테스트 규칙
 
-- `src/test/java/org/mandarin/booking/arch/HexagonalArchitectureTest.java` 는 아키텍처 규칙을 자동 검증합니다.
+- `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java` 는 아키텍처 규칙을 자동 검증합니다.
 - 규칙 위반 예:
     - adapter가 application 서비스 구현 클래스에 직접 의존
     - application이 adapter 패키지에 의존

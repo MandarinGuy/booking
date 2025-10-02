@@ -29,7 +29,7 @@
 
 2025.09.23
 - [ ] hall register
-    - [ ] register with registerer name
+    - [ ] register with registant name
     - [ ] register with seats
 
 ---

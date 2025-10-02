@@ -4,13 +4,16 @@
 
 근거 파일/경로:
 
-- 보안 설정: `src/main/java/org/mandarin/booking/adapter/security/SecurityConfig.java`
-- JWT 필터: `src/main/java/org/mandarin/booking/adapter/security/JwtFilter.java`
-- AuthenticationProvider: `src/main/java/org/mandarin/booking/adapter/security/CustomAuthenticationProvider.java`
-- 토큰 유틸: `src/main/java/org/mandarin/booking/app/TokenUtils.java`
-- 예외 처리기: `src/main/java/org/mandarin/booking/adapter/security/CustomAuthenticationEntryPoint.java`,
-  `CustomAccessDeniedHandler.java`
-- 프로필/환경: `src/main/resources/application.yml`, `application-local.yml`, `application-test.yml`
+- 보안 설정: `internal/src/main/java/org/mandarin/booking/adapter/SecurityConfig.java`
+- JWT 필터: `internal/src/main/java/org/mandarin/booking/adapter/JwtFilter.java`
+- AuthenticationProvider: `application/src/main/java/org/mandarin/booking/app/member/CustomAuthenticationProvider.java`
+- 토큰 유틸: `internal/src/main/java/org/mandarin/booking/adapter/JwtTokenUtils.java`,
+  `internal/src/main/java/org/mandarin/booking/adapter/TokenUtils.java`
+- 예외 처리기: `internal/src/main/java/org/mandarin/booking/adapter/CustomAuthenticationEntryPoint.java`,
+  `internal/src/main/java/org/mandarin/booking/adapter/CustomAccessDeniedHandler.java`
+- 엔드포인트 권한 매칭:
+  `application/src/main/java/org/mandarin/booking/adapter/security/ApplicationAuthorizationRequestMatcherConfigurer.java`
+- 프로필/환경: `application/src/main/resources/application.yml`, `application-local.yml`, `application-test.yml`
 
 ---
 
@@ -78,12 +81,16 @@
 
 ## 5. 공개 엔드포인트와 인증 필요 엔드포인트
 
-- 공개(permitAll): (근거: SecurityConfig.apiChain)
+- 공개(permitAll): (근거: SecurityConfig.apiChain, ApplicationAuthorizationRequestMatcherConfigurer)
   - `POST /api/member`
   - `POST /api/auth/login`
   - `POST /api/auth/reissue`
-- 인증 필요: (근거: SecurityConfig.apiChain)
-  - 위 공개 엔드포인트를 제외한 모든 `/api/**` 요청은 인증 필요
+  - `GET /api/show`, `GET /api/show/*`
+- 인증/권한 필요: (근거: ApplicationAuthorizationRequestMatcherConfigurer)
+    - `POST /api/hall` → `ROLE_ADMIN`
+    - `POST /api/show` → `ROLE_ADMIN`
+    - `POST /api/show/schedule` → `ROLE_DISTRIBUTOR`
+    - 그 외 `/api/**` → 인증 필요
 - 공개 체인(@Order(2)): (근거: SecurityConfig.publicChain)
   - `/error`, `/assets/**`, `/favicon.ico` 및 그 외 `/**`는 permitAll (운영상 공개 페이지용)
 
@@ -93,7 +100,8 @@
 
 - 테스트 실행 시 프로필 `test` 활성화: Gradle test 태스크에서 설정 (근거: build.gradle)
 - 테스트 프로필에서 JWT/DB 설정은 `application-test.yml`을 따른다.
-- 보안 관련 통합/단위 테스트는 다음을 참조: `src/test/java/org/mandarin/booking/adapter/security/*`
+- 보안 관련 테스트는 다음을 참조: `application/src/test/java/org/mandarin/booking/adapter/security/*`,
+  `internal/src/test/java/org/mandarin/booking/adapter/*Test.java`
 
 ---
 
@@ -111,4 +119,3 @@
 
 - 토큰 발급/서명 구현 세부(Access/Refresh 생성 로직) 문서화 수준: 확인 불가 (해당 클래스 상세는 별도 코드 참조 필요)
 - 키 회전/블랙리스트/토큰 철회 전략: 확인 불가
-

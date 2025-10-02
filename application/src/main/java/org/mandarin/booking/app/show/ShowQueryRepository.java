@@ -71,7 +71,7 @@ class ShowQueryRepository {
                         show.type,
                         show.rating,
                         show.posterUrl,
-                        select(hall.name)
+                        select(hall.hallName)
                                 .from(hall)
                                 .where(hall.id.eq(show.hallId)),
                         show.performanceStartDate,

@@ -1,6 +1,8 @@
 package org.mandarin.booking.utils;
 
+import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.utils.EnumFixture.randomEnum;
+import static org.mandarin.booking.utils.HallFixture.generateHallName;
 import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
@@ -32,10 +34,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestFixture {
     private final EntityManager entityManager;
     private final SecurePasswordEncoder securePasswordEncoder;
+    private volatile Member cachedDefaultMember;
 
     public TestFixture(EntityManager entityManager, SecurePasswordEncoder securePasswordEncoder) {
         this.entityManager = entityManager;
         this.securePasswordEncoder = securePasswordEncoder;
+    }
+
+    public Member getOrCreateDefaultMember() {
+        Member local = cachedDefaultMember;
+        if (local != null) {
+            return local;
+        }
+        synchronized (this) {
+            if (cachedDefaultMember == null) {
+                cachedDefaultMember = insertDummyMember(generateUserId(), generatePassword());
+            }
+            return cachedDefaultMember;
+        }
     }
 
     public Member insertDummyMember(String userId, String password) {
@@ -64,12 +80,13 @@ public class TestFixture {
         );
     }
 
-    public Member insertDummyMember() {
-        return this.insertDummyMember(generateUserId(), generatePassword());
+    public Member insertDummyMember(MemberAuthority memberAuthority) {
+        return this.insertDummyMember(generateUserId(), generatePassword(), List.of(memberAuthority));
     }
 
     public Show insertDummyShow(LocalDate performanceStartDate, LocalDate performanceEndDate) {
-        var hall = insertDummyHall();
+        var member = insertDummyMember(generateUserId(), generatePassword(), List.of(ADMIN));
+        var hall = insertDummyHall(member.getUserId());
         var command = ShowCreateCommand.from(
                 new ShowRegisterRequest(
                         hall.getId(),
@@ -86,14 +103,14 @@ public class TestFixture {
         return showInsert(show);
     }
 
-    public Hall insertDummyHall() {
-        var hall = Hall.create("hall name");
+    public Hall insertDummyHall(String userId) {
+        var hall = Hall.create(generateHallName(), userId);
         entityManager.persist(hall);
         return hall;
     }
 
     public Show generateShow(int scheduleCount) {
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         var show = generateShow(hall.getId());
 
         for (int i = 0; i < scheduleCount; i++) {
@@ -110,27 +127,27 @@ public class TestFixture {
     }
 
     public List<Show> generateShows(int showCount) {
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         return IntStream.range(0, showCount)
                 .mapToObj(i -> generateShow(hall.getId()))
                 .toList();
     }
 
     public void generateShows(int showCount, Type type) {
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         IntStream.range(0, showCount)
                 .forEach(i -> generateShow(hall.getId(), type));
     }
 
     public void generateShows(int showCount, Rating rating) {
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         IntStream.range(0, showCount)
                 .forEach(i -> generateShow(hall.getId(), rating));
     }
 
     public void generateShows(int showCount, String titlePart) {
         Random random = new Random();
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         IntStream.range(0, showCount)
                 .forEach(i -> {
                     var request = validShowRegisterRequest(hall.getId(),
@@ -145,7 +162,7 @@ public class TestFixture {
 
     public void generateShows(int showCount, int before, int after) {
         Random random = new Random();
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         var hallId = hall.getId();
         IntStream.range(0, showCount)
                 .forEach(i -> {
@@ -165,7 +182,7 @@ public class TestFixture {
     }
 
     public Show generateShowWithNoSynopsis(int scheduleCount) {
-        var hall = insertDummyHall();
+        var hall = insertDummyHall(generateUserId());
         var show = Show.create(hall.getId(), ShowCreateCommand.from(new ShowRegisterRequest(
                 hall.getId(),
                 UUID.randomUUID().toString().substring(0, 10),
@@ -191,9 +208,9 @@ public class TestFixture {
         return showInsert(show);
     }
 
-    public boolean existsHallName(String name) {
-        return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.name = :name")
-                .setParameter("name", name)
+    public boolean existsHallName(String hallName) {
+        return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.hallName = :hallName")
+                .setParameter("hallName", hallName)
                 .getSingleResult() instanceof Long count) && count > 0;
     }
 

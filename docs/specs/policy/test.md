@@ -5,9 +5,10 @@
 
 근거 파일/경로:
 
-- build.gradle: test 태스크, 라이브러리, JVM args 설정
-- src/main/resources/application-test.yml: 테스트 프로필 환경
-- src/test/java/**/*: 실제 테스트 코드 일체
+- root build.gradle: test 태스크, 라이브러리, JVM args 설정
+- application/src/main/resources/application-test.yml: 테스트 프로필 환경
+- application/src/test/java/**/*: 실제 테스트 코드 일체(통합/웹/아키텍처)
+- internal/src/test/java/**/*: 내부 어댑터 단위 테스트
 - docs/specs/api/*.md: API별 수용 기준(체크리스트)
 
 ---
@@ -21,7 +22,7 @@
 명령:
 
 - 전체 테스트: `./gradlew test`
-- 테스트 프로필: Gradle가 자동으로 `spring.profiles.active=test`를 설정함 (build.gradle 근거).
+- 테스트 프로필: Gradle가 자동으로 `spring.profiles.active=test`를 설정함 (root build.gradle 근거).
 
 ---
 
@@ -40,7 +41,7 @@
 - 라이브러리/설정 근거:
   - Mockito inline 사용: `build.gradle` → `testImplementation 'org.mockito:mockito-inline:5.2.0'`
   - JUnit5 사용: `build.gradle` → `useJUnitPlatform()`
-  - ByteBuddy javaagent 사전 부착: `build.gradle` → `jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"`
+  - JVM 설정: `build.gradle` → `jvmArgs = ['-XX:+EnableDynamicAgentLoading', '-Xshare:off']`
 
 권장 규칙:
 
@@ -52,7 +53,8 @@
 ### 2.2 통합 테스트 (Integration Test)
 
 - 목적: Spring Context를 실제로 기동하여, 보안 필터/컨트롤러/시리얼라이저/예외 처리 및 JPA/H2 동작을 포함해 엔드투엔드에 가까운 경로를 검증.
-- 프로필/환경: `application-test.yml` 사용. H2 메모리 DB, JPA `ddl-auto: create`, JWT 시크릿/TTL 설정 포함.
+- 프로필/환경: `application/src/main/resources/application-test.yml` 사용. H2 메모리 DB, JPA `ddl-auto: create`, JWT 시크릿/TTL 설정
+  포함.
 - 보안: 실제 `SecurityConfig`와 `JwtFilter` 동작을 최대한 반영. 필요 시 테스트 전용 컨트롤러/설정 (`TestOnlyController`, `TestConfig`) 사용.
 - 유틸리티: `IntegrationTest`, `IntegrationTestUtils`, `IntegrationTestUtilsSpecs`, `JwtTestUtils` 등 공용 유틸을 통해 테스트 준비/토큰
   생성/컨텍스트 초기화.
@@ -96,7 +98,7 @@
 ### 2.3 아키텍처 테스트 (ArchUnit)
 
 - 목적: 헥사고날 계층 규칙 준수 보장.
-- 근거 테스트: `src/test/java/org/mandarin/booking/arch/HexagonalArchitectureTest.java`
+- 근거 테스트: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
 - 핵심 규칙:
   - adapter 레이어는 어떤 레이어에도 접근 허용되지 않음(외부에서 접근 금지).
   - application 레이어는 adapter에서만 접근 가능.
@@ -170,20 +172,21 @@
 
 ## 8. 디렉터리/네이밍 가이드
 
-- 테스트 루트: `src/test/java`
+- 테스트 루트: `application/src/test/java`
 - 관례:
   - 단위 테스트: 대상 패키지에 맞춰 배치, 클래스명 `*Test`
   - 통합 테스트: 시나리오 중심 폴더 구조 사용 가능
     - 예시)
-      - POST `/api/auth/login`: `src/test/java/org/mandarin/booking/webapi/auth/login/POST_specs.java`
-      - GET `/api/show`: `src/test/java/org/mandarin/booking/webapi/show/GET_specs.java`
+        - POST `/api/auth/login`: `application/src/test/java/org/mandarin/booking/webapi/auth/login/POST_specs.java`
+        - GET `/api/show`: `application/src/test/java/org/mandarin/booking/webapi/show/GET_specs.java`
   - 아키텍처 테스트: `arch/*`
 
 ---
 
 ## 9. 부록: 참고 클래스
 
-- ArchUnit: `src/test/java/org/mandarin/booking/arch/HexagonalArchitectureTest.java`
-- 보안 테스트: `src/test/java/org/mandarin/booking/adapter/security/*.java`
-- 웹 API 스펙: `src/test/java/org/mandarin/booking/webapi/**`
-- 통합 유틸: `src/test/java/org/mandarin/booking/IntegrationTest*.java`, `JwtTestUtils.java`
+- ArchUnit: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
+- 보안 테스트: `application/src/test/java/org/mandarin/booking/adapter/security/*.java`,
+  `internal/src/test/java/org/mandarin/booking/adapter/*Test.java`
+- 웹 API 스펙: `application/src/test/java/org/mandarin/booking/webapi/**`
+- 통합 유틸: `application/src/test/java/org/mandarin/booking/utils/*`

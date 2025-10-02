@@ -4,11 +4,13 @@
 
 근거 파일/경로:
 
-- 보안 설정: `src/main/java/org/mandarin/booking/adapter/security/SecurityConfig.java`
-- 권한 Enum: `src/main/java/org/mandarin/booking/domain/member/MemberAuthority.java`
-- JWT 필터: `src/main/java/org/mandarin/booking/adapter/security/JwtFilter.java`
-- 예외 처리기: `src/main/java/org/mandarin/booking/adapter/security/CustomAccessDeniedHandler.java`,
-  `CustomAuthenticationEntryPoint.java`
+- 보안 설정: `internal/src/main/java/org/mandarin/booking/adapter/SecurityConfig.java`
+- 권한 Enum: `common/src/main/java/org/mandarin/booking/MemberAuthority.java`
+- JWT 필터: `internal/src/main/java/org/mandarin/booking/adapter/JwtFilter.java`
+- 권한 매칭 구성:
+  `application/src/main/java/org/mandarin/booking/adapter/security/ApplicationAuthorizationRequestMatcherConfigurer.java`
+- 예외 처리기: `internal/src/main/java/org/mandarin/booking/adapter/CustomAccessDeniedHandler.java`,
+  `internal/src/main/java/org/mandarin/booking/adapter/CustomAuthenticationEntryPoint.java`
 
 ---
 
@@ -28,12 +30,15 @@
   - `POST /api/member`
   - `POST /api/auth/login`
   - `POST /api/auth/reissue`
+  - `GET /api/show`, `GET /api/show/*`
 
 - 권한 필요(hasAuthority):
-    - `POST /api/show` → `ROLE_DISTRIBUTOR`
+    - `POST /api/hall` → `ROLE_ADMIN`
+    - `POST /api/show` → `ROLE_ADMIN`
+    - `POST /api/show/schedule` → `ROLE_DISTRIBUTOR`
 
 - 그 외 `/api/**`:
-  - `anyRequest().authenticated()` → 유효한 JWT 필요(특정 권한 제한 없음). 컨트롤러/도메인 단에서 별도 검증이 필요한 경우 추가 로직으로 보완.
+    - `anyRequest().authenticated()` → 유효한 JWT 필요(특정 권한 제한 없음)
 
 - 퍼블릭 체인(@Order(2)):
   - `/error`, `/assets/**`, `/favicon.ico`, 및 그 외 `/**`는 permitAll (정적/오류/기타 공개 경로)
@@ -44,7 +49,11 @@
 - `.requestMatchers(HttpMethod.POST, "/api/member").permitAll()`
 - `.requestMatchers("/api/auth/login").permitAll()`
 - `.requestMatchers("/api/auth/reissue").permitAll()`
-- `.requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_DISTRIBUTOR")`
+- `.requestMatchers(HttpMethod.GET, "/api/show").permitAll()`
+- `.requestMatchers(HttpMethod.GET, "/api/show/*").permitAll()`
+- `.requestMatchers(HttpMethod.POST, "/api/show/schedule").hasAuthority("ROLE_DISTRIBUTOR")`
+- `.requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_ADMIN")`
+- `.requestMatchers(HttpMethod.POST, "/api/hall").hasAuthority("ROLE_ADMIN")`
 - `.anyRequest().authenticated()`
 
 ---
