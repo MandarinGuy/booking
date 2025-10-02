@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 class HallCommandRepository {
     private final HallRepository jpaRepository;
 
-
-    public Hall insert(Hall hall) {
+    Hall insert(Hall hall) {
         return jpaRepository.save(hall);
     }
 }

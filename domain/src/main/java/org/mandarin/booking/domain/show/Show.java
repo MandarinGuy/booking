@@ -160,7 +160,8 @@ public class Show extends AbstractEntity {
             this.ticketGrades = ticketGrades;
         }
 
-        public static ShowCreateCommand from(ShowRegisterRequest request) {
+        public static ShowCreateCommand from(
+                ShowRegisterRequest request) {//TODO 2025 10 03 00:26:26 : test 코드를 위해 public...?
             return new ShowCreateCommand(
                     request.title(),
                     Type.valueOf(request.type()),

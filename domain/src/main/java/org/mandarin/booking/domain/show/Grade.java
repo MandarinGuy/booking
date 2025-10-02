@@ -32,7 +32,7 @@ class Grade extends AbstractEntity {
 
     private Integer quantity;
 
-    public static Grade of(Show show, GradeRequest gradeRequest) {
+    static Grade of(Show show, GradeRequest gradeRequest) {
         return new Grade(show, gradeRequest.name(), gradeRequest.basePrice(), gradeRequest.quantity());
     }
 }
