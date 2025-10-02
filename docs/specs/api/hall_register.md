@@ -78,7 +78,7 @@
 - [x] hall name이 중복되면 INTERNAL_SERVER_ERROR을 반환한다
 - [x] section name이 중복되면 BAD_REQUEST을 반환한다
 - [x] 동일한 section 내에 중복된 죄석을 요청하면 BAD_REQUEST를 반환한다
-- [ ] hall 하위 정보가 잘못된 경우 hall도 저장되지 않는다
+- [x] hall 하위 정보가 잘못된 경우 hall도 저장되지 않는다
 - [ ] 하나의 hall에 동일한 section name을 등록 요청하면 BAD_REQUEST가 발생한다
 - [ ] sections가 비어있으면 BAD_REQUEST를 반환한다
 - [ ] section의 seats가 비어있으면 BAD_REQUEST를 반환한다

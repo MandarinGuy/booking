@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mandarin.booking.domain.hall.HallRegisterRequest;
 import org.mandarin.booking.domain.hall.HallRegisterResponse;
 import org.mandarin.booking.domain.hall.SeatRegisterRequest;
@@ -345,5 +346,44 @@ class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.mandarin.booking.webapi.hall.POST_specs#blankNameRequests")
+    void hall_하위_정보가_잘못된_경우_hall도_저장되지_않는다(
+            HallRegisterRequest request,// Arrange
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Act
+        testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        var hallName = request.hallName();
+        assertThat(testFixture.existsHallName(hallName)).isFalse();
+    }
+
+    private static List<HallRegisterRequest> blankNameRequests() {
+        return List.of(
+                new HallRegisterRequest("name", List.of(
+                        new SectionRegisterRequest("sectionName", List.of(
+                                new SeatRegisterRequest("A", "1"),
+                                new SeatRegisterRequest("A", "1")
+                        ))
+                )),// 동일 좌석
+                new HallRegisterRequest("name", List.of(
+                        new SectionRegisterRequest("sectionName", List.of(
+                                new SeatRegisterRequest("A", "1"),
+                                new SeatRegisterRequest("A", "2")
+                        )),
+                        new SectionRegisterRequest("sectionName", List.of(
+                                new SeatRegisterRequest("A", "1"),
+                                new SeatRegisterRequest("A", "2")
+                        ))
+
+                ))// 동일 구역 이름
+        );
     }
 }
