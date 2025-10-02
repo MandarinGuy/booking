@@ -41,7 +41,7 @@ public record IntegrationTestUtils(
     }
 
     public String getAuthToken() {
-        var member = fixture.insertDummyMember();
+        var member = fixture.getOrCreateDefaultMember();
         return "Bearer " + this.getUserToken(member.getUserId(), member.getNickName(), member.getAuthorities())
                 .accessToken();
     }
@@ -62,4 +62,3 @@ public record IntegrationTestUtils(
                 .accessToken();
     }
 }
-

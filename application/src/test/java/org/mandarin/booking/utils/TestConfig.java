@@ -8,6 +8,7 @@ import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 @TestConfiguration
 public class TestConfig {
@@ -25,5 +26,21 @@ public class TestConfig {
     @Bean
     public TestFixture testFixture(@Autowired SecurePasswordEncoder securePasswordEncoder) {
         return new TestFixture(entityManager, securePasswordEncoder);
+    }
+
+    @Bean
+    @Primary
+    public SecurePasswordEncoder fastTestPasswordEncoder() {
+        return new SecurePasswordEncoder() {
+            @Override
+            public String encode(String password) {
+                return "ENC:" + (password == null ? "" : password);
+            }
+
+            @Override
+            public boolean matches(String rawPassword, String encodedPassword) {
+                return encode(rawPassword).equals(encodedPassword);
+            }
+        };
     }
 }

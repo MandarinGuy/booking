@@ -34,10 +34,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestFixture {
     private final EntityManager entityManager;
     private final SecurePasswordEncoder securePasswordEncoder;
+    private volatile Member cachedDefaultMember;
 
     public TestFixture(EntityManager entityManager, SecurePasswordEncoder securePasswordEncoder) {
         this.entityManager = entityManager;
         this.securePasswordEncoder = securePasswordEncoder;
+    }
+
+    public Member getOrCreateDefaultMember() {
+        Member local = cachedDefaultMember;
+        if (local != null) {
+            return local;
+        }
+        synchronized (this) {
+            if (cachedDefaultMember == null) {
+                cachedDefaultMember = insertDummyMember(generateUserId(), generatePassword());
+            }
+            return cachedDefaultMember;
+        }
     }
 
     public Member insertDummyMember(String userId, String password) {
@@ -64,10 +78,6 @@ public class TestFixture {
         return memberInsert(
                 member
         );
-    }
-
-    public Member insertDummyMember() {
-        return this.insertDummyMember(generateUserId(), generatePassword());
     }
 
     public Member insertDummyMember(MemberAuthority memberAuthority) {
