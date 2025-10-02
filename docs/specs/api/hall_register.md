@@ -80,4 +80,4 @@
 - [x] 동일한 section 내에 중복된 죄석을 요청하면 BAD_REQUEST를 반환한다
 - [x] hall 하위 정보가 잘못된 경우 hall도 저장되지 않는다
 - [x] sections가 비어있으면 BAD_REQUEST를 반환한다
-- [ ] section의 seats가 비어있으면 BAD_REQUEST를 반환한다
+- [x] section의 seats가 비어있으면 BAD_REQUEST를 반환한다

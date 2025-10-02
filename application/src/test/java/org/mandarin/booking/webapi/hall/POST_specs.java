@@ -382,6 +382,26 @@ class POST_specs {
         assertThat(response.getData()).contains("At least one section is required");
     }
 
+    @Test
+    void section의_seats가_비어있으면_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("sectionName", List.of())
+        ));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).contains("At least one seat is required");
+
+    }
+
     private static List<HallRegisterRequest> blankNameRequests() {
         return List.of(
                 new HallRegisterRequest("name", List.of(
