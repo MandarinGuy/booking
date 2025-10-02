@@ -55,7 +55,7 @@ public class POST_specs {
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var request = validShowRegisterRequest(testFixture.insertDummyHall().getId());
+        var request = validShowRegisterRequest(testFixture.insertDummyHall("userId").getId());
 
         // Act
         var response = testUtils.post(
@@ -75,7 +75,7 @@ public class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var hallId = testFixture.insertDummyHall().getId();
+        var hallId = testFixture.insertDummyHall("userId").getId();
         var request = validShowRegisterRequest(hallId);
 
         // Act
@@ -117,7 +117,7 @@ public class POST_specs {
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var hallId = testFixture.insertDummyHall().getId();
+        var hallId = testFixture.insertDummyHall("userId").getId();
         var request = new ShowRegisterRequest(
                 hallId,
                 "공연 제목",
@@ -148,7 +148,7 @@ public class POST_specs {
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var hallId = testFixture.insertDummyHall().getId();
+        var hallId = testFixture.insertDummyHall("userId").getId();
         var request = validShowRegisterRequest(hallId);
 
         // Act
@@ -170,7 +170,7 @@ public class POST_specs {
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var hallId = testFixture.insertDummyHall().getId();
+        var hallId = testFixture.insertDummyHall("userId").getId();
         var request = new ShowRegisterRequest(
                 hallId,
                 "공연 제목",
@@ -204,7 +204,7 @@ public class POST_specs {
     ) {
         // Arrange
         var authToken = testUtils.getAuthToken(ADMIN);
-        var request = validShowRegisterRequest(testFixture.insertDummyHall().getId());
+        var request = validShowRegisterRequest(testFixture.insertDummyHall("userId").getId());
         testUtils.post(
                         "/api/show",
                         request

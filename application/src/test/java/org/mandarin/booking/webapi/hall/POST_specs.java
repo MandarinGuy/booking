@@ -8,6 +8,7 @@ import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
+import static org.mandarin.booking.utils.HallFixture.generateHallName;
 
 import java.util.Collections;
 import java.util.List;
@@ -255,12 +256,12 @@ class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var request = new HallRegisterRequest("name", List.of(
+        var request = new HallRegisterRequest(generateHallName(), List.of(
                 new SectionRegisterRequest("sectionName", List.of(
                         new SeatRegisterRequest("A", "1")
                 ))
         ));
-        var member = testFixture.insertDummyMember("test@test.com", "test", List.of(ADMIN));
+        var member = testFixture.insertDummyMember(ADMIN);
         var authToken = testUtils.getAuthToken(member);
 
         // Act
