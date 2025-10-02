@@ -33,6 +33,7 @@
   - `GET /api/show`, `GET /api/show/*`
 
 - 권한 필요(hasAuthority):
+    - `POST /api/hall` → `ROLE_ADMIN`
     - `POST /api/show` → `ROLE_ADMIN`
     - `POST /api/show/schedule` → `ROLE_DISTRIBUTOR`
 
@@ -48,7 +49,11 @@
 - `.requestMatchers(HttpMethod.POST, "/api/member").permitAll()`
 - `.requestMatchers("/api/auth/login").permitAll()`
 - `.requestMatchers("/api/auth/reissue").permitAll()`
-- `.requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_DISTRIBUTOR")`
+- `.requestMatchers(HttpMethod.GET, "/api/show").permitAll()`
+- `.requestMatchers(HttpMethod.GET, "/api/show/*").permitAll()`
+- `.requestMatchers(HttpMethod.POST, "/api/show/schedule").hasAuthority("ROLE_DISTRIBUTOR")`
+- `.requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_ADMIN")`
+- `.requestMatchers(HttpMethod.POST, "/api/hall").hasAuthority("ROLE_ADMIN")`
 - `.anyRequest().authenticated()`
 
 ---

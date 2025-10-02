@@ -49,7 +49,7 @@ public class POST_specs {
     }
 
     @Test
-    void ADMIN_권한을_가진_사용자가_올바른_요청을_하는_경우_SUCCESS_상태코드를_반환한다(
+    void DISTRIBUTOR_권한을_가진_사용자가_올바른_요청을_하는_경우_SUCCESS_상태코드를_반환한다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
     ) {

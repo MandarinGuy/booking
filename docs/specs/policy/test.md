@@ -41,7 +41,7 @@
 - 라이브러리/설정 근거:
   - Mockito inline 사용: `build.gradle` → `testImplementation 'org.mockito:mockito-inline:5.2.0'`
   - JUnit5 사용: `build.gradle` → `useJUnitPlatform()`
-  - ByteBuddy javaagent 사전 부착: `build.gradle` → `jvmArgs "-javaagent:${configurations.byteBuddyAgent.singleFile}"`
+  - JVM 설정: `build.gradle` → `jvmArgs = ['-XX:+EnableDynamicAgentLoading', '-Xshare:off']`
 
 권장 규칙:
 
@@ -98,7 +98,7 @@
 ### 2.3 아키텍처 테스트 (ArchUnit)
 
 - 목적: 헥사고날 계층 규칙 준수 보장.
-- 근거 테스트: `src/test/java/org/mandarin/booking/arch/HexagonalArchitectureTest.java`
+- 근거 테스트: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
 - 핵심 규칙:
   - adapter 레이어는 어떤 레이어에도 접근 허용되지 않음(외부에서 접근 금지).
   - application 레이어는 adapter에서만 접근 가능.

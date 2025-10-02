@@ -2,7 +2,9 @@ package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
+import static org.mandarin.booking.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
@@ -91,7 +93,7 @@ public class POST_specs {
 
     @ParameterizedTest
     @MethodSource("org.mandarin.booking.webapi.show.POST_specs#nullOrBlankElementRequests")
-    void title_type_rating_synopsis_posterUrl_performanceDates가_비어있으면_BAD_REQUEST이다(
+    void title_type_rating_synopsis_posterUrl_performanceStartDate_performanceEndDate가_비어있으면_BAD_REQUEST이다(
             ShowRegisterRequest request,
             @Autowired IntegrationTestUtils testUtils
     ) {
@@ -246,6 +248,26 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void 비ADMIN_토큰으로_요청하면_FORBIDDEN_상태코드를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var request = validShowRegisterRequest(testFixture.insertDummyHall("userId").getId());
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
     }
 
     private ShowRegisterRequest validShowRegisterRequest(Long hallId) {

@@ -87,6 +87,7 @@
   - `POST /api/auth/reissue`
   - `GET /api/show`, `GET /api/show/*`
 - 인증/권한 필요: (근거: ApplicationAuthorizationRequestMatcherConfigurer)
+    - `POST /api/hall` → `ROLE_ADMIN`
     - `POST /api/show` → `ROLE_ADMIN`
     - `POST /api/show/schedule` → `ROLE_DISTRIBUTOR`
     - 그 외 `/api/**` → 인증 필요
