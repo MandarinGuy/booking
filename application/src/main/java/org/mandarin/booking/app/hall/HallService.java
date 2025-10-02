@@ -14,22 +14,27 @@ class HallService implements HallValidator, HallFetcher, HallRegisterer {
     private final HallCommandRepository commandRepository;
 
     @Override
-    public void checkHallExist(Long hallId) {
+    public Hall fetch(Long hallId) {
+        return queryRepository.findById(hallId);
+    }
+
+    @Override
+    public void checkHallExistByHallId(Long hallId) {
         if (!queryRepository.existsById(hallId)) {
             throw new HallException("NOT_FOUND", "해당 공연장을 찾을 수 없습니다.");
         }
     }
 
     @Override
-    public Hall fetch(Long hallId) {
-        return queryRepository.findById(hallId);
+    public void checkHallExistByHallName(String hallName) {
+        if (queryRepository.existsByHallName(hallName)) {
+            throw new HallException("INTERNAL_SERVER_ERROR", "이미 존재하는 공연장 이름입니다.");
+        }
     }
 
     @Override
     public HallRegisterResponse register(String userId, HallRegisterRequest request) {
-        if (queryRepository.existsByHallName(request.hallName())) {
-            throw new HallException("INTERNAL_SERVER_ERROR", "이미 존재하는 공연장 이름입니다.");
-        }
+        checkHallExistByHallName(request.hallName());
 
         var hall = Hall.create(request.hallName(), userId);
 

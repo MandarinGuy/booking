@@ -34,7 +34,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     public ShowRegisterResponse register(ShowRegisterRequest request) {
         var hallId = request.hallId();
 
-        hallValidator.checkHallExist(hallId);
+        hallValidator.checkHallExistByHallId(hallId);
         var command = ShowCreateCommand.from(request);
         var show = Show.create(hallId, command);
 
