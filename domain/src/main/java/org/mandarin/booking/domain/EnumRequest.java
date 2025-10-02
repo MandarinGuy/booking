@@ -14,7 +14,7 @@ public @interface EnumRequest {
 
     Class<? extends Enum<?>> value();
 
-    String message() default "invalid value, must be one from valid enum types";
+    String message() default "invalid value, must be one of valid enum types";
 
     Class<?>[] groups() default {};
 

@@ -1,6 +1,7 @@
 package org.mandarin.booking.webapi.show;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
@@ -9,7 +10,7 @@ import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
-import static org.mandarin.booking.domain.show.ShowRegisterRequest.TicketGradeRequest;
+import static org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
@@ -35,31 +37,31 @@ public class POST_specs {
         return List.of(
                 new ShowRegisterRequest(hallId, "", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "", "https://example.com/poster.jpg",
                         LocalDate.now(), LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "", LocalDate.now(),
                         LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         null, LocalDate.now().plusDays(1),
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 ),
                 new ShowRegisterRequest(hallId, "공연 제목", "MUSICAL", "ALL", "공연 줄거리", "https://example.com/poster.jpg",
                         LocalDate.now(), null,
-                        "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                        "KRW", List.of(new GradeRequest("VIP", 100000, 100))
                 )
         );
     }
@@ -143,7 +145,7 @@ public class POST_specs {
                 "https://example.com/poster.jpg",
                 LocalDate.now(),
                 LocalDate.now().plusDays(30),
-                "KRW", List.of(new TicketGradeRequest("VIP", 100000))
+                "KRW", List.of(new GradeRequest("VIP", 100000, 100))
         );
 
         // Act
@@ -181,6 +183,48 @@ public class POST_specs {
     }
 
     @Test
+    void 요청한_ticketGrades가_Show에_영속된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var hallId = testFixture.insertDummyHall("userId").getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                UUID.randomUUID().toString().substring(0, 10),
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(
+                        new GradeRequest("VIP", 180000, 100),
+                        new GradeRequest("R", 150000, 30)
+                )
+        );
+
+        // Act
+        testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .assertSuccess(ShowRegisterResponse.class);
+
+        // Assert
+        Show show = testFixture.findShowByTitle(request.title());
+        assertThat(show.getGrades())
+                .hasSize(2)
+                .extracting("name", "basePrice", "quantity")
+                .containsExactlyInAnyOrder(
+                        tuple("VIP", 180000, 100),
+                        tuple("R", 150000, 30)
+                );
+    }
+
+    @Test
     void 공연_시작일은_공연_종료일_이후면_INTERNAL_SERVER_ERROR이다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
@@ -198,7 +242,7 @@ public class POST_specs {
                 LocalDate.now(),
                 LocalDate.now().minusDays(1),
                 "KRW",
-                List.of(new TicketGradeRequest("VIP", 100000))
+                List.of(new GradeRequest("VIP", 100000, 100))
         );
 
         // Act
@@ -326,8 +370,8 @@ public class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        var authToken = testUtils.getAuthToken(ADMIN);
-        var hallId = testFixture.insertDummyHall("userId").getId();
+
+        var hallId = testFixture.insertDummyHall(testFixture.insertDummyMember(ADMIN).getUserId()).getId();
         var request = new ShowRegisterRequest(
                 hallId,
                 UUID.randomUUID().toString().substring(0, 10),
@@ -339,8 +383,8 @@ public class POST_specs {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new TicketGradeRequest("VIP", 180000),
-                        new TicketGradeRequest("VIP", 150000)
+                        new GradeRequest("VIP", 180000, 100),
+                        new GradeRequest("VIP", 150000, 30)
                 )
         );
 
@@ -349,7 +393,7 @@ public class POST_specs {
                         "/api/show",
                         request
                 )
-                .withAuthorization(authToken)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
                 .assertFailure();
 
         // Assert
@@ -375,7 +419,7 @@ public class POST_specs {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new TicketGradeRequest("VIP", 0)
+                        new GradeRequest("VIP", 0, 100)
                 )
         );
 
@@ -385,6 +429,37 @@ public class POST_specs {
                         request
                 )
                 .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void quantity가_양수가_아닌_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var hallId = testFixture.insertDummyHall(testFixture.insertDummyMember(ADMIN).getUserId()).getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                UUID.randomUUID().toString().substring(0, 10),
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(
+                        new GradeRequest("VIP", 100000, -1)
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show", request)
+                .withAuthorization(testUtils.getAuthToken(ADMIN))
                 .assertFailure();
 
         // Assert
@@ -411,8 +486,8 @@ public class POST_specs {
                 LocalDate.now().plusDays(30),
                 currency,
                 List.of(
-                        new TicketGradeRequest("VIP", 180000),
-                        new TicketGradeRequest("R", 150000)
+                        new GradeRequest("VIP", 180000, 100),
+                        new GradeRequest("R", 150000, 20)
                 )
         );
 
@@ -437,8 +512,8 @@ public class POST_specs {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new TicketGradeRequest("VIP", 180000),
-                        new TicketGradeRequest("R", 150000)
+                        new GradeRequest("VIP", 180000, 100),
+                        new GradeRequest("R", 150000, 30)
                 )
         );
     }
@@ -455,8 +530,8 @@ public class POST_specs {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new TicketGradeRequest("VIP", 180000),
-                        new TicketGradeRequest("R", 150000)
+                        new GradeRequest("VIP", 180000, 100),
+                        new GradeRequest("R", 150000, 30)
                 )
         );
     }

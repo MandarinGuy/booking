@@ -98,7 +98,7 @@ public class TestFixture {
                         performanceStartDate,
                         performanceEndDate,
                         "KRW",
-                        List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
+                        List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
                 )
         );
         var show = Show.create(hall.getId(), command);
@@ -178,7 +178,7 @@ public class TestFixture {
                             LocalDate.now().minusDays(random.nextInt(before)),
                             LocalDate.now().plusDays(random.nextInt(after)),
                             "KRW",
-                            List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
+                            List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
                     );
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showInsert(show);
@@ -197,7 +197,7 @@ public class TestFixture {
                 LocalDate.now(),
                 LocalDate.now().plusDays(30),
                 "KRW",
-                List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
+                List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
         )));
 
         for (int i = 0; i < scheduleCount; i++) {
@@ -221,6 +221,7 @@ public class TestFixture {
     }
 
     public void removeShows() {
+        entityManager.createQuery("DELETE FROM Grade ").executeUpdate();
         entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 
@@ -235,6 +236,16 @@ public class TestFixture {
                 .setParameter("hallId", hallId)
                 .getSingleResult();
     }
+
+    public Show findShowByTitle(String title) {
+        return entityManager.createQuery(
+                        "SELECT s FROM Show s " +
+                        "JOIN FETCH s.grades grade " +
+                        "WHERE s.title = :title", Show.class)
+                .setParameter("title", title)
+                .getSingleResult();
+    }
+
 
     public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
         return !entityManager.createQuery(
@@ -262,8 +273,8 @@ public class TestFixture {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new ShowRegisterRequest.TicketGradeRequest("VIP", 180000),
-                        new ShowRegisterRequest.TicketGradeRequest("R", 150000)
+                        new ShowRegisterRequest.GradeRequest("VIP", 180000, 100),
+                        new ShowRegisterRequest.GradeRequest("R", 150000, 30)
                 )
         );
     }

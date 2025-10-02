@@ -50,19 +50,23 @@ public record ShowRegisterRequest(
 
         @NotNull(message = "ticketGrades are required")
         @NotEmpty(message = "ticketGrades must not be empty")
-        List<@Valid TicketGradeRequest> ticketGrades
+        List<@Valid GradeRequest> ticketGrades
 ) {
     @AssertTrue(message = "ticketGrade names must be unique")
     public boolean hasUniqueTicketGradeNames() {
-        Set<String> names = ticketGrades.stream().map(TicketGradeRequest::name).collect(Collectors.toSet());
+        Set<String> names = ticketGrades.stream().map(GradeRequest::name).collect(Collectors.toSet());
         return names.size() == ticketGrades.size();
     }
 
-    public record TicketGradeRequest(
+    public record GradeRequest(
             @NotBlank(message = "ticketGrade name is required")
             String name,
+
             @Positive(message = "basePrice must be positive")
-            Integer basePrice
+            Integer basePrice,
+
+            @Positive(message = "quantity must be positive")
+            Integer quantity
     ) {
     }
 }
