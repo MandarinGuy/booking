@@ -96,7 +96,9 @@ public class TestFixture {
                         "synopsis",
                         "https://example.com/poster.jpg",
                         performanceStartDate,
-                        performanceEndDate
+                        performanceEndDate,
+                        "KRW",
+                        List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
                 )
         );
         var show = Show.create(hall.getId(), command);
@@ -174,7 +176,9 @@ public class TestFixture {
                             "공연 줄거리",
                             "https://example.com/poster.jpg",
                             LocalDate.now().minusDays(random.nextInt(before)),
-                            LocalDate.now().plusDays(random.nextInt(after))
+                            LocalDate.now().plusDays(random.nextInt(after)),
+                            "KRW",
+                            List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
                     );
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showInsert(show);
@@ -191,7 +195,9 @@ public class TestFixture {
                 null,
                 "https://example.com/poster.jpg",
                 LocalDate.now(),
-                LocalDate.now().plusDays(30)
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(new ShowRegisterRequest.TicketGradeRequest("VIP", 100000))
         )));
 
         for (int i = 0; i < scheduleCount; i++) {
@@ -253,7 +259,12 @@ public class TestFixture {
                 "공연 줄거리",
                 "https://example.com/poster.jpg",
                 LocalDate.now(),
-                LocalDate.now().plusDays(30)
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(
+                        new ShowRegisterRequest.TicketGradeRequest("VIP", 180000),
+                        new ShowRegisterRequest.TicketGradeRequest("R", 150000)
+                )
         );
     }
 
