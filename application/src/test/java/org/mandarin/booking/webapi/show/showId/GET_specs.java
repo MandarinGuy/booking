@@ -47,7 +47,7 @@ class GET_specs {
         // Arrange
         var show = testFixture.generateShow(5);
         var invalidShowId = show.getId() + 9999;
-        
+
         // Act
         var response = testUtils.get("/api/show/" + invalidShowId)
                 .assertFailure();

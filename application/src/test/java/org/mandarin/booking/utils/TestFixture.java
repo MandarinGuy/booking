@@ -255,6 +255,12 @@ public class TestFixture {
                 .getResultList().isEmpty();
     }
 
+    private Show generateShow(Long hallId) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showInsert(show);
+    }
+
     private void generateShow(Long hallId, Type type) {
         var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
@@ -283,12 +289,6 @@ public class TestFixture {
         var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
         showInsert(show);
-    }
-
-    public Show generateShow(Long hallId) {
-        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        return showInsert(show);
     }
 
     private Show showInsert(Show show) {
