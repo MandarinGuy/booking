@@ -5,6 +5,7 @@ import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.USER;
 import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
 import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
+import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.adapter.ApiStatus.UNAUTHORIZED;
 
@@ -269,5 +270,34 @@ class POST_specs {
         // Assert
         var hall = testFixture.findHallById(response.getData().hallId());
         assertThat(hall.getRegistantId()).isEqualTo(member.getUserId());
+    }
+
+    @Test
+    void hall_name이_중복되면_INTERNAL_SERVER_ERROR을_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var hallName = "name";
+        var prevRequest = new HallRegisterRequest(hallName, List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1")
+                ))
+        ));
+        var authToken = testUtils.getAuthToken(ADMIN);
+        testUtils.post("/api/hall", prevRequest)
+                .withAuthorization(authToken)
+                .assertSuccess(HallRegisterResponse.class);
+        var request = new HallRegisterRequest(hallName, List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1")
+                ))));
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR);
     }
 }
