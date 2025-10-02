@@ -8,4 +8,8 @@ interface HallRepository extends Repository<Hall, Long> {
     boolean existsById(Long id);
 
     Optional<Hall> findById(Long id);
+
+    boolean existsByHallName(String hallName);
+
+    Hall save(Hall hall);
 }

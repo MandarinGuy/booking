@@ -20,6 +20,7 @@ import org.mandarin.booking.domain.hall.SeatRegisterRequest;
 import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
+import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
@@ -244,5 +245,29 @@ class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void hall을_등록하면_등록한_사용자_정보도_저장된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var request = new HallRegisterRequest("name", List.of(
+                new SectionRegisterRequest("sectionName", List.of(
+                        new SeatRegisterRequest("A", "1")
+                ))
+        ));
+        var member = testFixture.insertDummyMember("test@test.com", "test", List.of(ADMIN));
+        var authToken = testUtils.getAuthToken(member);
+
+        // Act
+        var response = testUtils.post("/api/hall", request)
+                .withAuthorization(authToken)
+                .assertSuccess(HallRegisterResponse.class);
+
+        // Assert
+        var hall = testFixture.findHallById(response.getData().hallId());
+        assertThat(hall.getRegistantId()).isEqualTo(member.getUserId());
     }
 }

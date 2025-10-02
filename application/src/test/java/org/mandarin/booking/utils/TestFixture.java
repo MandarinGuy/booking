@@ -87,7 +87,7 @@ public class TestFixture {
     }
 
     public Hall insertDummyHall() {
-        var hall = Hall.create("hall name", 1L);
+        var hall = Hall.create("hall name", "userId");
         entityManager.persist(hall);
         return hall;
     }
@@ -191,9 +191,9 @@ public class TestFixture {
         return showInsert(show);
     }
 
-    public boolean existsHallName(String name) {
-        return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.name = :name")
-                .setParameter("name", name)
+    public boolean existsHallName(String hallName) {
+        return (entityManager.createQuery("SELECT COUNT(h) FROM Hall h WHERE h.hallName = :hallName")
+                .setParameter("hallName", hallName)
                 .getSingleResult() instanceof Long count) && count > 0;
     }
 

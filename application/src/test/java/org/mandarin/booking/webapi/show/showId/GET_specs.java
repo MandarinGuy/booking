@@ -92,7 +92,7 @@ class GET_specs {
         var fetched = testFixture.findHallById(hallId);
 
         assertThat(fetched).isNotNull();
-        assertThat(fetched.getName()).isEqualTo(hallName);
+        assertThat(fetched.getHallName()).isEqualTo(hallName);
         assertThat(fetched.getId()).isEqualTo(hallId);
     }
 

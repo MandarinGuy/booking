@@ -74,7 +74,7 @@
 - [x] rowNumber 또는 seatNumber가 빈 문자인 경우 BAD_REQUEST을 반환한다
 - [x] 동일 섹션 내 rowNumber와 seatNumber의 조합이 중복이면 BAD_REQUEST을 반환한다
 - [x] 섹션 이름이 중복되면 BAD_REQUEST을 반환한다
-- [ ] hall을 등록하면 등록한 사용자 정보도 저장된다
+- [x] hall을 등록하면 등록한 사용자 정보도 저장된다
 - [ ] hall name이 중복되면 INTERNAL_SERVER_ERROR을 반환한다
 - [ ] section name이 중복되면 INTERNAL_SERVER_ERROR을 반환한다
 - [ ] 동일한 section 내에 중복된 죄석을 요청하면 BAD_REQUEST를 반환한다

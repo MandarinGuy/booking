@@ -16,7 +16,11 @@ class HallQueryRepository {
         return repository.existsById(hallId);
     }
 
-    public Hall findById(Long hallId) {
+    boolean existsByHallName(String hallName) {
+        return repository.existsByHallName(hallName);
+    }
+
+    Hall findById(Long hallId) {
         return repository.findById(hallId)
                 .orElseThrow(() -> new HallException("NOT_FOUND", "해당 공연장을 찾을 수 없습니다."));
     }

@@ -3,6 +3,7 @@ package org.mandarin.booking.domain.hall;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -19,16 +20,17 @@ public class Hall extends AbstractEntity {
     @OneToMany(mappedBy = "hall", cascade = ALL, fetch = LAZY)
     private List<Section> sections = new ArrayList<>();
 
-    private String name;
+    @Column(unique = true)
+    private String hallName;
 
-    private Long registantId;
+    private String registantId;
 
-    public Hall(String name, Long registantId) {
-        this.name = name;
+    public Hall(String hallName, String registantId) {
+        this.hallName = hallName;
         this.registantId = registantId;
     }
 
-    public static Hall create(String name, Long registantId) {
+    public static Hall create(String name, String registantId) {
         return new Hall(name, registantId);
     }
 }
