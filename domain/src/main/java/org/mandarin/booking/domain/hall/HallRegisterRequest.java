@@ -9,7 +9,7 @@ import java.util.List;
 public record HallRegisterRequest(
         @NotBlank
         String hallName,
-        @Size(min = 1)
+        @Size(min = 1, message = "At least one section is required")
         @Valid
         List<SectionRegisterRequest> sectionRegisterRequests) {
     @AssertFalse(message = "Duplicate section names are not allowed")

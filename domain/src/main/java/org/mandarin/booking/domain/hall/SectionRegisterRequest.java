@@ -11,7 +11,7 @@ import java.util.Set;
 public record SectionRegisterRequest(
         @NotBlank
         String sectionName,
-        @Size(min = 1)
+        @Size(min = 1, message = "At least one seat is required")
         @Valid
         List<SeatRegisterRequest> seats) {
     @AssertFalse(message = "Duplicate seats are not allowed")
