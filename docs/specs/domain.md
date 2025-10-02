@@ -32,6 +32,8 @@ _Aggregate Root_
 - 공연 시작일(performanceStartDate, yyyy-MM-dd)
 - 공연 종료일(performanceEndDate, yyyy-MM-dd)
 - 공연 스케줄(schedules: List\<ShowSchedule>)
+- 통화(currency: KRW)
+- 등급(grades: List\<Grade>)
 
 #### 행위
 
@@ -41,7 +43,7 @@ _Aggregate Root_
 #### 관련 타입
 
 - `ShowCreateCommand`
-    - title, type, rating, synopsis, posterUrl, performanceStartDate, performanceEndDate
+    - title, type, rating, synopsis, posterUrl, performanceStartDate, performanceEndDate, currency, ticketGrades
 - `ShowRegisterRequest` / `ShowRegisterResponse`
 
 ---
@@ -103,16 +105,18 @@ _Entity_
 
 ---
 
-### 좌석등급(TicketGrade)
+### 등급(Grade)
 
 _Entity_
 
-- 홀 단위 좌석 등급
+- 쇼 단위 좌석 등급(가격/수량 포함)
 
 #### 속성
 
-- hallId(FK)
-- 이름(name)
+- showId(FK)
+- 이름(name) — 쇼 내 유니크
+- 기본가격(basePrice)
+- 수량(quantity)
 
 ---
 

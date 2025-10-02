@@ -21,10 +21,10 @@
       "performanceEndDate": "2025-10-31",
       "currency": "KRW",
       "ticketGrades": [
-        { "name": "VIP", "basePrice": 180000 },
-        { "name": "R",   "basePrice": 150000 },
-        { "name": "S",   "basePrice": 120000 },
-        { "name": "A",   "basePrice": 90000  }
+        { "name": "VIP", "basePrice": 180000, "quantity": 100 },
+        { "name": "R",   "basePrice": 150000, "quantity": 50  },
+        { "name": "S",   "basePrice": 120000, "quantity": 30  },
+        { "name": "A",   "basePrice": 90000,  "quantity": 20  }
       ]
     }
     ```
@@ -45,10 +45,10 @@
       "performanceEndDate": "2025-10-31",
       "currency": "KRW",
       "ticketGrades": [
-        { "name": "VIP", "basePrice": 180000 },
-        { "name": "R",   "basePrice": 150000 },
-        { "name": "S",   "basePrice": 120000 },
-        { "name": "A",   "basePrice": 90000  }
+        { "name": "VIP", "basePrice": 180000, "quantity": 100 },
+        { "name": "R",   "basePrice": 150000, "quantity": 50  },
+        { "name": "S",   "basePrice": 120000, "quantity": 30  },
+        { "name": "A",   "basePrice": 90000,  "quantity": 20  }
       ]
     }'
     ```
