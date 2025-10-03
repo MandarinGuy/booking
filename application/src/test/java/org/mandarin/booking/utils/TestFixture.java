@@ -96,7 +96,9 @@ public class TestFixture {
                         "synopsis",
                         "https://example.com/poster.jpg",
                         performanceStartDate,
-                        performanceEndDate
+                        performanceEndDate,
+                        "KRW",
+                        List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
                 )
         );
         var show = Show.create(hall.getId(), command);
@@ -174,7 +176,9 @@ public class TestFixture {
                             "공연 줄거리",
                             "https://example.com/poster.jpg",
                             LocalDate.now().minusDays(random.nextInt(before)),
-                            LocalDate.now().plusDays(random.nextInt(after))
+                            LocalDate.now().plusDays(random.nextInt(after)),
+                            "KRW",
+                            List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
                     );
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showInsert(show);
@@ -191,7 +195,9 @@ public class TestFixture {
                 null,
                 "https://example.com/poster.jpg",
                 LocalDate.now(),
-                LocalDate.now().plusDays(30)
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
         )));
 
         for (int i = 0; i < scheduleCount; i++) {
@@ -215,6 +221,7 @@ public class TestFixture {
     }
 
     public void removeShows() {
+        entityManager.createQuery("DELETE FROM Grade ").executeUpdate();
         entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 
@@ -230,12 +237,28 @@ public class TestFixture {
                 .getSingleResult();
     }
 
+    public Show findShowByTitle(String title) {
+        return entityManager.createQuery(
+                        "SELECT s FROM Show s " +
+                        "JOIN FETCH s.grades grade " +
+                        "WHERE s.title = :title", Show.class)
+                .setParameter("title", title)
+                .getSingleResult();
+    }
+
+
     public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
         return !entityManager.createQuery(
                         "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
                 .setParameter("scheduleId", res.getScheduleId())
                 .setParameter("showId", show.getId())
                 .getResultList().isEmpty();
+    }
+
+    private Show generateShow(Long hallId) {
+        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showInsert(show);
     }
 
     private void generateShow(Long hallId, Type type) {
@@ -253,7 +276,12 @@ public class TestFixture {
                 "공연 줄거리",
                 "https://example.com/poster.jpg",
                 LocalDate.now(),
-                LocalDate.now().plusDays(30)
+                LocalDate.now().plusDays(30),
+                "KRW",
+                List.of(
+                        new ShowRegisterRequest.GradeRequest("VIP", 180000, 100),
+                        new ShowRegisterRequest.GradeRequest("R", 150000, 30)
+                )
         );
     }
 
@@ -261,12 +289,6 @@ public class TestFixture {
         var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
         showInsert(show);
-    }
-
-    public Show generateShow(Long hallId) {
-        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        return showInsert(show);
     }
 
     private Show showInsert(Show show) {

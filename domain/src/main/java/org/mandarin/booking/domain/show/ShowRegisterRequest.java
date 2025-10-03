@@ -1,9 +1,17 @@
 package org.mandarin.booking.domain.show;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.mandarin.booking.Currency;
 import org.mandarin.booking.domain.EnumRequest;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.Type;
@@ -34,7 +42,31 @@ public record ShowRegisterRequest(
         LocalDate performanceStartDate,
 
         @NotNull(message = "performance end date is required")
-        LocalDate performanceEndDate
-) {
-}
+        LocalDate performanceEndDate,
 
+        @NotBlank(message = "currency is required")
+        @EnumRequest(value = Currency.class, message = "invalid currency")
+        String currency,
+
+        @NotNull(message = "ticketGrades are required")
+        @NotEmpty(message = "ticketGrades must not be empty")
+        List<@Valid GradeRequest> ticketGrades
+) {
+    @AssertTrue(message = "ticketGrade names must be unique")
+    public boolean hasUniqueTicketGradeNames() {
+        Set<String> names = ticketGrades.stream().map(GradeRequest::name).collect(Collectors.toSet());
+        return names.size() == ticketGrades.size();
+    }
+
+    public record GradeRequest(
+            @NotBlank(message = "ticketGrade name is required")
+            String name,
+
+            @Positive(message = "basePrice must be positive")
+            Integer basePrice,
+
+            @Positive(message = "quantity must be positive")
+            Integer quantity
+    ) {
+    }
+}

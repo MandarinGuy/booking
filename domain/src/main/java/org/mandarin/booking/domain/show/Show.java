@@ -16,8 +16,10 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.mandarin.booking.Currency;
 import org.mandarin.booking.domain.AbstractEntity;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
+import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 
 @Entity
 @Table(name = "shows")
@@ -45,9 +47,16 @@ public class Show extends AbstractEntity {
 
     private LocalDate performanceEndDate;
 
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
+    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
+    private List<Grade> grades = new ArrayList<>();
+
     private Show(Long hallId, String title, Type type, Rating rating, String synopsis, String posterUrl,
                  LocalDate performanceStartDate,
-                 LocalDate performanceEndDate) {
+                 LocalDate performanceEndDate,
+                 Currency currency) {
         this.hallId = hallId;
         this.title = title;
         this.type = type;
@@ -56,6 +65,7 @@ public class Show extends AbstractEntity {
         this.posterUrl = posterUrl;
         this.performanceStartDate = performanceStartDate;
         this.performanceEndDate = performanceEndDate;
+        this.currency = currency;
     }
 
     public void registerSchedule(ShowScheduleCreateCommand command) {
@@ -88,7 +98,7 @@ public class Show extends AbstractEntity {
             throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
         }
 
-        return new Show(
+        var show = new Show(
                 hallId,
                 command.getTitle(),
                 command.getType(),
@@ -96,8 +106,19 @@ public class Show extends AbstractEntity {
                 command.getSynopsis(),
                 command.getPosterUrl(),
                 startDate,
-                endDate
+                endDate,
+                command.getCurrency()
         );
+
+        var grades = command.getTicketGrades().stream()
+                .map(gradeReq -> Grade.of(show, gradeReq))
+                .toList();
+        show.addGrades(grades);
+        return show;
+    }
+
+    private void addGrades(List<Grade> grades) {
+        this.grades.addAll(grades);
     }
 
     private boolean isInSchedule(LocalDateTime scheduleStartAt, LocalDateTime scheduleEndAt) {
@@ -122,9 +143,12 @@ public class Show extends AbstractEntity {
         private final String posterUrl;
         private final LocalDate performanceStartDate;
         private final LocalDate performanceEndDate;
+        private final Currency currency;
+        private final List<GradeRequest> ticketGrades;
 
         private ShowCreateCommand(String title, Type type, Rating rating, String synopsis, String posterUrl,
-                                  LocalDate performanceStartDate, LocalDate performanceEndDate) {
+                                  LocalDate performanceStartDate, LocalDate performanceEndDate,
+                                  Currency currency, List<GradeRequest> ticketGrades) {
             this.title = title;
             this.type = type;
             this.rating = rating;
@@ -132,9 +156,12 @@ public class Show extends AbstractEntity {
             this.posterUrl = posterUrl;
             this.performanceStartDate = performanceStartDate;
             this.performanceEndDate = performanceEndDate;
+            this.currency = currency;
+            this.ticketGrades = ticketGrades;
         }
 
-        public static ShowCreateCommand from(ShowRegisterRequest request) {
+        public static ShowCreateCommand from(
+                ShowRegisterRequest request) {//TODO 2025 10 03 00:26:26 : test 코드를 위해 public...?
             return new ShowCreateCommand(
                     request.title(),
                     Type.valueOf(request.type()),
@@ -142,7 +169,9 @@ public class Show extends AbstractEntity {
                     request.synopsis(),
                     request.posterUrl(),
                     request.performanceStartDate(),
-                    request.performanceEndDate()
+                    request.performanceEndDate(),
+                    Currency.valueOf(request.currency()),
+                    request.ticketGrades()
             );
         }
     }

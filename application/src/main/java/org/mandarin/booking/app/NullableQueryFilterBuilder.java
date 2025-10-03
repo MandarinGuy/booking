@@ -41,7 +41,7 @@ public class NullableQueryFilterBuilder {
     }
 
     /**
-     * from, to 둘 다 존재할 때만 between 조건을 추가
+     * of, to 둘 다 존재할 때만 between 조건을 추가
      *
      * @param from      요청 구간 시작 (예: LocalDate, LocalDateTime)
      * @param to        요청 구간 종료
@@ -69,7 +69,7 @@ public class NullableQueryFilterBuilder {
 
 //    /**
 //     * 두 값이 모두 존재할 때만 mapper 적용
-//     * 예: whenBoth(from, to, (f, t) -> show.performanceDate.between(f, t))
+//     * 예: whenBoth(of, to, (f, t) -> show.performanceDate.between(f, t))
 //     */
 //    public <L, R> NullableQueryFilterBuilder whenBoth(@Nullable L left, @Nullable R right, BiFunction<L, R, Predicate> mapper) {
 //        if (left != null && right != null) {
