@@ -29,10 +29,12 @@
 
 2025.09.23
 
-- [ ] hall register
-    - [ ] register with registant name
-    - [ ] register with seats
+- [x] hall register
+    - [x] register with registant name
+    - [x] register with seats
+
+2025.10.02
+
+- [x] show register에 grade 추가 고민
 
 ---
-
-- [ ] show register에 grade 추가 고민
