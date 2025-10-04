@@ -79,7 +79,8 @@ class ShowService implements ShowRegisterer, ShowFetcher {
                 show.getPerformanceEndDate(),
                 hall.getId(),
                 hall.getHallName(),
-                show.getScheduleResponses()
+                show.getScheduleResponses(),
+                show.getGradeResponses()
         );
     }
 

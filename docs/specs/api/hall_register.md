@@ -13,17 +13,17 @@
 
     ```json
     {
-      "name": "Seoul Art Hall",
+      "hallName": "Seoul Art Hall",
       "sections": [
         {
-          "name": "A",
+          "sectionName": "A",
           "seats": [
             { "rowNumber": 1, "seatNumber": 1 },
             { "rowNumber": 1, "seatNumber": 2 }
           ]
         },
         {
-          "name": "B",
+          "sectionName": "B",
           "seats": [
             { "rowNumber": 1, "seatNumber": 1 }
           ]
@@ -39,10 +39,10 @@
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzNCIsInJvbGVzIjoiUk9MRV9BRE1JTiIsInVzZXJJZCI6InRlc3QxMjM0Iiwibmlja05hbWUiOiJ0ZXN0IiwiaWF0IjoxNzU3MzExNDc5LCJleHAiOjE3NTczMTIwNzl9.xhEkuZEF0gZlvyX_F2kiAMEMGw_C2ZtGL8PmzLxhZQW32A9hmr6M0nauYEejXOFrZAb3nMdU3jFLxuhDWDbE2g' \
     -d '{
-      "name": "Seoul Art Hall",
+      "hallName": "Seoul Art Hall",
       "sections": [
-        { "name": "A", "seats": [ { "rowNumber": 1, "seatNumber": 1 }, { "rowNumber": 1, "seatNumber": 2 } ] },
-        { "name": "B", "seats": [ { "rowNumber": 1, "seatNumber": 1 } ] }
+        { "sectionName": "A", "seats": [ { "rowNumber": 1, "seatNumber": 1 }, { "rowNumber": 1, "seatNumber": 2 } ] },
+        { "sectionName": "B", "seats": [ { "rowNumber": 1, "seatNumber": 1 } ] }
       ]
     }'
     ```

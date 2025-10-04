@@ -26,6 +26,7 @@ import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,6 +186,25 @@ public class TestFixture {
                 });
     }
 
+    public Show generateShow(List<GradeRequest> grades) {
+        var hall = insertDummyHall(generateUserId());
+        var hallId = hall.getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                UUID.randomUUID().toString().substring(0, 10),
+                randomEnum(Type.class).name(),
+                randomEnum(Rating.class).name(),
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW",
+                grades
+        );
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showInsert(show);
+    }
+
     public Show generateShowWithNoSynopsis(int scheduleCount) {
         var hall = insertDummyHall(generateUserId());
         var show = Show.create(hall.getId(), ShowCreateCommand.from(new ShowRegisterRequest(
@@ -250,7 +270,7 @@ public class TestFixture {
     public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
         return !entityManager.createQuery(
                         "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
-                .setParameter("scheduleId", res.getScheduleId())
+                .setParameter("scheduleId", res.scheduleId())
                 .setParameter("showId", show.getId())
                 .getResultList().isEmpty();
     }
@@ -279,8 +299,10 @@ public class TestFixture {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new ShowRegisterRequest.GradeRequest("VIP", 180000, 100),
-                        new ShowRegisterRequest.GradeRequest("R", 150000, 30)
+                        new ShowRegisterRequest.GradeRequest("standing", 90000, 300),
+                        new ShowRegisterRequest.GradeRequest("VIP", 100000, 100),
+                        new ShowRegisterRequest.GradeRequest("R", 150000, 30),
+                        new ShowRegisterRequest.GradeRequest("S", 180000, 10)
                 )
         );
     }

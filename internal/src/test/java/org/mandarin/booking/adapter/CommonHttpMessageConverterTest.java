@@ -1,22 +1,40 @@
 package org.mandarin.booking.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 
-@ExtendWith(MockitoExtension.class)
 class CommonHttpMessageConverterTest {
-    @InjectMocks
     CommonHttpMessageConverter converter;
+
+    @BeforeEach
+    void setUp() {
+        converter = new CommonHttpMessageConverter(new ObjectMapper());
+    }
 
     @Test
     void readInternal_throwsUnsupportedOperation() {
-        HttpInputMessage msg = mock(HttpInputMessage.class);
+        HttpInputMessage msg = new HttpInputMessage() {
+
+            @Override
+            @NullUnmarked
+            public HttpHeaders getHeaders() {
+                return null;
+            }
+
+            @Override
+            @NullUnmarked
+            public InputStream getBody() {
+                return null;
+            }
+        };
+
         assertThrows(
                 UnsupportedOperationException.class,
                 () -> converter.readInternal(ApiResponse.class, msg)

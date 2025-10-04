@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.Currency;
@@ -68,28 +69,6 @@ public class Show extends AbstractEntity {
         this.currency = currency;
     }
 
-    public void registerSchedule(ShowScheduleCreateCommand command) {
-        if (!isInSchedule(command.startAt(), command.endAt())) {
-            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
-        }
-
-        var schedule = ShowSchedule.create(this, command);
-        this.schedules.add(schedule);
-    }
-
-    public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
-        return this.schedules.stream()
-                .sorted(Comparator.comparing(ShowSchedule::getEndAt))
-                .map(
-                        schedule -> new ShowScheduleResponse(
-                                schedule.getId(),
-                                schedule.getStartAt(),
-                                schedule.getEndAt()
-                        )
-                )
-                .toList();
-    }
-
     public static Show create(Long hallId, ShowCreateCommand command) {
         var startDate = command.getPerformanceStartDate();
         var endDate = command.getPerformanceEndDate();
@@ -117,6 +96,37 @@ public class Show extends AbstractEntity {
         return show;
     }
 
+    public void registerSchedule(ShowScheduleCreateCommand command) {
+        if (!isInSchedule(command.startAt(), command.endAt())) {
+            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
+        }
+
+        var schedule = ShowSchedule.create(this, command);
+        this.schedules.add(schedule);
+    }
+
+    public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
+        return this.schedules.stream()
+                .sorted(Comparator.comparing(ShowSchedule::getEndAt))
+                .map(
+                        schedule -> new ShowScheduleResponse(
+                                schedule.getId(),
+                                schedule.getStartAt(),
+                                schedule.getEndAt(),
+                                schedule.getRuntimeMinutes()
+                        )
+                )
+                .toList();
+    }
+
+    public List<GradeResponse> getGradeResponses() {
+        return this.grades.stream()
+                .map(Grade::toResponse)
+                .sorted(Comparator.comparing(GradeResponse::basePrice)
+                        .thenComparing(GradeResponse::quantity, Comparator.reverseOrder()))
+                .toList();
+    }
+
     private void addGrades(List<Grade> grades) {
         this.grades.addAll(grades);
     }
@@ -135,6 +145,7 @@ public class Show extends AbstractEntity {
     }
 
     @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ShowCreateCommand {
         private final String title;
         private final Type type;
@@ -145,20 +156,6 @@ public class Show extends AbstractEntity {
         private final LocalDate performanceEndDate;
         private final Currency currency;
         private final List<GradeRequest> ticketGrades;
-
-        private ShowCreateCommand(String title, Type type, Rating rating, String synopsis, String posterUrl,
-                                  LocalDate performanceStartDate, LocalDate performanceEndDate,
-                                  Currency currency, List<GradeRequest> ticketGrades) {
-            this.title = title;
-            this.type = type;
-            this.rating = rating;
-            this.synopsis = synopsis;
-            this.posterUrl = posterUrl;
-            this.performanceStartDate = performanceStartDate;
-            this.performanceEndDate = performanceEndDate;
-            this.currency = currency;
-            this.ticketGrades = ticketGrades;
-        }
 
         public static ShowCreateCommand from(
                 ShowRegisterRequest request) {//TODO 2025 10 03 00:26:26 : test 코드를 위해 public...?
