@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.Currency;
@@ -68,6 +69,33 @@ public class Show extends AbstractEntity {
         this.currency = currency;
     }
 
+    public static Show create(Long hallId, ShowCreateCommand command) {
+        var startDate = command.getPerformanceStartDate();
+        var endDate = command.getPerformanceEndDate();
+
+        if (startDate.isAfter(endDate)) {
+            throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
+        }
+
+        var show = new Show(
+                hallId,
+                command.getTitle(),
+                command.getType(),
+                command.getRating(),
+                command.getSynopsis(),
+                command.getPosterUrl(),
+                startDate,
+                endDate,
+                command.getCurrency()
+        );
+
+        var grades = command.getTicketGrades().stream()
+                .map(gradeReq -> Grade.of(show, gradeReq))
+                .toList();
+        show.addGrades(grades);
+        return show;
+    }
+
     public void registerSchedule(ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
@@ -99,33 +127,6 @@ public class Show extends AbstractEntity {
                 .toList();
     }
 
-    public static Show create(Long hallId, ShowCreateCommand command) {
-        var startDate = command.getPerformanceStartDate();
-        var endDate = command.getPerformanceEndDate();
-
-        if (startDate.isAfter(endDate)) {
-            throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
-        }
-
-        var show = new Show(
-                hallId,
-                command.getTitle(),
-                command.getType(),
-                command.getRating(),
-                command.getSynopsis(),
-                command.getPosterUrl(),
-                startDate,
-                endDate,
-                command.getCurrency()
-        );
-
-        var grades = command.getTicketGrades().stream()
-                .map(gradeReq -> Grade.of(show, gradeReq))
-                .toList();
-        show.addGrades(grades);
-        return show;
-    }
-
     private void addGrades(List<Grade> grades) {
         this.grades.addAll(grades);
     }
@@ -144,6 +145,7 @@ public class Show extends AbstractEntity {
     }
 
     @Getter
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ShowCreateCommand {
         private final String title;
         private final Type type;
@@ -154,20 +156,6 @@ public class Show extends AbstractEntity {
         private final LocalDate performanceEndDate;
         private final Currency currency;
         private final List<GradeRequest> ticketGrades;
-
-        private ShowCreateCommand(String title, Type type, Rating rating, String synopsis, String posterUrl,
-                                  LocalDate performanceStartDate, LocalDate performanceEndDate,
-                                  Currency currency, List<GradeRequest> ticketGrades) {
-            this.title = title;
-            this.type = type;
-            this.rating = rating;
-            this.synopsis = synopsis;
-            this.posterUrl = posterUrl;
-            this.performanceStartDate = performanceStartDate;
-            this.performanceEndDate = performanceEndDate;
-            this.currency = currency;
-            this.ticketGrades = ticketGrades;
-        }
 
         public static ShowCreateCommand from(
                 ShowRegisterRequest request) {//TODO 2025 10 03 00:26:26 : test 코드를 위해 public...?
