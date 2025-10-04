@@ -84,9 +84,16 @@ public class Show extends AbstractEntity {
                         schedule -> new ShowScheduleResponse(
                                 schedule.getId(),
                                 schedule.getStartAt(),
-                                schedule.getEndAt()
+                                schedule.getEndAt(),
+                                schedule.getRuntimeMinutes()
                         )
                 )
+                .toList();
+    }
+
+    public List<GradeResponse> getGradeResponses() {
+        return this.grades.stream()
+                .map(Grade::toResponse)
                 .toList();
     }
 

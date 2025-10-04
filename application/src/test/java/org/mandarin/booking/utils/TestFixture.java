@@ -250,7 +250,7 @@ public class TestFixture {
     public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
         return !entityManager.createQuery(
                         "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
-                .setParameter("scheduleId", res.getScheduleId())
+                .setParameter("scheduleId", res.scheduleId())
                 .setParameter("showId", show.getId())
                 .getResultList().isEmpty();
     }
@@ -279,8 +279,10 @@ public class TestFixture {
                 LocalDate.now().plusDays(30),
                 "KRW",
                 List.of(
-                        new ShowRegisterRequest.GradeRequest("VIP", 180000, 100),
-                        new ShowRegisterRequest.GradeRequest("R", 150000, 30)
+                        new ShowRegisterRequest.GradeRequest("standing", 90000, 300),
+                        new ShowRegisterRequest.GradeRequest("VIP", 100000, 100),
+                        new ShowRegisterRequest.GradeRequest("R", 150000, 30),
+                        new ShowRegisterRequest.GradeRequest("S", 180000, 10)
                 )
         );
     }

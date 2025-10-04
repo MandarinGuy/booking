@@ -52,6 +52,26 @@ GET /api/show/1
         "endAt": "2025-10-11T16:30:00",
         "runtimeMinutes": 150
       }
+    ],
+    "grades": [
+      {
+        "gradeId": 1,
+        "name": "VIP",
+        "basePrice": 100000,
+        "quantity": 100
+      },
+      {
+        "gradeId": 2,
+        "name": "R",
+        "basePrice": 80000,
+        "quantity": 200
+      },
+      {
+        "gradeId": 3,
+        "name": "S",
+        "basePrice": 60000,
+        "quantity": 300
+      }
     ]
   },
   "timestamp": "2025-09-25T00:00:00Z"
@@ -82,3 +102,5 @@ GET /api/show/1
 - [x] schedules는 endAt ASC 순으로 정렬되어 반환된다
 - [x] 영속화된 정보가 조회된다
 - [x] synopsis가 없는 경우 빈 문자열로 반환된다
+- [x] grade에 비어있는 요소는 없다
+- [ ] grades는 basePrice ASC 또는 quantity DESC 순으로 정렬된다

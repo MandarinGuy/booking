@@ -111,7 +111,7 @@ class GET_specs {
         // Assert
         var schedules = response.getData().schedules();
         assertThat(schedules)
-                .allMatch(schedule -> schedule.getEndAt()
+                .allMatch(schedule -> schedule.endAt()
                         .isBefore(response.getData().performanceEndDate().atStartOfDay()));
 
     }
@@ -132,8 +132,8 @@ class GET_specs {
         var schedules = response.getData().schedules();
 
         assertThat(schedules)
-                .allMatch(schedule -> schedule.getRuntimeMinutes() == Duration.between(schedule.getStartAt(),
-                        schedule.getEndAt()).toMinutes());
+                .allMatch(schedule -> schedule.runtimeMinutes() == Duration.between(schedule.startAt(),
+                        schedule.endAt()).toMinutes());
     }
 
     @Test
@@ -151,7 +151,7 @@ class GET_specs {
         // Assert
         var schedules = response.getData().schedules();
         assertThat(schedules).isNotEmpty();
-        assertThat(schedules).isSortedAccordingTo(Comparator.comparing(ShowScheduleResponse::getEndAt));
+        assertThat(schedules).isSortedAccordingTo(Comparator.comparing(ShowScheduleResponse::endAt));
     }
 
     @Test
@@ -202,5 +202,29 @@ class GET_specs {
 
         assertThat(data.synopsis()).isNotNull();
         assertThat(data.synopsis()).isEmpty();
+    }
+
+    @Test
+    void grade에_비어있는_요소는_없다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        var show = testFixture.generateShow(5);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var data = response.getData();
+        var grades = data.grades();
+
+        assertThatStream(grades.stream())
+                .allSatisfy(gradeResponse -> {
+                    assertThat(gradeResponse.gradeId()).isNotNull();
+                    assertThat(gradeResponse.name()).isNotNull();
+                    assertThat(gradeResponse.basePrice()).isNotNull();
+                    assertThat(gradeResponse.quantity()).isNotNull();
+                });
     }
 }
