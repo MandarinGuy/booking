@@ -108,6 +108,26 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(FORBIDDEN);
     }
 
+    @Test
+    void runtimeMinutes가_0_이하일_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var now = LocalDateTime.now();
+        var request = generateShowScheduleRegisterRequest(show, now, now.minusMinutes(1));
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).contains("The end time must be after the start time");
+    }
+
 
     @Test
     void startAt이_endAt보다_늦은_경우_BAD_REQUEST를_반환한다(
