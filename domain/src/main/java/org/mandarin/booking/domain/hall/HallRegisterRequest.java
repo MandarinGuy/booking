@@ -11,13 +11,13 @@ public record HallRegisterRequest(
         String hallName,
         @Size(min = 1, message = "At least one section is required")
         @Valid
-        List<SectionRegisterRequest> sectionRegisterRequests) {
+        List<SectionRegisterRequest> sections) {
     @AssertFalse(message = "Duplicate section names are not allowed")
     public boolean hasDuplicateSectionNames() {
-        return sectionRegisterRequests.stream()
+        return sections.stream()
                        .map(SectionRegisterRequest::sectionName)
                        .distinct()
-                       .count() != sectionRegisterRequests.size();
+                       .count() != sections.size();
     }
 }
 
