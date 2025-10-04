@@ -114,7 +114,6 @@
   - Hibernate Dialect: `H2Dialect` + 테스트 중 MySQL 호환 모드
   - JPA: `ddl-auto: create`, `format_sql/show_sql: true`
 - JWT 설정: `application-test.yml`의 `jwt.token.secret/access/refresh`
-- 정적 분석: 필요시 `./gradlew spotbugsMain spotbugsTest` 병행 실행 가능.
 
 ---
 

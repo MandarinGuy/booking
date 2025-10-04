@@ -194,7 +194,7 @@ erDiagram
 
     Hall {
         BIGINT id PK
-        string name
+        string hallName
     }
     
     Section {
@@ -206,10 +206,8 @@ erDiagram
     Seat {
         BIGINT id PK
         BIGINT sectionId FK
-        string rowLabel
-        int number
-        enum viewGrade "NORMAL|PARTIAL_VIEW|OBSTRUCTED"
-        enum accessibility "GENERAL|WHEELCHAIR|COMPANION"
+        string rowNumber
+        string seatNumber
     }
 
     Member {

@@ -35,10 +35,8 @@ GET /api/show/1
     "posterUrl": "https://cdn.example.com/posters/la_la_land.jpg",
     "performanceStartDate": "2025-10-05",
     "performanceEndDate": "2025-11-05",
-    "hall": {
-      "hallId": 3,
-      "hallName": "샤롯데씨어터"
-    },
+    "hallId": 3,
+    "hallName": "샤롯데씨어터",
     "schedules": [
       {
         "scheduleId": 10,
