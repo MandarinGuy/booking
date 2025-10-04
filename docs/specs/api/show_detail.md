@@ -103,4 +103,4 @@ GET /api/show/1
 - [x] 영속화된 정보가 조회된다
 - [x] synopsis가 없는 경우 빈 문자열로 반환된다
 - [x] grade에 비어있는 요소는 없다
-- [ ] grades는 basePrice ASC 또는 quantity DESC 순으로 정렬된다
+- [x] grades는 basePrice ASC 또는 quantity DESC 순으로 정렬된다
