@@ -8,12 +8,15 @@ import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.time.Duration;
 import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mandarin.booking.domain.show.GradeResponse;
 import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
+import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -226,5 +229,32 @@ class GET_specs {
                     assertThat(gradeResponse.basePrice()).isNotNull();
                     assertThat(gradeResponse.quantity()).isNotNull();
                 });
+    }
+
+    @Test
+    void grades는_basePrice_ASC_또는_quantity_DESC_순으로_정렬된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var gradeRequests = List.of(
+                new GradeRequest("VIP", 100, 100),
+                new GradeRequest("R", 500, 200),
+                new GradeRequest("S", 500, 150),
+                new GradeRequest("SS", 300, 300),
+                new GradeRequest("SSS", 300, 250)
+        );
+
+        var show = testFixture.generateShow(gradeRequests);
+
+        // Act
+        var response = testUtils.get("/api/show/" + show.getId())
+                .assertSuccess(ShowDetailResponse.class);
+
+        // Assert
+        var gradeResponses = response.getData().grades();
+        assertThat(gradeResponses).isNotEmpty();
+        assertThat(gradeResponses).isSortedAccordingTo(Comparator.comparing(GradeResponse::basePrice)
+                .thenComparing(GradeResponse::quantity, Comparator.reverseOrder()));
     }
 }

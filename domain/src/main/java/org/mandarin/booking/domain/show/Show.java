@@ -94,6 +94,8 @@ public class Show extends AbstractEntity {
     public List<GradeResponse> getGradeResponses() {
         return this.grades.stream()
                 .map(Grade::toResponse)
+                .sorted(Comparator.comparing(GradeResponse::basePrice)
+                        .thenComparing(GradeResponse::quantity, Comparator.reverseOrder()))
                 .toList();
     }
 

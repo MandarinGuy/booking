@@ -26,6 +26,7 @@ import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
 import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
+import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -183,6 +184,25 @@ public class TestFixture {
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showInsert(show);
                 });
+    }
+
+    public Show generateShow(List<GradeRequest> grades) {
+        var hall = insertDummyHall(generateUserId());
+        var hallId = hall.getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                UUID.randomUUID().toString().substring(0, 10),
+                randomEnum(Type.class).name(),
+                randomEnum(Rating.class).name(),
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW",
+                grades
+        );
+        var show = Show.create(hallId, ShowCreateCommand.from(request));
+        return showInsert(show);
     }
 
     public Show generateShowWithNoSynopsis(int scheduleCount) {
