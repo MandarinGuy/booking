@@ -18,7 +18,14 @@
 
 ## 요청 예시
 
-GET /api/show/1
+- curl 명령 예시
+
+    ```bash
+    curl -i -X POST '<http://localhost:8080/api/show/1>' \\
+    -H 'Content-Type: application/json' \\
+    ```
+
+---
 
 ## 응답 본문
 
