@@ -74,7 +74,7 @@
 - [x] 존재하지 않는 showId를 보내면 NOT_FOUND 상태코드를 반환한다
 - [x] 공연 기간 범위를 벗어나는 startAt 또는 endAt을 보낼 경우 BAD_REQUEST를 반환한다
 - [x] 동일한 hallId와 시간이 겹치는 회차를 등록하려 하면 INTERNAL_SERVER_ERROR를 반환한다
-- [ ] showId에 해당하는 hall에 해당하는 sectionId를 찾을 수 없으면 NOT_FOUND를 반환한다
+- [x] showId에 해당하는 hall에 해당하는 sectionId를 찾을 수 없으면 NOT_FOUND를 반환한다
 - [ ] excludeSeatIds에 해당 section의 id가 아닌 좌석 id가 포함되면 NOT_FOUND를 반환한다
 - [ ] excludeSeatIds에 중복된 좌석이 있는 경우 BAD_REQUEST를 반환한다
 - [ ] gradeAssignments의 gradeId가 해당 show에 존재하지 않으면 NOT_FOUND를 반환한다
