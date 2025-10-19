@@ -13,10 +13,13 @@ import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.GradeAssignmentRequest;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.SeatUsageRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -161,7 +164,8 @@ public class POST_specs {
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30)
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                getSeatUsageRequest()
         );
 
         // Act
@@ -184,7 +188,8 @@ public class POST_specs {
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
-                LocalDateTime.of(2023, 9, 10, 21, 30)
+                LocalDateTime.of(2023, 9, 10, 21, 30),
+                getSeatUsageRequest()
         );
 
         // Act
@@ -251,7 +256,19 @@ public class POST_specs {
         return new ShowScheduleRegisterRequest(
                 show.getId(),
                 startAt,
-                endAt
+                endAt,
+                getSeatUsageRequest()
+        );
+    }
+
+    private static SeatUsageRequest getSeatUsageRequest() {
+        return new SeatUsageRequest(
+                2L,
+                List.of(),
+                List.of(
+                        new GradeAssignmentRequest(1L, List.of(1L, 2L, 3L)),
+                        new GradeAssignmentRequest(2L, List.of(4L, 5L, 6L))
+                )
         );
     }
 }
