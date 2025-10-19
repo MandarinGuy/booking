@@ -33,4 +33,8 @@ public class Hall extends AbstractEntity {
     public static Hall create(String name, String registantId) {
         return new Hall(name, registantId);
     }
+
+    public boolean hasSectionOf(Long sectionId) {
+        return sections.stream().anyMatch(section -> section.getId().equals(sectionId));
+    }
 }

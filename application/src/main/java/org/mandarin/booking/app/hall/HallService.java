@@ -33,6 +33,13 @@ class HallService implements HallValidator, HallFetcher, HallRegisterer {
     }
 
     @Override
+    public void checkHallExistBySectionId(Long hallId, Long sectionId) {
+        if (!queryRepository.existsByHallIdAndSectionId(hallId, sectionId)) {
+            throw new HallException("NOT_FOUND", "해당 공연장에 섹션이 존재하지 않습니다.");
+        }
+    }
+
+    @Override
     public HallRegisterResponse register(String userId, HallRegisterRequest request) {
         checkHallExistByHallName(request.hallName());
 

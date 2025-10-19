@@ -4,4 +4,6 @@ public interface HallValidator {
     void checkHallExistByHallId(Long hallId);
 
     void checkHallExistByHallName(String hallName);
+
+    void checkHallExistBySectionId(Long hallId, Long sectionId);
 }

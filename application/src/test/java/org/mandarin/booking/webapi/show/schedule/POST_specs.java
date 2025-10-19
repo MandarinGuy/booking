@@ -244,6 +244,29 @@ public class POST_specs {
         assertThat(response.getData()).contains("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
     }
 
+    @Test
+    void showId에_해당하는_hall에_해당하는_sectionId를_찾을_수_없으면_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                getSeatUsageRequest(9999L) // 존재하지 않는 sectionId
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+    }
+
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
         return generateShowScheduleRegisterRequest(show, LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
@@ -258,6 +281,17 @@ public class POST_specs {
                 startAt,
                 endAt,
                 getSeatUsageRequest()
+        );
+    }
+
+    private static SeatUsageRequest getSeatUsageRequest(long sectionId) {
+        return new SeatUsageRequest(
+                sectionId,
+                List.of(),
+                List.of(
+                        new GradeAssignmentRequest(1L, List.of(1L, 2L, 3L)),
+                        new GradeAssignmentRequest(2L, List.of(4L, 5L, 6L))
+                )
         );
     }
 

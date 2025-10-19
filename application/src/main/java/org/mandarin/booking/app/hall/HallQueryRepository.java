@@ -24,4 +24,8 @@ class HallQueryRepository {
         return repository.findById(hallId)
                 .orElseThrow(() -> new HallException("NOT_FOUND", "해당 공연장을 찾을 수 없습니다."));
     }
+
+    boolean existsByHallIdAndSectionId(Long hallId, Long sectionId) {
+        return findById(hallId).hasSectionOf(sectionId);
+    }
 }
