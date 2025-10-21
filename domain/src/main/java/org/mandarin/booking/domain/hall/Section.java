@@ -30,4 +30,18 @@ class Section extends AbstractEntity {
     private List<Seat> seats = new ArrayList<>();
 
     private String name;
+
+    Section(Hall hall, String name) {
+        this.hall = hall;
+        this.name = name;
+    }
+
+    static Section create(SectionRegisterRequest request, Hall hall) {
+        var section = new Section(hall, request.sectionName());
+        var createdSeats = request.seats().stream()
+                .map(r -> Seat.create(section, r.rowNumber(), r.seatNumber()))
+                .toList();
+        section.seats.addAll(createdSeats);
+        return section;
+    }
 }

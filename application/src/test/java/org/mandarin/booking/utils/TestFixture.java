@@ -3,20 +3,22 @@ package org.mandarin.booking.utils;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.utils.EnumFixture.randomEnum;
 import static org.mandarin.booking.utils.HallFixture.generateHallName;
+import static org.mandarin.booking.utils.HallFixture.generateSectionRegisterRequest;
 import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEmail;
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleCreateCommand;
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.domain.hall.Hall;
+import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
@@ -27,7 +29,6 @@ import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
-import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,7 +108,8 @@ public class TestFixture {
     }
 
     public Hall insertDummyHall(String userId) {
-        var hall = Hall.create(generateHallName(), userId);
+        List<SectionRegisterRequest> sections = generateSectionRegisterRequest(10);
+        var hall = Hall.create(generateHallName(), sections, userId);
         entityManager.persist(hall);
         return hall;
     }
@@ -117,12 +119,7 @@ public class TestFixture {
         var show = generateShow(hall.getId());
 
         for (int i = 0; i < scheduleCount; i++) {
-            Random random = new Random();
-            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
-            var command = new ShowScheduleCreateCommand(show.getId(),
-                    startAt,
-                    startAt.plusHours(random.nextInt(2, 5))
-            );
+            var command = generateShowScheduleCreateCommand(show);
             show.registerSchedule(command);
         }
 
@@ -221,12 +218,7 @@ public class TestFixture {
         )));
 
         for (int i = 0; i < scheduleCount; i++) {
-            Random random = new Random();
-            var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
-            var command = new ShowScheduleCreateCommand(show.getId(),
-                    startAt,
-                    startAt.plusHours(random.nextInt(2, 5))
-            );
+            var command = generateShowScheduleCreateCommand(show);
             show.registerSchedule(command);
         }
 
@@ -273,6 +265,13 @@ public class TestFixture {
                 .setParameter("scheduleId", res.scheduleId())
                 .setParameter("showId", show.getId())
                 .getResultList().isEmpty();
+    }
+
+    public List<Long> findSectionIdsByHallId(Long hallId) {
+        return entityManager.createQuery(
+                        "select s.id from Section s where s.hall.id = :hallId", Long.class)
+                .setParameter("hallId", hallId)
+                .getResultList();
     }
 
     private Show generateShow(Long hallId) {

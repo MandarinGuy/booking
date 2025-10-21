@@ -6,6 +6,8 @@ import static jakarta.persistence.FetchType.LAZY;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -30,8 +32,11 @@ public class Hall extends AbstractEntity {
         this.registantId = registantId;
     }
 
-    public static Hall create(String name, String registantId) {
-        return new Hall(name, registantId);
+    public static Hall create(String name, @Size @Valid List<SectionRegisterRequest> sections, String registantId) {
+        var hall = new Hall(name, registantId);
+        sections.forEach(req
+                -> hall.sections.add(Section.create(req, hall)));
+        return hall;
     }
 
     public boolean hasSectionOf(Long sectionId) {

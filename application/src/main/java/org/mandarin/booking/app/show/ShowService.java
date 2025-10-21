@@ -48,6 +48,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
         hallValidator.checkHallExistBySectionId(show.getHallId(), request.use().sectionId());
+        hallValidator.checkHallInvalidSeatIds(request.use().excludeSeatIds(), request.use().sectionId());
 
         checkConflictSchedule(show.getHallId(), request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());

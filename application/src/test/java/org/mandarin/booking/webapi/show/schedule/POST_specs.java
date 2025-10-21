@@ -37,8 +37,11 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = generateShowScheduleRegisterRequest(
                 show,
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -58,8 +61,11 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = generateShowScheduleRegisterRequest(
                 show,
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -79,8 +85,11 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = generateShowScheduleRegisterRequest(
                 show,
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
 
@@ -100,7 +109,9 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show);
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var request = generateShowScheduleRegisterRequest(show, sectionId);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -118,8 +129,10 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var now = LocalDateTime.now();
-        var request = generateShowScheduleRegisterRequest(show, now, now.minusMinutes(1));
+        var request = generateShowScheduleRegisterRequest(show, sectionId, now, now.minusMinutes(1));
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -139,7 +152,10 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = generateShowScheduleRegisterRequest(show,
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
                 LocalDateTime.of(2025, 9, 10, 19, 0)
         );
@@ -160,12 +176,14 @@ public class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                getSeatUsageRequest()
+                getSeatUsageRequest(sectionId)
         );
 
         // Act
@@ -185,11 +203,13 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
                 LocalDateTime.of(2023, 9, 10, 21, 30),
-                getSeatUsageRequest()
+                getSeatUsageRequest(sectionId)
         );
 
         // Act
@@ -212,14 +232,18 @@ public class POST_specs {
                 LocalDate.now().minusDays(1),
                 LocalDate.now().plusDays(10)
         );
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
         var request = generateShowScheduleRegisterRequest(
                 show,
+                sectionId,
                 LocalDateTime.now(),
                 LocalDateTime.now().plusHours(2)
         );
 
         var nextRequest = generateShowScheduleRegisterRequest(
                 show,
+                sectionId,
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(3)
         );
@@ -267,37 +291,57 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
-        return generateShowScheduleRegisterRequest(show, LocalDateTime.of(2025, 9, 10, 19, 0),
+    @Test
+    void excludeSeatIds에_해당_section의_id가_아닌_좌석_id가_포함되면_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var invalidSeatId = 9999L;
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(invalidSeatId),
+                        List.of(new GradeAssignmentRequest(1L, List.of()))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, Long sectionId) {
+        return generateShowScheduleRegisterRequest(show, sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30));
     }
 
 
     private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
+                                                                            Long sectionId,
                                                                             LocalDateTime startAt,
                                                                             LocalDateTime endAt) {
         return new ShowScheduleRegisterRequest(
                 show.getId(),
                 startAt,
                 endAt,
-                getSeatUsageRequest()
+                getSeatUsageRequest(sectionId)
         );
     }
 
     private static SeatUsageRequest getSeatUsageRequest(long sectionId) {
         return new SeatUsageRequest(
                 sectionId,
-                List.of(),
-                List.of(
-                        new GradeAssignmentRequest(1L, List.of(1L, 2L, 3L)),
-                        new GradeAssignmentRequest(2L, List.of(4L, 5L, 6L))
-                )
-        );
-    }
-
-    private static SeatUsageRequest getSeatUsageRequest() {
-        return new SeatUsageRequest(
-                2L,
                 List.of(),
                 List.of(
                         new GradeAssignmentRequest(1L, List.of(1L, 2L, 3L)),
