@@ -5,6 +5,7 @@ import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,7 +23,13 @@ class Seat extends AbstractEntity {
     @JoinColumn(name = "section_id", nullable = false)
     private Section section;
 
+    @Column(name = "seat_row")
     private String rowNumber;
 
+    @Column(name = "seat_number")
     private String seatNumber;
+
+    static Seat create(Section section, String rowNumber, String seatNumber) {
+        return new Seat(section, rowNumber, seatNumber);
+    }
 }
