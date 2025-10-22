@@ -16,6 +16,7 @@ import static org.mandarin.booking.utils.ShowFixture.getSeatUsageRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
@@ -40,11 +41,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        Map<Long, List<Long>> gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = generateShowScheduleRegisterRequest(
                 show,
                 sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -64,11 +66,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = generateShowScheduleRegisterRequest(
                 show,
                 sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -88,11 +91,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = generateShowScheduleRegisterRequest(
                 show,
                 sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -112,7 +116,8 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
-        var request = generateShowScheduleRegisterRequest(show, sectionId);
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
+        var request = generateShowScheduleRegisterRequest(show, sectionId, gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -132,8 +137,9 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var now = LocalDateTime.now();
-        var request = generateShowScheduleRegisterRequest(show, sectionId, now, now.minusMinutes(1));
+        var request = generateShowScheduleRegisterRequest(show, sectionId, now, now.minusMinutes(1), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -155,11 +161,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = generateShowScheduleRegisterRequest(show,
                 sectionId,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                LocalDateTime.of(2025, 9, 10, 19, 0)
-        );
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -180,11 +187,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = new ShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                getSeatUsageRequest(sectionId)
+                getSeatUsageRequest(sectionId, gradeSeatMap)
         );
 
         // Act
@@ -206,11 +214,12 @@ public class POST_specs {
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
                 LocalDateTime.of(2023, 9, 10, 21, 30),
-                getSeatUsageRequest(sectionId)
+                getSeatUsageRequest(sectionId, gradeSeatMap)
         );
 
         // Act
@@ -235,19 +244,20 @@ public class POST_specs {
         );
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
         var request = generateShowScheduleRegisterRequest(
                 show,
                 sectionId,
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(2)
-        );
+                LocalDateTime.now().plusHours(2),
+                gradeSeatMap);
 
         var nextRequest = generateShowScheduleRegisterRequest(
                 show,
                 sectionId,
                 LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(3)
-        );
+                LocalDateTime.now().plusHours(3),
+                gradeSeatMap);
 
         testUtils.post(
                         "/api/show/schedule",
@@ -276,11 +286,19 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
+        var sectionId = 9999L;
         var request = new ShowScheduleRegisterRequest(
                 show.getId(),
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                getSeatUsageRequest(9999L) // 존재하지 않는 sectionId
+                new SeatUsageRequest(
+                        sectionId,// 존재하지 않는 sectionId
+                        List.of(),
+                        gradeSeatMap.entrySet().stream()
+                                .map(entry -> new GradeAssignmentRequest(entry.getKey(), entry.getValue()))
+                                .toList()
+                )
         );
 
         // Act

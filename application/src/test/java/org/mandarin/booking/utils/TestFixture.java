@@ -8,11 +8,14 @@ import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEm
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
+import static org.mandarin.booking.utils.ShowFixture.generateGradeRequest;
 import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleCreateCommand;
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -176,7 +179,7 @@ public class TestFixture {
                             LocalDate.now().minusDays(random.nextInt(before)),
                             LocalDate.now().plusDays(random.nextInt(after)),
                             "KRW",
-                            List.of(new ShowRegisterRequest.GradeRequest("VIP", 100000, 100))
+                            generateGradeRequest(5)
                     );
                     var show = Show.create(hallId, ShowCreateCommand.from(request));
                     showInsert(show);
@@ -274,6 +277,50 @@ public class TestFixture {
                 .getResultList();
     }
 
+    public List<Long> findSeatIdsBySectionId(long sectionId) {
+        return entityManager.createQuery(
+                        "SELECT seat.id FROM Section section "
+                        + "join section.seats as seat WHERE section.id = :sectionId",
+                        Long.class)
+                .setParameter("sectionId", sectionId)
+                .getResultList();
+    }
+
+    public Map<Long, List<Long>> generateGradeSeatMapByShowIdAndSectionId(Long showId) {
+        // grade id 가져오기
+        var gradeIds = findGradeIdsByShowId(showId);
+        // seat id 가져오기
+        var hall = findHallById(showId);
+        var seatIds = entityManager.createQuery("SELECT seat.id FROM Seat seat WHERE seat.section.hall.id = :hallId",
+                        Long.class)
+                .setParameter("hallId", hall.getId())
+                .getResultList();
+
+        // seatIds를 gradeIds의 개수만큼 분할하여 매핑
+        return gerateGradeSeatMap(gradeIds, seatIds);
+    }
+
+    private Map<Long, List<Long>> gerateGradeSeatMap(List<Long> gradeIds, List<Long> seatIds) {
+        Map<Long, List<Long>> result = new HashMap<>();
+        var gradeCount = gradeIds.size();
+        var seatCount = seatIds.size();
+        int seatPerGrade = seatCount / gradeCount;
+        int remainingSeats = seatCount % gradeCount;
+
+        int currentIndex = 0;
+        for (int i = 0; i < gradeCount; i++) {
+            int seatsToAdd = seatPerGrade;
+            if (i < remainingSeats) {
+                seatsToAdd++;
+            }
+
+            result.put(gradeIds.get(i), seatIds.subList(currentIndex, currentIndex + seatsToAdd));
+            currentIndex += seatsToAdd;
+        }
+
+        return result;
+    }
+
     private Show generateShow(Long hallId) {
         var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), randomEnum(Rating.class).name());
         var show = Show.create(hallId, ShowCreateCommand.from(request));
@@ -322,12 +369,9 @@ public class TestFixture {
         return member;
     }
 
-    public List<Long> findSeatIdsBySectionId(long sectionId) {
-        return entityManager.createQuery(
-                        "SELECT seat.id FROM Section section "
-                        + "join section.seats as seat WHERE section.id = :sectionId",
-                        Long.class)
-                .setParameter("sectionId", sectionId)
+    private List<Long> findGradeIdsByShowId(Long showId) {
+        return entityManager.createQuery("select g.id from Grade g where g.show.id = :showId ", Long.class)
+                .setParameter("showId", showId)
                 .getResultList();
     }
 }
