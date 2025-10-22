@@ -10,13 +10,14 @@ import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
+import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleRegisterRequest;
+import static org.mandarin.booking.utils.ShowFixture.getSeatUsageRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.GradeAssignmentRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.SeatUsageRequest;
@@ -320,33 +321,31 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, Long sectionId) {
-        return generateShowScheduleRegisterRequest(show, sectionId,
-                LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
-    }
-
-
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
-                                                                            Long sectionId,
-                                                                            LocalDateTime startAt,
-                                                                            LocalDateTime endAt) {
-        return new ShowScheduleRegisterRequest(
+    @Test
+    void excludeSeatIds에_중복된_좌석이_있는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var request = new ShowScheduleRegisterRequest(
                 show.getId(),
-                startAt,
-                endAt,
-                getSeatUsageRequest(sectionId)
-        );
-    }
-
-    private static SeatUsageRequest getSeatUsageRequest(long sectionId) {
-        return new SeatUsageRequest(
-                sectionId,
-                List.of(),
-                List.of(
-                        new GradeAssignmentRequest(1L, List.of(1L, 2L, 3L)),
-                        new GradeAssignmentRequest(2L, List.of(4L, 5L, 6L))
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(1L, 1L),
+                        List.of(new GradeAssignmentRequest(1L, List.of()))
                 )
         );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
     }
 }
