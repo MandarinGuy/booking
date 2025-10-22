@@ -321,4 +321,13 @@ public class TestFixture {
         entityManager.persist(member);
         return member;
     }
+
+    public List<Long> findSeatIdsBySectionId(long sectionId) {
+        return entityManager.createQuery(
+                        "SELECT seat.id FROM Section section "
+                        + "join section.seats as seat WHERE section.id = :sectionId",
+                        Long.class)
+                .setParameter("sectionId", sectionId)
+                .getResultList();
+    }
 }

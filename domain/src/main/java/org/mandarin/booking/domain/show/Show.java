@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.Currency;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.hall.HallException;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 
@@ -127,6 +129,14 @@ public class Show extends AbstractEntity {
                 .toList();
     }
 
+    public void validateGradeIds(List<Long> gradeIds) {
+        var fetchedGradeIds = this.grades.stream()
+                .map(AbstractEntity::getId).toList();
+        if (!new HashSet<>(fetchedGradeIds).containsAll(gradeIds)) {
+            throw new HallException("NOT_FOUND", "해당하는 등급이 존재하지 않습니다.");
+        }
+    }
+
     private void addGrades(List<Grade> grades) {
         this.grades.addAll(grades);
     }
@@ -136,17 +146,19 @@ public class Show extends AbstractEntity {
                && scheduleEndAt.isBefore(performanceEndDate.atStartOfDay());
     }
 
+
     public enum Type {
         MUSICAL, PLAY, CONCERT, OPERA, DANCE, CLASSICAL, ETC
+
     }
 
     public enum Rating {
         ALL, AGE12, AGE15, AGE18
     }
-
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ShowCreateCommand {
+
         private final String title;
         private final Type type;
         private final Rating rating;

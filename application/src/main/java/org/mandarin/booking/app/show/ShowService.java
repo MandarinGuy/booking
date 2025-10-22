@@ -19,6 +19,7 @@ import org.mandarin.booking.domain.show.ShowRegisterResponse;
 import org.mandarin.booking.domain.show.ShowResponse;
 import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.GradeAssignmentRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         var show = queryRepository.findById(request.showId());
         hallValidator.checkHallExistBySectionId(show.getHallId(), request.use().sectionId());
         hallValidator.checkHallInvalidSeatIds(request.use().excludeSeatIds(), request.use().sectionId());
+        show.validateGradeIds(request.use().gradeAssignments().stream().map(GradeAssignmentRequest::gradeId).toList());
 
         checkConflictSchedule(show.getHallId(), request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());
