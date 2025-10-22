@@ -50,6 +50,10 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         var show = queryRepository.findById(request.showId());
         hallValidator.checkHallExistBySectionId(show.getHallId(), request.use().sectionId());
         hallValidator.checkHallInvalidSeatIds(request.use().excludeSeatIds(), request.use().sectionId());
+        hallValidator.checkHallInvalidSeatIds(request.use().gradeAssignments().stream()
+                        .flatMap(gradeAssignmentRequest -> gradeAssignmentRequest.seatIds().stream())
+                        .toList(),
+                request.use().sectionId());
         show.validateGradeIds(request.use().gradeAssignments().stream().map(GradeAssignmentRequest::gradeId).toList());
 
         checkConflictSchedule(show.getHallId(), request);

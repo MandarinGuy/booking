@@ -426,4 +426,38 @@ public class POST_specs {
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
         assertThat(response.getData()).isEqualTo("gradeAssignments gradeIds must not contain duplicates");
     }
+
+    @Test
+    void gradeAssignments의_seatIds에_해당_hall의_seat_id가_존재하지_않는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var seatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId());
+        var invalidSeatId = 9999L;
+        seatMap.entrySet().stream().findFirst().ifPresent(entry -> entry.getValue().add(invalidSeatId));
+
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(),
+                        seatMap.entrySet().stream()
+                                .map(entry -> new GradeAssignmentRequest(entry.getKey(), entry.getValue()))
+                                .toList()
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
 }
