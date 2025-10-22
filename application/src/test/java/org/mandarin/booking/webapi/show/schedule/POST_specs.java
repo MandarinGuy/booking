@@ -396,4 +396,34 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
+
+    @Test
+    void gradeAssignments의_gradeId가_중복된_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        List<Long> seatIds = testFixture.findSeatIdsBySectionId(sectionId);
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(),
+                        List.of(new GradeAssignmentRequest(1L, seatIds), new GradeAssignmentRequest(1L, seatIds))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo("gradeAssignments gradeIds must not contain duplicates");
+    }
 }

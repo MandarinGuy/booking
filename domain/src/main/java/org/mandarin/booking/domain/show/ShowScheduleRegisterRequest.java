@@ -47,6 +47,14 @@ public record ShowScheduleRegisterRequest(
             return uniqueIds.size() == excludeSeatIds.size();
         }
 
+        @AssertTrue(message = "gradeAssignments gradeIds must not contain duplicates")
+        public boolean hasUniqueGradeIds() {
+            Set<Long> gradeIds = new HashSet<>();
+            return gradeAssignments.stream()
+                    .map(GradeAssignmentRequest::gradeId)
+                    .allMatch(gradeIds::add);
+        }
+
         @AssertTrue(message = "gradeAssignments seatIds must not contain duplicates across all assignments")
         public boolean hasUniqueSeatIdsInGradeAssignments() {
             Set<Long> allSeatIds = new HashSet<>();
