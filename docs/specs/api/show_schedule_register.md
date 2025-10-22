@@ -77,7 +77,7 @@
 - [x] showId에 해당하는 hall에 해당하는 sectionId를 찾을 수 없으면 NOT_FOUND를 반환한다
 - [x] excludeSeatIds에 해당 section의 id가 아닌 좌석 id가 포함되면 NOT_FOUND를 반환한다
 - [x] excludeSeatIds에 중복된 좌석이 있는 경우 BAD_REQUEST를 반환한다
-- [ ] gradeAssignments의 gradeId가 해당 show에 존재하지 않으면 NOT_FOUND를 반환한다
+- [x] gradeAssignments의 gradeId가 해당 show에 존재하지 않으면 NOT_FOUND를 반환한다
 - [ ] gradeAssignments의 gradeId가 중복된 경우 BAD_REQUEST를 반환한다
 - [ ] gradeAssignments의 seatIds에 해당 hall의 seat id가 존재하지 않는 경우 NOT_FOUND를 반환한다
 - [ ] gradeAssignments의 seatIds에 중복된 좌석이 존재하는 경우 BAD_REQUEST를 반환한다
