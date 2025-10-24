@@ -62,6 +62,12 @@ public record ShowScheduleRegisterRequest(
                     .flatMap(assignment -> assignment.seatIds().stream())
                     .allMatch(allSeatIds::add);
         }
+
+        public List<Long> includeSeatIds() {
+            return gradeAssignments.stream()
+                    .flatMap(assignment -> assignment.seatIds().stream())
+                    .toList();
+        }
     }
 
     public record GradeAssignmentRequest(

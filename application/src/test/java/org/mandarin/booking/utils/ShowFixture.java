@@ -24,20 +24,23 @@ public class ShowFixture {
         );
     }
 
-    public static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show, Long sectionId,
+    public static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Long showId,
+                                                                                  Long sectionId,
                                                                                   Map<Long, List<Long>> gradeSeatMap) {
-        return generateShowScheduleRegisterRequest(show, sectionId,
+        return generateShowScheduleRegisterRequest(
+                showId,
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
                 LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
     }
 
-    public static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
+    public static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Long showId,
                                                                                   Long sectionId,
                                                                                   LocalDateTime startAt,
                                                                                   LocalDateTime endAt,
                                                                                   Map<Long, List<Long>> gradeSeatMap) {
         return new ShowScheduleRegisterRequest(
-                show.getId(),
+                showId,
                 startAt,
                 endAt,
                 getSeatUsageRequest(sectionId, gradeSeatMap)

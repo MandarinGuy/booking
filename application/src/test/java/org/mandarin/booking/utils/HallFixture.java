@@ -11,17 +11,17 @@ public class HallFixture {
         return UUID.randomUUID().toString().substring(0, 10);
     }
 
-    static List<SectionRegisterRequest> generateSectionRegisterRequest(int count) {
-        return List.of(
-                new SectionRegisterRequest(
+    static List<SectionRegisterRequest> generateSectionRegisterRequest(int sectionCount, int seatCount) {
+        return IntStream.range(0, sectionCount)
+                .mapToObj(i -> new SectionRegisterRequest(
                         UUID.randomUUID().toString().substring(0, 10),
-                        IntStream.range(0, count)
-                                .mapToObj(i -> new SeatRegisterRequest(
+                        IntStream.range(0, seatCount)
+                                .mapToObj(j -> new SeatRegisterRequest(
                                         UUID.randomUUID().toString().substring(0, 8),
                                         UUID.randomUUID().toString().substring(0, 8)
                                 ))
                                 .toList()
-                )
-        );
+                ))
+                .toList();
     }
 }

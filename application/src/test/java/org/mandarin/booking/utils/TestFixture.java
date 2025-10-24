@@ -111,7 +111,7 @@ public class TestFixture {
     }
 
     public Hall insertDummyHall(String userId) {
-        List<SectionRegisterRequest> sections = generateSectionRegisterRequest(10);
+        List<SectionRegisterRequest> sections = generateSectionRegisterRequest(10, 100);
         var hall = Hall.create(generateHallName(), sections, userId);
         entityManager.persist(hall);
         return hall;
@@ -286,14 +286,13 @@ public class TestFixture {
                 .getResultList();
     }
 
-    public Map<Long, List<Long>> generateGradeSeatMapByShowIdAndSectionId(Long showId) {
+    public Map<Long, List<Long>> generateGradeSeatMapByShowIdAndSectionId(Long showId, Long sectionId) {
         // grade id 가져오기
         var gradeIds = findGradeIdsByShowId(showId);
         // seat id 가져오기
-        var hall = findHallById(showId);
-        var seatIds = entityManager.createQuery("SELECT seat.id FROM Seat seat WHERE seat.section.hall.id = :hallId",
+        var seatIds = entityManager.createQuery("SELECT seat.id FROM Seat seat WHERE seat.section.id = :sectionId",
                         Long.class)
-                .setParameter("hallId", hall.getId())
+                .setParameter("sectionId", sectionId)
                 .getResultList();
 
         // seatIds를 gradeIds의 개수만큼 분할하여 매핑

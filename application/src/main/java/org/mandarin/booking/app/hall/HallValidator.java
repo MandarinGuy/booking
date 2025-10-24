@@ -9,5 +9,5 @@ public interface HallValidator {
 
     void checkHallExistBySectionId(Long hallId, Long sectionId);
 
-    void checkHallInvalidSeatIds(List<Long> excludeSeatIds, Long sectionId);
+    void checkHallInvalidSeatIds(Long sectionId, List<Long> seatIds);
 }

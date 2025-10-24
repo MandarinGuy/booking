@@ -41,9 +41,8 @@ class HallService implements HallValidator, HallFetcher, HallRegisterer {
     }
 
     @Override
-    public void checkHallInvalidSeatIds(List<Long> seatIds, Long sectionId) {
-        var areSeatIdsValid = queryRepository.containsSeatIdsBySectionId(seatIds, sectionId);
-        if (!areSeatIdsValid) {
+    public void checkHallInvalidSeatIds(Long sectionId, List<Long> seatIds) {
+        if (!queryRepository.containsSeatIdsBySectionId(sectionId, seatIds)) {
             throw new HallException("BAD_REQUEST", "해당 섹션에 존재하지 않는 좌석이 있습니다.");
         }
     }

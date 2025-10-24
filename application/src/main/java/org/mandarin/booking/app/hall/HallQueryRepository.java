@@ -1,10 +1,10 @@
 package org.mandarin.booking.app.hall;
 
-import static com.querydsl.core.types.ExpressionUtils.count;
 import static org.mandarin.booking.domain.hall.QSeat.seat;
 import static org.mandarin.booking.domain.hall.QSection.section;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.hall.Hall;
@@ -36,17 +36,16 @@ class HallQueryRepository {
         return findById(hallId).hasSectionOf(sectionId);
     }
 
-    boolean containsSeatIdsBySectionId(List<Long> excludeSeatIds, Long sectionId) {
-        if (excludeSeatIds.isEmpty()) {
+    boolean containsSeatIdsBySectionId(Long sectionId, List<Long> seatIds) {
+        if (seatIds.isEmpty()) {
             return true;
         }
-        var count = jpaQueryFactory
-                .select(count(seat.id))
+        var fetched = jpaQueryFactory
+                .select(seat.id)
                 .from(section)
-                .join(section.seats, seat).on(seat.id.in(excludeSeatIds))
+                .join(section.seats, seat)
                 .where(section.id.eq(sectionId))
-                .fetchFirst();
-
-        return count != null && count.equals((long) excludeSeatIds.size());
+                .fetch();
+        return new HashSet<>(fetched).containsAll(seatIds);
     }
 }

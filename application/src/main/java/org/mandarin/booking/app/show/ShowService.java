@@ -48,12 +48,12 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
-        hallValidator.checkHallExistBySectionId(show.getHallId(), request.use().sectionId());
-        hallValidator.checkHallInvalidSeatIds(request.use().excludeSeatIds(), request.use().sectionId());
-        hallValidator.checkHallInvalidSeatIds(request.use().gradeAssignments().stream()
-                        .flatMap(gradeAssignmentRequest -> gradeAssignmentRequest.seatIds().stream())
-                        .toList(),
-                request.use().sectionId());
+        var sectionId = request.use().sectionId();
+        var excludeSeatIds = request.use().excludeSeatIds();
+        var includeSeatIds = request.use().includeSeatIds();
+        hallValidator.checkHallExistBySectionId(show.getHallId(), sectionId);
+        hallValidator.checkHallInvalidSeatIds(sectionId, excludeSeatIds);
+        hallValidator.checkHallInvalidSeatIds(sectionId, includeSeatIds);
         show.validateGradeIds(request.use().gradeAssignments().stream().map(GradeAssignmentRequest::gradeId).toList());
 
         checkConflictSchedule(show.getHallId(), request);
@@ -63,6 +63,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         var saved = commandRepository.insert(show);
         return new ShowScheduleRegisterResponse(requireNonNull(saved.getId()));
     }
+
 
     @Override
     public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating,
