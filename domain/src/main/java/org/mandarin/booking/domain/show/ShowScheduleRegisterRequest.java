@@ -5,6 +5,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,6 +68,13 @@ public record ShowScheduleRegisterRequest(
             return gradeAssignments.stream()
                     .flatMap(assignment -> assignment.seatIds().stream())
                     .toList();
+        }
+
+        public List<Long> allSeatIds() {
+            List<Long> ids = new ArrayList<>();
+            ids.addAll(excludeSeatIds);
+            ids.addAll(includeSeatIds());
+            return ids;
         }
     }
 

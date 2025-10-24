@@ -54,6 +54,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
         hallValidator.checkHallExistBySectionId(show.getHallId(), sectionId);
         hallValidator.checkHallInvalidSeatIds(sectionId, excludeSeatIds);
         hallValidator.checkHallInvalidSeatIds(sectionId, includeSeatIds);
+        hallValidator.checkSectionContainsAllOf(sectionId, request.use().allSeatIds());
         show.validateGradeIds(request.use().gradeAssignments().stream().map(GradeAssignmentRequest::gradeId).toList());
 
         checkConflictSchedule(show.getHallId(), request);

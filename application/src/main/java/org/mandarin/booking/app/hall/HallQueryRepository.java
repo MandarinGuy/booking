@@ -48,4 +48,17 @@ class HallQueryRepository {
                 .fetch();
         return new HashSet<>(fetched).containsAll(seatIds);
     }
+
+    boolean equalsSeatIdsBySectionId(Long sectionId, List<Long> seatIds) {
+        if (seatIds.isEmpty()) {
+            return true;
+        }
+        var fetched = jpaQueryFactory
+                .select(seat.id)
+                .from(section)
+                .join(section.seats, seat)
+                .where(section.id.eq(sectionId))
+                .fetch();
+        return new HashSet<>(seatIds).equals(new HashSet<>(fetched));
+    }
 }
