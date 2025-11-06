@@ -25,6 +25,7 @@ import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
+import org.mandarin.booking.domain.show.Inventory;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
 import org.mandarin.booking.domain.show.Show.ShowCreateCommand;
@@ -297,6 +298,14 @@ public class TestFixture {
 
         // seatIds를 gradeIds의 개수만큼 분할하여 매핑
         return gerateGradeSeatMap(gradeIds, seatIds);
+    }
+
+    public Inventory findInventoryByScheduleId(Long scheduleId) {
+        return entityManager.createQuery(
+                        "SELECT i FROM Inventory i JOIN FETCH i.states as state WHERE i.showScheduleId = :scheduleId",
+                        Inventory.class)
+                .setParameter("scheduleId", scheduleId)
+                .getSingleResult();
     }
 
     private Map<Long, List<Long>> gerateGradeSeatMap(List<Long> gradeIds, List<Long> seatIds) {

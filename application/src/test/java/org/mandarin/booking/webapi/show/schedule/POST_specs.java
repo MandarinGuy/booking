@@ -2,6 +2,7 @@ package org.mandarin.booking.webapi.show.schedule;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.MemberAuthority.USER;
@@ -26,6 +27,7 @@ import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @IntegrationTest
 @DisplayName("POST /api/show/schedule")
@@ -536,5 +538,40 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
         assertThat(response.getData()).isEqualTo("해당 섹션 좌석과 총 좌석이 상이합니다.");
+    }
+
+    @Test
+    void 일정이_정상적으로_등록된_경우_inventory에_해당_회차의_좌석이_모두_생성된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        var scheduleId = response.getData().scheduleId();
+        var inventory = testFixture.findInventoryByScheduleId(scheduleId);
+        assertThatStream(inventory.getStates().stream())
+                .allSatisfy(input -> {
+                            var gradeId = (Long) ReflectionTestUtils.getField(input, "gradeId");
+                            var seatId = (Long) ReflectionTestUtils.getField(input, "seatId");
+                            assertThat(gradeSeatMap.keySet()).contains(gradeId);
+                            assertThat(gradeSeatMap.get(gradeId)).contains(seatId);
+                        }
+                );
     }
 }

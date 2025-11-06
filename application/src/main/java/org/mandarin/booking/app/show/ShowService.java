@@ -30,6 +30,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     private final ShowQueryRepository queryRepository;
     private final HallValidator hallValidator;
     private final HallFetcher hallFetcher;
+    private final InventoryWriter inventoryWriter;
 
     @Override
     public ShowRegisterResponse register(ShowRegisterRequest request) {
@@ -48,23 +49,23 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     @Override
     public ShowScheduleRegisterResponse registerSchedule(ShowScheduleRegisterRequest request) {
         var show = queryRepository.findById(request.showId());
-        var sectionId = request.use().sectionId();
-        var excludeSeatIds = request.use().excludeSeatIds();
-        var includeSeatIds = request.use().includeSeatIds();
-        hallValidator.checkHallExistBySectionId(show.getHallId(), sectionId);
-        hallValidator.checkHallInvalidSeatIds(sectionId, excludeSeatIds);
-        hallValidator.checkHallInvalidSeatIds(sectionId, includeSeatIds);
-        hallValidator.checkSectionContainsAllOf(sectionId, request.use().allSeatIds());
+        validateSeats(request, show, request.use().sectionId());
         show.validateGradeIds(request.use().gradeAssignments().stream().map(GradeAssignmentRequest::gradeId).toList());
 
         checkConflictSchedule(show.getHallId(), request);
         var command = new ShowScheduleCreateCommand(request.showId(), request.startAt(), request.endAt());
 
-        show.registerSchedule(command);
+        var schedule = show.registerSchedule(command);
         var saved = commandRepository.insert(show);
+
+        var hall = hallFetcher.fetch(show.getHallId());
+
+        var seatsByGradeIds = request.use().seatsByGradeId(saved, hall);
+
+        inventoryWriter.createInventory(schedule.getId(), seatsByGradeIds);
+
         return new ShowScheduleRegisterResponse(requireNonNull(saved.getId()));
     }
-
 
     @Override
     public SliceView<ShowResponse> fetchShows(Integer page, Integer size, String type, String rating,
@@ -105,5 +106,13 @@ class ShowService implements ShowRegisterer, ShowFetcher {
             throw new ShowException("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
         }
     }
+
+    private void validateSeats(ShowScheduleRegisterRequest request, Show show, Long sectionId) {
+        hallValidator.checkHallExistBySectionId(show.getHallId(), sectionId);
+        hallValidator.checkHallInvalidSeatIds(sectionId, request.use().excludeSeatIds());
+        hallValidator.checkHallInvalidSeatIds(sectionId, request.use().includeSeatIds());
+        hallValidator.checkSectionContainsAllOf(sectionId, request.use().allSeatIds());
+    }
+
 }
 

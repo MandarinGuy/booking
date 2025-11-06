@@ -32,6 +32,15 @@ public class Hall extends AbstractEntity {
         this.registantId = registantId;
     }
 
+    public List<Long> getSeatsBySectionIdAndSeatIds(Long sectionId, List<Long> seatIds) {
+        return sections.stream()
+                .filter(section -> section.getId().equals(sectionId))
+                .flatMap(section -> section.getSeats().stream())
+                .map(AbstractEntity::getId)
+                .filter(seatIds::contains)
+                .toList();
+    }
+
     public static Hall create(String name, @Size @Valid List<SectionRegisterRequest> sections, String registantId) {
         var hall = new Hall(name, registantId);
         sections.forEach(req

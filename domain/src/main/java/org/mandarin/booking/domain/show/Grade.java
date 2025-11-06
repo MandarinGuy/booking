@@ -20,7 +20,7 @@ import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PACKAGE)
 @Table(uniqueConstraints = @UniqueConstraint(name = "uk_grade_show_name", columnNames = {"show_id", "name"}))
-class Grade extends AbstractEntity {
+public class Grade extends AbstractEntity {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "show_id", nullable = false)

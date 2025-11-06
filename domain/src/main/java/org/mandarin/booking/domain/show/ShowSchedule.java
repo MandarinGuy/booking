@@ -14,7 +14,7 @@ import org.mandarin.booking.domain.AbstractEntity;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-class ShowSchedule extends AbstractEntity {
+public class ShowSchedule extends AbstractEntity {
 
     @ManyToOne(fetch = LAZY, optional = false)
     @JoinColumn(name = "show_id", nullable = false)

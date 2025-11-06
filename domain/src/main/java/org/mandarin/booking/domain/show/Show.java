@@ -32,6 +32,9 @@ public class Show extends AbstractEntity {
     @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
     private final List<ShowSchedule> schedules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
+    private List<Grade> grades = new ArrayList<>();
+
     private Long hallId;
 
     private String title;
@@ -53,8 +56,6 @@ public class Show extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
-    private List<Grade> grades = new ArrayList<>();
 
     private Show(Long hallId, String title, Type type, Rating rating, String synopsis, String posterUrl,
                  LocalDate performanceStartDate,
@@ -98,13 +99,14 @@ public class Show extends AbstractEntity {
         return show;
     }
 
-    public void registerSchedule(ShowScheduleCreateCommand command) {
+    public ShowSchedule registerSchedule(ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
         }
 
         var schedule = ShowSchedule.create(this, command);
         this.schedules.add(schedule);
+        return schedule;
     }
 
     public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
@@ -135,6 +137,13 @@ public class Show extends AbstractEntity {
         if (!new HashSet<>(fetchedGradeIds).containsAll(gradeIds)) {
             throw new HallException("NOT_FOUND", "해당하는 등급이 존재하지 않습니다.");
         }
+    }
+
+    public Grade getGradeById(Long gradeId) {
+        return this.grades.stream()
+                .filter(grade -> grade.getId().equals(gradeId))
+                .findFirst()
+                .orElseThrow(() -> new ShowException("존재하지 않는 등급입니다."));
     }
 
     private void addGrades(List<Grade> grades) {

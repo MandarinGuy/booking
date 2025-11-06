@@ -18,7 +18,7 @@ import org.mandarin.booking.domain.AbstractEntity;
 @Entity
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PRIVATE)
-class Seat extends AbstractEntity {
+public class Seat extends AbstractEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "section_id", nullable = false)
     private Section section;

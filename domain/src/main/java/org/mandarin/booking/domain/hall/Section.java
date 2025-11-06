@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -21,12 +22,13 @@ import org.mandarin.booking.domain.AbstractEntity;
 @Entity
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PRIVATE)
-class Section extends AbstractEntity {
+public class Section extends AbstractEntity {
     @ManyToOne(fetch = LAZY, optional = false)
     @JoinColumn(name = "hall_id")
     private Hall hall;
 
     @OneToMany(mappedBy = "section", cascade = ALL, fetch = LAZY)
+    @Getter(value = PUBLIC)
     private List<Seat> seats = new ArrayList<>();
 
     private String name;

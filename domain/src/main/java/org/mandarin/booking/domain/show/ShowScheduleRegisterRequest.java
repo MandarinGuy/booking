@@ -8,7 +8,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.mandarin.booking.domain.hall.Hall;
 
 public record ShowScheduleRegisterRequest(
         @NotNull(message = "showId is required")
@@ -75,6 +78,14 @@ public record ShowScheduleRegisterRequest(
             ids.addAll(excludeSeatIds);
             ids.addAll(includeSeatIds());
             return ids;
+        }
+
+        public Map<Long, List<Long>> seatsByGradeId(Show saved, Hall hall) {
+            return this.gradeAssignments.stream()
+                    .collect(Collectors.toMap(
+                            ga -> saved.getGradeById(ga.gradeId()).getId(),
+                            ga -> hall.getSeatsBySectionIdAndSeatIds(this.sectionId(), ga.seatIds())
+                    ));
         }
     }
 
