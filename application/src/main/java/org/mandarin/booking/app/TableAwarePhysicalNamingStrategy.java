@@ -19,28 +19,14 @@ public class TableAwarePhysicalNamingStrategy extends PhysicalNamingStrategyStan
     @Override
     public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment jdbcEnvironment) {
         var logical = name.getText();
-        var table = CURRENT_TABLE.get();
-        var physical = "id".equalsIgnoreCase(logical)
-                ? (table == null || table.isBlank() ? "id" : table + "_id")
-                : toSnakeCase(logical);
+        var physical = toSnakeCase(logical);
         return Identifier.toIdentifier(physical, name.isQuoted());
     }
 
     private static String toSnakeCase(String s) {
-        if (s.isEmpty()) {
-            return s;
-        }
-        var n = s.length();
-        var sb = new StringBuilder(n + 8);
-        for (int i = 0; i < n; i++) {
-            var c = s.charAt(i);
-            if (Character.isUpperCase(c)
-                && i > 0
-                && (Character.isLowerCase(s.charAt(i - 1)) || (i + 1 < n && Character.isLowerCase(s.charAt(i + 1))))) {
-                sb.append('_');
-            }
-            sb.append(Character.toLowerCase(c));
-        }
-        return sb.toString();
+        return s
+                .replaceAll("([a-z])([A-Z])", "$1_$2") // camelCase → camel_Case
+                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2") // HTTPServer → HTTP_Server
+                .toLowerCase();
     }
 }
