@@ -37,9 +37,6 @@ class HallQueryRepository {
     }
 
     boolean containsSeatIdsBySectionId(Long sectionId, List<Long> seatIds) {
-        if (seatIds.isEmpty()) {
-            return true;
-        }
         var fetched = jpaQueryFactory
                 .select(seat.id)
                 .from(section)
@@ -50,9 +47,6 @@ class HallQueryRepository {
     }
 
     boolean equalsSeatIdsBySectionId(Long sectionId, List<Long> seatIds) {
-        if (seatIds.isEmpty()) {
-            return true;
-        }
         var fetched = jpaQueryFactory
                 .select(seat.id)
                 .from(section)

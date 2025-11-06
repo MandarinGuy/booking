@@ -372,6 +372,7 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo("excludeSeatIds must not contain duplicates");
     }
 
     @Test
@@ -436,7 +437,6 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-        System.out.println("request = " + request);
         assertThat(response.getData()).isEqualTo("gradeAssignments gradeIds must not contain duplicates");
     }
 
