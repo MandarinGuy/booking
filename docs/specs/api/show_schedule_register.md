@@ -82,7 +82,7 @@
 - [x] gradeAssignments의 seatIds에 해당 hall의 seat id가 존재하지 않는 경우 BAD_REQUEST 반환한다
 - [x] gradeAssignments의 seatIds에 중복된 좌석이 존재하는 경우 BAD_REQUEST를 반환한다
 - [x] 제외 좌석과 등록 좌석 전체가 section의 모든 좌석과 다른 경우 BAD_REQUEST를 반환한다
-- [ ] 일정이 정상적으로 등록된 경우 inventory에 해당 회차의 좌석이 모두 생성된다
+- [x] 일정이 정상적으로 등록된 경우 inventory에 해당 회차의 좌석이 모두 생성된다
 
 비고
 
