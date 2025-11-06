@@ -361,7 +361,7 @@ public class POST_specs {
                 new SeatUsageRequest(
                         sectionId,
                         List.of(1L, 1L),
-                        List.of(new GradeAssignmentRequest(1L, List.of()))
+                        List.of(new GradeAssignmentRequest(1L, List.of(1L, 2L)))
                 )
         );
 
@@ -573,5 +573,44 @@ public class POST_specs {
                             assertThat(gradeSeatMap.get(gradeId)).contains(seatId);
                         }
                 );
+    }
+
+    @Test
+    void excludeSeatIds에_중복이_없으면_TRUE_로_검증되고_SUCCESS를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var allSeats = testFixture.findSeatIdsBySectionId(sectionId);
+
+        var includeSeatIds = new java.util.ArrayList<>(allSeats);
+        var excludeSeatId1 = includeSeatIds.get(0);
+        var excludeSeatId2 = includeSeatIds.get(1);
+        var excludeSeatIds = List.of(excludeSeatId1, excludeSeatId2);
+        includeSeatIds.remove(excludeSeatId1);
+        includeSeatIds.remove(excludeSeatId2);
+
+        var gradeId = gradeSeatMap.keySet().stream().findFirst().get();
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        excludeSeatIds,
+                        List.of(new GradeAssignmentRequest(gradeId, includeSeatIds))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
 }

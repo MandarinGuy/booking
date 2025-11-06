@@ -83,6 +83,7 @@
 - [x] gradeAssignments의 seatIds에 중복된 좌석이 존재하는 경우 BAD_REQUEST를 반환한다
 - [x] 제외 좌석과 등록 좌석 전체가 section의 모든 좌석과 다른 경우 BAD_REQUEST를 반환한다
 - [x] 일정이 정상적으로 등록된 경우 inventory에 해당 회차의 좌석이 모두 생성된다
+- [x] excludeSeatIds에_중복이_없으면_TRUE_로_검증되고_SUCCESS를_반환한다
 
 비고
 
