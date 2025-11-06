@@ -64,7 +64,7 @@ class ShowService implements ShowRegisterer, ShowFetcher {
 
         inventoryWriter.createInventory(schedule.getId(), seatsByGradeIds);
 
-        return new ShowScheduleRegisterResponse(requireNonNull(saved.getId()));
+        return new ShowScheduleRegisterResponse(requireNonNull(schedule.getId()));
     }
 
     @Override
