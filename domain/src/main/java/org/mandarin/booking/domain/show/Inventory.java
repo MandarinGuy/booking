@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.show.SeatState.SeatStateRow;
 
 
 @Entity
@@ -39,5 +40,15 @@ public class Inventory extends AbstractEntity {
 
         inventory.states.addAll(seatStates);
         return inventory;
+    }
+
+    public List<SeatStateRow> extractSeatStateRows() {
+        return states.stream()
+                .map(SeatState::extractRow)
+                .toList();
+    }
+
+    public void clearSeatStates() {
+        this.states.clear();
     }
 }

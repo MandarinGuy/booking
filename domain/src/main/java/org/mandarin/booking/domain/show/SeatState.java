@@ -33,4 +33,11 @@ public class SeatState extends AbstractEntity {
         state.gradeId = gradeId;
         return state;
     }
+
+    SeatStateRow extractRow() {
+        return new SeatStateRow(seatId, gradeId);
+    }
+
+    public record SeatStateRow(Long seatId, Long gradeId) {
+    }
 }
