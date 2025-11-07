@@ -8,7 +8,6 @@ import static org.mandarin.booking.utils.MemberFixture.EmailGenerator.generateEm
 import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generateNickName;
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
-import static org.mandarin.booking.utils.ShowFixture.generateGradeRequest;
 import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleCreateCommand;
 
 import jakarta.persistence.EntityManager;
@@ -20,6 +19,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
+import org.mandarin.booking.app.JdbcBatchUtils;
 import org.mandarin.booking.domain.hall.Hall;
 import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.domain.member.Member;
@@ -40,11 +40,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestFixture {
     private final EntityManager entityManager;
     private final SecurePasswordEncoder securePasswordEncoder;
+    private final JdbcBatchUtils jdbcBatchUtils;
     private volatile Member cachedDefaultMember;
 
-    public TestFixture(EntityManager entityManager, SecurePasswordEncoder securePasswordEncoder) {
+    public TestFixture(EntityManager entityManager, SecurePasswordEncoder securePasswordEncoder,
+                       JdbcBatchUtils jdbcBatchUtils) {
         this.entityManager = entityManager;
         this.securePasswordEncoder = securePasswordEncoder;
+        this.jdbcBatchUtils = jdbcBatchUtils;
     }
 
     public Member getOrCreateDefaultMember() {
@@ -113,9 +116,28 @@ public class TestFixture {
 
     public Hall insertDummyHall(String userId) {
         List<SectionRegisterRequest> sections = generateSectionRegisterRequest(10, 100);
-        var hall = Hall.create(generateHallName(), sections, userId);
-        entityManager.persist(hall);
-        return hall;
+        return insertHallGraph(generateHallName(), userId, sections);
+    }
+
+    public void generateShows(int showCount, Type type) {
+        var hall = insertDummyHall(generateUserId());
+        var hallId = hall.getId();
+        var today = LocalDate.now();
+        var rows = IntStream.range(0, showCount)
+                .mapToObj(i -> new ShowRow(
+                        hallId,
+                        UUID.randomUUID().toString().substring(0, 10),
+                        type.name(),
+                        randomEnum(Rating.class).name(),
+                        "공연 줄거리",
+                        "https://example.com/poster.jpg",
+                        today,
+                        today.plusDays(30),
+                        "KRW"
+                ))
+                .toList();
+
+        batchInsertShows(rows);
     }
 
     public Show generateShow(int scheduleCount) {
@@ -137,54 +159,110 @@ public class TestFixture {
                 .toList();
     }
 
-    public void generateShows(int showCount, Type type) {
-        var hall = insertDummyHall(generateUserId());
-        IntStream.range(0, showCount)
-                .forEach(i -> generateShow(hall.getId(), type));
-    }
-
     public void generateShows(int showCount, Rating rating) {
         var hall = insertDummyHall(generateUserId());
-        IntStream.range(0, showCount)
-                .forEach(i -> generateShow(hall.getId(), rating));
+        var hallId = hall.getId();
+        var today = LocalDate.now();
+        var rows = IntStream.range(0, showCount)
+                .mapToObj(i -> new ShowRow(
+                        hallId,
+                        UUID.randomUUID().toString().substring(0, 10),
+                        randomEnum(Type.class).name(),
+                        rating.name(),
+                        "공연 줄거리",
+                        "https://example.com/poster.jpg",
+                        today,
+                        today.plusDays(30),
+                        "KRW"
+                ))
+                .toList();
+
+        batchInsertShows(rows);
     }
 
     public void generateShows(int showCount, String titlePart) {
         Random random = new Random();
         var hall = insertDummyHall(generateUserId());
-        IntStream.range(0, showCount)
-                .forEach(i -> {
-                    var request = validShowRegisterRequest(hall.getId(),
-                            randomEnum(Type.class).name(),
-                            randomEnum(Rating.class).name());
-                    var show = Show.create(hall.getId(), ShowCreateCommand.from(request));
-                    ReflectionTestUtils.setField(show, "title",
-                            (char) random.nextInt('a', 'z') + titlePart + (char) random.nextInt('a', 'z'));
-                    showInsert(show);
-                });
+        var hallId = hall.getId();
+        var today = LocalDate.now();
+        var rows = IntStream.range(0, showCount)
+                .mapToObj(i -> new ShowRow(
+                        hallId,
+                        (char) random.nextInt('a', 'z') + titlePart + (char) random.nextInt('a', 'z'),
+                        randomEnum(Type.class).name(),
+                        randomEnum(Rating.class).name(),
+                        "공연 줄거리",
+                        "https://example.com/poster.jpg",
+                        today,
+                        today.plusDays(30),
+                        "KRW"
+                ))
+                .toList();
+
+        batchInsertShows(rows);
     }
 
     public void generateShows(int showCount, int before, int after) {
         Random random = new Random();
         var hall = insertDummyHall(generateUserId());
         var hallId = hall.getId();
-        IntStream.range(0, showCount)
-                .forEach(i -> {
-                    var request = new ShowRegisterRequest(
-                            hallId,
-                            UUID.randomUUID().toString().substring(0, 10),
-                            randomEnum(Type.class).name(),
-                            randomEnum(Rating.class).name(),
-                            "공연 줄거리",
-                            "https://example.com/poster.jpg",
-                            LocalDate.now().minusDays(random.nextInt(before)),
-                            LocalDate.now().plusDays(random.nextInt(after)),
-                            "KRW",
-                            generateGradeRequest(5)
-                    );
-                    var show = Show.create(hallId, ShowCreateCommand.from(request));
-                    showInsert(show);
-                });
+        var rows = IntStream.range(0, showCount)
+                .mapToObj(i -> new ShowRow(
+                        hallId,
+                        UUID.randomUUID().toString().substring(0, 10),
+                        randomEnum(Type.class).name(),
+                        randomEnum(Rating.class).name(),
+                        "공연 줄거리",
+                        "https://example.com/poster.jpg",
+                        LocalDate.now().minusDays(random.nextInt(before)),
+                        LocalDate.now().plusDays(random.nextInt(after)),
+                        "KRW"
+                ))
+                .toList();
+
+        batchInsertShows(rows);
+    }
+
+    private Hall insertHallGraph(String hallName, String userId, List<SectionRegisterRequest> sections) {
+        var hall = new Hall(hallName, userId);
+        entityManager.persist(hall);
+        entityManager.flush();
+        long hallId = hall.getId();
+
+        jdbcBatchUtils.batchUpdate(
+                "INSERT INTO section (hall_id, name) VALUES (?, ?)",
+                sections,
+                (ps, s) -> {
+                    ps.setLong(1, hallId);
+                    ps.setString(2, s.sectionName());
+                },
+                1000
+        );
+
+        var seatParams = sections.stream()
+                .flatMap(sec -> sec.seats().stream()
+                        .map(seat -> new Object[]{
+                                sec.sectionName(),
+                                seat.rowNumber(),
+                                seat.seatNumber()
+                        }))
+                .toList();
+        if (!seatParams.isEmpty()) {
+            jdbcBatchUtils.batchUpdate(
+                    "INSERT INTO seat (section_id, seat_row, seat_number) " +
+                    "VALUES ((SELECT s.id FROM section s WHERE s.hall_id = ? AND s.name = ?), ?, ?)",
+                    seatParams,
+                    (ps, arr) -> {
+                        ps.setLong(1, hallId);
+                        ps.setString(2, (String) arr[0]);
+                        ps.setString(3, (String) arr[1]);
+                        ps.setString(4, (String) arr[2]);
+                    },
+                    1000
+            );
+        }
+
+        return hall;
     }
 
     public Show generateShow(List<GradeRequest> grades) {
@@ -288,15 +366,12 @@ public class TestFixture {
     }
 
     public Map<Long, List<Long>> generateGradeSeatMapByShowIdAndSectionId(Long showId, Long sectionId) {
-        // grade id 가져오기
         var gradeIds = findGradeIdsByShowId(showId);
-        // seat id 가져오기
         var seatIds = entityManager.createQuery("SELECT seat.id FROM Seat seat WHERE seat.section.id = :sectionId",
                         Long.class)
                 .setParameter("sectionId", sectionId)
                 .getResultList();
 
-        // seatIds를 gradeIds의 개수만큼 분할하여 매핑
         return gerateGradeSeatMap(gradeIds, seatIds);
     }
 
@@ -335,12 +410,6 @@ public class TestFixture {
         return showInsert(show);
     }
 
-    private void generateShow(Long hallId, Type type) {
-        var request = validShowRegisterRequest(hallId, type.name(), randomEnum(Rating.class).name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        showInsert(show);
-    }
-
     private ShowRegisterRequest validShowRegisterRequest(Long hallId, String type, String rating) {
         return new ShowRegisterRequest(
                 hallId,
@@ -361,12 +430,6 @@ public class TestFixture {
         );
     }
 
-    private void generateShow(Long hallId, Rating rating) {
-        var request = validShowRegisterRequest(hallId, randomEnum(Type.class).name(), rating.name());
-        var show = Show.create(hallId, ShowCreateCommand.from(request));
-        showInsert(show);
-    }
-
     private Show showInsert(Show show) {
         entityManager.persist(show);
         return show;
@@ -381,5 +444,42 @@ public class TestFixture {
         return entityManager.createQuery("select g.id from Grade g where g.show.id = :showId ", Long.class)
                 .setParameter("showId", showId)
                 .getResultList();
+    }
+
+    private void batchInsertShows(List<ShowRow> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+        String sql =
+                "INSERT INTO shows (hall_id, title, type, rating, synopsis, poster_url, performance_start_date, performance_end_date, currency) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcBatchUtils.batchUpdate(
+                sql,
+                rows,
+                (ps, row) -> {
+                    ps.setLong(1, row.hallId());
+                    ps.setString(2, row.title());
+                    ps.setString(3, row.type());
+                    ps.setString(4, row.rating());
+                    ps.setString(5, row.synopsis());
+                    ps.setString(6, row.posterUrl());
+                    ps.setObject(7, row.performanceStartDate());
+                    ps.setObject(8, row.performanceEndDate());
+                    ps.setString(9, row.currency());
+                },
+                1000
+        );
+    }
+
+    private record ShowRow(Long hallId,
+                           String title,
+                           String type,
+                           String rating,
+                           String synopsis,
+                           String posterUrl,
+                           LocalDate performanceStartDate,
+                           LocalDate performanceEndDate,
+                           String currency) {
     }
 }

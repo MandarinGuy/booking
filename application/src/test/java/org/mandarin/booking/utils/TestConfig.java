@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.mandarin.booking.adapter.TokenUtils;
+import org.mandarin.booking.app.JdbcBatchUtils;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -24,8 +25,9 @@ public class TestConfig {
     }
 
     @Bean
-    public TestFixture testFixture(@Autowired SecurePasswordEncoder securePasswordEncoder) {
-        return new TestFixture(entityManager, securePasswordEncoder);
+    public TestFixture testFixture(@Autowired SecurePasswordEncoder securePasswordEncoder,
+                                   @Autowired JdbcBatchUtils jdbcBatchUtils) {
+        return new TestFixture(entityManager, securePasswordEncoder, jdbcBatchUtils);
     }
 
     @Bean
