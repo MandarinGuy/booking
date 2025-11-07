@@ -51,4 +51,23 @@ public class Hall extends AbstractEntity {
     public boolean hasSectionOf(Long sectionId) {
         return sections.stream().anyMatch(section -> section.getId().equals(sectionId));
     }
+
+    public List<SeatInsertRow> extractSeatRows() {
+        List<SeatInsertRow> rows = new ArrayList<>();
+        for (Section section : getSections()) {
+            for (Seat seat : section.getSeats()) {
+                rows.add(new SeatInsertRow(section, seat.getRowNumber(), seat.getSeatNumber()));
+            }
+        }
+        return rows;
+    }
+
+    public void clearSeats() {
+        for (Section section : getSections()) {
+            section.getSeats().clear();
+        }
+    }
+
+    public record SeatInsertRow(Section section, String rowNumber, String seatNumber) {
+    }
 }
