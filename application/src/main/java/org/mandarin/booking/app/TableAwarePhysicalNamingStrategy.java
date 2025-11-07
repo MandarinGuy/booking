@@ -1,5 +1,8 @@
 package org.mandarin.booking.app;
 
+
+import static org.mandarin.booking.StringFormatterUtils.toSnakeCase;
+
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
@@ -21,12 +24,5 @@ public class TableAwarePhysicalNamingStrategy extends PhysicalNamingStrategyStan
         var logical = name.getText();
         var physical = toSnakeCase(logical);
         return Identifier.toIdentifier(physical, name.isQuoted());
-    }
-
-    private static String toSnakeCase(String s) {
-        return s
-                .replaceAll("([a-z])([A-Z])", "$1_$2") // camelCase → camel_Case
-                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2") // HTTPServer → HTTP_Server
-                .toLowerCase();
     }
 }
