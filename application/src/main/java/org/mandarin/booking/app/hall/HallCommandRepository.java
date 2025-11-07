@@ -3,8 +3,10 @@ package org.mandarin.booking.app.hall;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.JdbcBatchUtils;
+import org.mandarin.booking.domain.EntityInsertBuilder;
 import org.mandarin.booking.domain.hall.Hall;
 import org.mandarin.booking.domain.hall.Hall.SeatInsertRow;
+import org.mandarin.booking.domain.hall.Seat;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +29,9 @@ class HallCommandRepository {
     }
 
     private void batchInsertSeats(List<SeatInsertRow> rows) {
-        String sql = "INSERT INTO seat (section_id, seat_row, seat_number) VALUES (?, ?, ?)";
-        jdbcBatchUtils.batchUpdate(
-                sql,
-                rows,
-                (ps, row) -> {
-                    ps.setLong(1, row.section().getId());
-                    ps.setString(2, row.rowNumber());
-                    ps.setString(3, row.seatNumber());
-                },
-                1000
-        );
+        var compiled = EntityInsertBuilder.forTable("seat", SeatInsertRow.class, Seat.class)
+                .autoBindAll()
+                .compile();
+        jdbcBatchUtils.batchUpdate(compiled.sql(), rows, (ps, row) -> compiled.binder().bind(ps, row), 1000);
     }
 }

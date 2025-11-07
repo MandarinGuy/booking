@@ -3,7 +3,9 @@ package org.mandarin.booking.app.show;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.JdbcBatchUtils;
+import org.mandarin.booking.domain.EntityInsertBuilder;
 import org.mandarin.booking.domain.show.Inventory;
+import org.mandarin.booking.domain.show.SeatState;
 import org.mandarin.booking.domain.show.SeatState.SeatStateRow;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +27,10 @@ class InventoryCommandRepository {
     }
 
     void batchInsert(Long inventoryId, List<SeatStateRow> rows) {
-        String sql = "INSERT INTO seat_state (inventory_id, seat_id, grade_id) VALUES (?, ?, ?)";
-        jdbcBatchUtils.batchUpdate(
-                sql,
-                rows,
-                (ps, row) -> {
-                    ps.setLong(1, inventoryId);
-                    ps.setLong(2, row.seatId());
-                    ps.setLong(3, row.gradeId());
-                },
-                1000
-        );
+        var compiled = EntityInsertBuilder.forTable("seat_state", SeatStateRow.class, SeatState.class)
+                .withForeignKey(inventoryId)
+                .autoBindAll()
+                .compile();
+        jdbcBatchUtils.batchUpdate(compiled.sql(), rows, (ps, row) -> compiled.binder().bind(ps, row), 1000);
     }
 }
