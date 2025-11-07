@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.RecordComponent;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,91 +23,61 @@ import java.util.function.Function;
 
 public final class EntityInsertBuilder<R, E> {
     private final String table;
-    private final Class<R> recordType;
+    private final Class<R> dtoType;
     private final Class<E> entityType;
-    private final List<Const> constants = new ArrayList<>();
-    private final List<Binding<R>> bindings = new ArrayList<>();
+    private final List<ColBinding<R>> binds = new ArrayList<>();
 
-    private EntityInsertBuilder(String table, Class<R> recordType, Class<E> entityType) {
+    private EntityInsertBuilder(String table, Class<R> dtoType, Class<E> entityType) {
         this.table = table;
-        this.recordType = recordType;
+        this.dtoType = dtoType;
         this.entityType = entityType;
-        if (!recordType.isRecord()) {
-            throw new IllegalArgumentException("recordType must be a record");
-        }
     }
 
     public EntityInsertBuilder<R, E> withForeignKey(Object value) {
-        String col = resolveSingleJoinColumnName(entityType);
-        this.constants.add(new Const(col, value));
-        return this;
-    }
-
-    public <V, X> EntityInsertBuilder<R, E> bind(Rec<R, V> recordAccessor, Function<V, X> mapper) {
-        String component = componentName(recordAccessor);
-        String column = resolveColumnNameByField(entityType, component);
-        Function<R, ?> extractor = r -> {
-            try {
-                @SuppressWarnings("unchecked")
-                V v = (V) recordType.getMethod(component).invoke(r);
-                return mapper.apply(v);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException(e);
-            }
-        };
-        bindings.add(new Binding<>(column, extractor));
+        binds.add(ColBinding.constant(resolveSingleJoinColumnName(entityType), value));
         return this;
     }
 
     public <V> EntityInsertBuilder<R, E> bindAs(Rec<R, V> recordAccessor, String entityFieldName) {
         String component = componentName(recordAccessor);
         String column = resolveColumnNameByField(entityType, entityFieldName);
-
-        bindings.add(new Binding<>(column, r -> retrieveEntityIdOrValue(r, component)));
+        binds.add(ColBinding.of(column, r -> toDbValue(getRecordComponent(r, component))));
         return this;
     }
 
     public EntityInsertBuilder<R, E> autoBindAll() {
-        for (var rc : recordType.getRecordComponents()) {
+        for (RecordComponent rc : dtoType.getRecordComponents()) {
             String name = rc.getName();
-            var fOpt = findField(entityType, name);
-            if (fOpt.isEmpty()) {
-                continue;
-            }
-            var f = fOpt.get();
-            if (f.getAnnotation(OneToMany.class) != null || f.getAnnotation(ManyToMany.class) != null) {
-                continue;
-            }
-            if (f.getAnnotation(OneToOne.class) != null && f.getAnnotation(JoinColumn.class) == null) {
-                continue;
-            }
-
-            String column = resolveColumnNameByField(entityType, name);
-            bindings.add(new Binding<>(column, r -> retrieveEntityIdOrValue(r, name)));
+            findField(entityType, name).ifPresent(f -> {
+                if (f.isAnnotationPresent(OneToMany.class)
+                    || f.isAnnotationPresent(ManyToMany.class)
+                    || (f.isAnnotationPresent(OneToOne.class) && !f.isAnnotationPresent(JoinColumn.class))) {
+                    return;
+                }
+                String column = resolveColumnNameByField(entityType, name);
+                binds.add(ColBinding.of(column, r -> toDbValue(getRecordComponent(r, name))));
+            });
         }
         return this;
     }
 
     public Compiled<R> compile() {
-        List<String> columns = new ArrayList<>();
-        constants.forEach(c -> columns.add(c.column));
-        bindings.forEach(b -> columns.add(b.column));
+        if (binds.isEmpty()) {
+            throw new IllegalStateException("No columns bound for INSERT");
+        }
 
         StringJoiner cols = new StringJoiner(", ");
         StringJoiner holders = new StringJoiner(", ");
-        for (String column : columns) {
-            cols.add(column);
+        binds.forEach(b -> {
+            cols.add(b.column());
             holders.add("?");
-        }
-        String sql = "INSERT INTO " + table + " (" + cols + ") VALUES (" + holders + ")";
+        });
 
+        String sql = "INSERT INTO " + table + " (" + cols + ") VALUES (" + holders + ")";
         Binder<R> binder = (ps, item) -> {
             int idx = 1;
-            for (Const c : constants) {
-                setObject(ps, idx++, c.value);
-            }
-            for (Binding<R> b : bindings) {
-                setObject(ps, idx++, b.extractor.apply(item));
+            for (ColBinding<R> b : binds) {
+                ps.setObject(idx++, b.extractor().apply(item));
             }
         };
         return new Compiled<>(sql, binder);
@@ -116,76 +87,56 @@ public final class EntityInsertBuilder<R, E> {
         return new EntityInsertBuilder<>(table, recordType, entityType);
     }
 
-    private Object retrieveEntityIdOrValue(R r, String component) {
+    private <V> Object getRecordComponent(R r, String component) {
         try {
-            Object v = recordType.getMethod(component).invoke(r);
-            if (v instanceof AbstractEntity ae) {
-                return ae.getId();
-            }
-            return v;
+            return dtoType.getMethod(component).invoke(r);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Cannot access record component: " + component, e);
         }
     }
 
+    private static Object toDbValue(Object v) {
+        return (v instanceof AbstractEntity ae) ? ae.getId() : v;
+    }
+
     private static String resolveSingleJoinColumnName(Class<?> entityType) {
-        Field chosen = null;
-        for (Field f : allFields(entityType)) {
-            if (f.getAnnotation(JoinColumn.class) != null) {
-                if (chosen != null) {
+        return allFields(entityType).stream()
+                .filter(f -> f.isAnnotationPresent(JoinColumn.class))
+                .reduce((a, b) -> {
                     throw new IllegalArgumentException("Multiple @JoinColumn present");
-                }
-                chosen = f;
-            }
-        }
-        if (chosen == null) {
-            throw new IllegalArgumentException("No @JoinColumn present");
-        }
-        JoinColumn jc = chosen.getAnnotation(JoinColumn.class);
-        if (jc != null && !jc.name().isBlank()) {
-            return jc.name();
-        }
-        return toSnakeCase(chosen.getName()) + "_id";
+                })
+                .map(f -> {
+                    JoinColumn jc = f.getAnnotation(JoinColumn.class);
+                    if (!jc.name().isBlank()) {
+                        return jc.name();
+                    }
+                    return toSnakeCase(f.getName()) + "_id";
+                })
+                .orElseThrow(() -> new IllegalArgumentException("No @JoinColumn present"));
     }
 
     private static String resolveColumnNameByField(Class<?> entityType, String fieldName) {
         Field f = findField(entityType, fieldName)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown entity field: " + fieldName));
-        JoinColumn jc = f.getAnnotation(JoinColumn.class);
-        if (jc != null && !jc.name().isBlank()) {
-            return jc.name();
+        if (f.isAnnotationPresent(JoinColumn.class) && !f.getAnnotation(JoinColumn.class).name().isBlank()) {
+            return f.getAnnotation(JoinColumn.class).name();
         }
-        Column c = f.getAnnotation(Column.class);
-        if (c != null && !c.name().isBlank()) {
-            return c.name();
+        if (f.isAnnotationPresent(Column.class) && !f.getAnnotation(Column.class).name().isBlank()) {
+            return f.getAnnotation(Column.class).name();
         }
         return toSnakeCase(fieldName);
-    }
-
-    private static List<Field> allFields(Class<?> type) {
-        List<Field> list = new ArrayList<>();
-        Class<?> t = type;
-        while (t != null && t != Object.class) {
-            list.addAll(Arrays.asList(t.getDeclaredFields()));
-            t = t.getSuperclass();
-        }
-        return list;
     }
 
     private static Optional<Field> findField(Class<?> type, String name) {
         return allFields(type).stream().filter(f -> f.getName().equals(name)).findFirst();
     }
 
-    private static void setObject(PreparedStatement ps, int idx, Object value) throws SQLException {
-        switch (value) {
-            case String s -> ps.setString(idx, s);
-            case Integer i -> ps.setInt(idx, i);
-            case Long l -> ps.setLong(idx, l);
-            case Boolean b -> ps.setBoolean(idx, b);
-            case Double d -> ps.setDouble(idx, d);
-            case Float f -> ps.setFloat(idx, f);
-            case null, default -> ps.setObject(idx, value);
+    private static List<Field> allFields(Class<?> type) {
+        List<Field> list = new ArrayList<>();
+        for (Class<?> t = type; t != Object.class; t = t.getSuperclass()) {
+            list.addAll(Arrays.asList(t.getDeclaredFields()));
         }
+        return list;
     }
 
     private static String componentName(Serializable lambda) {
@@ -211,9 +162,13 @@ public final class EntityInsertBuilder<R, E> {
     public record Compiled<R>(String sql, Binder<R> binder) {
     }
 
-    private record Const(String column, Object value) {
-    }
+    private record ColBinding<R>(String column, Function<R, Object> extractor) {
+        static <R> ColBinding<R> of(String column, Function<R, Object> extractor) {
+            return new ColBinding<>(column, extractor);
+        }
 
-    private record Binding<R>(String column, Function<R, ?> extractor) {
+        static <R> ColBinding<R> constant(String column, Object value) {
+            return new ColBinding<>(column, r -> value);
+        }
     }
 }
