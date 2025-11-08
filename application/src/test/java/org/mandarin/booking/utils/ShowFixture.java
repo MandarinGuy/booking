@@ -16,14 +16,6 @@ import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.SeatUsageReq
 public class ShowFixture {
     private static final Random random = new Random();
 
-    static ShowScheduleCreateCommand generateShowScheduleCreateCommand(Show show) {
-        var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
-        return new ShowScheduleCreateCommand(show.getId(),
-                startAt,
-                startAt.plusHours(random.nextInt(2, 5))
-        );
-    }
-
     public static ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Long showId,
                                                                                   Long sectionId,
                                                                                   Map<Long, List<Long>> gradeSeatMap) {
@@ -54,6 +46,14 @@ public class ShowFixture {
                 gradeSeatMap.entrySet().stream()
                         .map(entry -> new GradeAssignmentRequest(entry.getKey(), entry.getValue()))
                         .toList()
+        );
+    }
+
+    static ShowScheduleCreateCommand generateShowScheduleCreateCommand(Show show) {
+        var startAt = LocalDateTime.now().plusDays(random.nextInt(0, 10));
+        return new ShowScheduleCreateCommand(show.getId(),
+                startAt,
+                startAt.plusHours(random.nextInt(2, 5))
         );
     }
 

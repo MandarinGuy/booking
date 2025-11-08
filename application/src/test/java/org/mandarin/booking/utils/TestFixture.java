@@ -225,47 +225,6 @@ public class TestFixture {
         batchInsertShows(rows);
     }
 
-    private Hall insertHallGraph(String hallName, String userId, List<SectionRegisterRequest> sections) {
-        var hall = new Hall(hallName, userId);
-        entityManager.persist(hall);
-        entityManager.flush();
-        long hallId = hall.getId();
-
-        var sectionInsert = forTable(
-                "section",
-                SectionRegisterRequest.class,
-                Section.class)
-                .withForeignKey(hallId)
-                .bindAs(SectionRegisterRequest::sectionName, "name")
-                .compile();
-        jdbcBatchUtils.batchUpdate(sectionInsert.sql(), sections, (ps, s) -> sectionInsert.binder().bind(ps, s), 1000);
-
-        var seatParams = sections.stream()
-                .flatMap(sec -> sec.seats().stream()
-                        .map(seat -> new Object[]{
-                                sec.sectionName(),
-                                seat.rowNumber(),
-                                seat.seatNumber()
-                        }))
-                .toList();
-        if (!seatParams.isEmpty()) {
-            jdbcBatchUtils.batchUpdate(
-                    "INSERT INTO seat (section_id, seat_row, seat_number) " +
-                    "VALUES ((SELECT s.id FROM section s WHERE s.hall_id = ? AND s.name = ?), ?, ?)",
-                    seatParams,
-                    (ps, arr) -> {
-                        ps.setLong(1, hallId);
-                        ps.setString(2, (String) arr[0]);
-                        ps.setString(3, (String) arr[1]);
-                        ps.setString(4, (String) arr[2]);
-                    },
-                    1000
-            );
-        }
-
-        return hall;
-    }
-
     public Show generateShow(List<GradeRequest> grades) {
         var hall = insertDummyHall(generateUserId());
         var hallId = hall.getId();
@@ -341,7 +300,6 @@ public class TestFixture {
                 .getSingleResult();
     }
 
-
     public boolean isMatchingScheduleInShow(ShowScheduleResponse res, Show show) {
         return !entityManager.createQuery(
                         "SELECT s FROM ShowSchedule s WHERE s.id = :scheduleId AND s.show.id = :showId", Object.class)
@@ -382,6 +340,47 @@ public class TestFixture {
                         Inventory.class)
                 .setParameter("scheduleId", scheduleId)
                 .getSingleResult();
+    }
+
+    private Hall insertHallGraph(String hallName, String userId, List<SectionRegisterRequest> sections) {
+        var hall = new Hall(hallName, userId);
+        entityManager.persist(hall);
+        entityManager.flush();
+        long hallId = hall.getId();
+
+        var sectionInsert = forTable(
+                "section",
+                SectionRegisterRequest.class,
+                Section.class)
+                .withForeignKey(hallId)
+                .bindAs(SectionRegisterRequest::sectionName, "name")
+                .compile();
+        jdbcBatchUtils.batchUpdate(sectionInsert.sql(), sections, (ps, s) -> sectionInsert.binder().bind(ps, s), 1000);
+
+        var seatParams = sections.stream()
+                .flatMap(sec -> sec.seats().stream()
+                        .map(seat -> new Object[]{
+                                sec.sectionName(),
+                                seat.rowNumber(),
+                                seat.seatNumber()
+                        }))
+                .toList();
+        if (!seatParams.isEmpty()) {
+            jdbcBatchUtils.batchUpdate(
+                    "INSERT INTO seat (section_id, seat_row, seat_number) " +
+                    "VALUES ((SELECT s.id FROM section s WHERE s.hall_id = ? AND s.name = ?), ?, ?)",
+                    seatParams,
+                    (ps, arr) -> {
+                        ps.setLong(1, hallId);
+                        ps.setString(2, (String) arr[0]);
+                        ps.setString(3, (String) arr[1]);
+                        ps.setString(4, (String) arr[2]);
+                    },
+                    1000
+            );
+        }
+
+        return hall;
     }
 
     private Map<Long, List<Long>> gerateGradeSeatMap(List<Long> gradeIds, List<Long> seatIds) {

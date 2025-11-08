@@ -41,13 +41,6 @@ public class Hall extends AbstractEntity {
                 .toList();
     }
 
-    public static Hall create(String name, @Size @Valid List<SectionRegisterRequest> sections, String registantId) {
-        var hall = new Hall(name, registantId);
-        sections.forEach(req
-                -> hall.sections.add(Section.create(req, hall)));
-        return hall;
-    }
-
     public boolean hasSectionOf(Long sectionId) {
         return sections.stream().anyMatch(section -> section.getId().equals(sectionId));
     }
@@ -66,6 +59,13 @@ public class Hall extends AbstractEntity {
         for (Section section : getSections()) {
             section.getSeats().clear();
         }
+    }
+
+    public static Hall create(String name, @Size @Valid List<SectionRegisterRequest> sections, String registantId) {
+        var hall = new Hall(name, registantId);
+        sections.forEach(req
+                -> hall.sections.add(Section.create(req, hall)));
+        return hall;
     }
 
     public record SeatInsertRow(Section section, String rowNumber, String seatNumber) {

@@ -29,6 +29,16 @@ public class Inventory extends AbstractEntity {
 
     private Long showScheduleId;
 
+    public List<SeatStateRow> extractSeatStateRows() {
+        return states.stream()
+                .map(SeatState::extractRow)
+                .toList();
+    }
+
+    public void clearSeatStates() {
+        this.states.clear();
+    }
+
     public static Inventory create(Long showScheduleId, Map<Long, List<Long>> seatAssociations) {
         var inventory = new Inventory();
         inventory.showScheduleId = showScheduleId;
@@ -40,15 +50,5 @@ public class Inventory extends AbstractEntity {
 
         inventory.states.addAll(seatStates);
         return inventory;
-    }
-
-    public List<SeatStateRow> extractSeatStateRows() {
-        return states.stream()
-                .map(SeatState::extractRow)
-                .toList();
-    }
-
-    public void clearSeatStates() {
-        this.states.clear();
     }
 }

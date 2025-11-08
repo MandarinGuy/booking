@@ -72,33 +72,6 @@ public class Show extends AbstractEntity {
         this.currency = currency;
     }
 
-    public static Show create(Long hallId, ShowCreateCommand command) {
-        var startDate = command.getPerformanceStartDate();
-        var endDate = command.getPerformanceEndDate();
-
-        if (startDate.isAfter(endDate)) {
-            throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
-        }
-
-        var show = new Show(
-                hallId,
-                command.getTitle(),
-                command.getType(),
-                command.getRating(),
-                command.getSynopsis(),
-                command.getPosterUrl(),
-                startDate,
-                endDate,
-                command.getCurrency()
-        );
-
-        var grades = command.getTicketGrades().stream()
-                .map(gradeReq -> Grade.of(show, gradeReq))
-                .toList();
-        show.addGrades(grades);
-        return show;
-    }
-
     public ShowSchedule registerSchedule(ShowScheduleCreateCommand command) {
         if (!isInSchedule(command.startAt(), command.endAt())) {
             throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
@@ -146,6 +119,33 @@ public class Show extends AbstractEntity {
                 .orElseThrow(() -> new ShowException("존재하지 않는 등급입니다."));
     }
 
+    public static Show create(Long hallId, ShowCreateCommand command) {
+        var startDate = command.getPerformanceStartDate();
+        var endDate = command.getPerformanceEndDate();
+
+        if (startDate.isAfter(endDate)) {
+            throw new ShowException("공연 시작 날짜는 종료 날짜 이후에 있을 수 없습니다.");
+        }
+
+        var show = new Show(
+                hallId,
+                command.getTitle(),
+                command.getType(),
+                command.getRating(),
+                command.getSynopsis(),
+                command.getPosterUrl(),
+                startDate,
+                endDate,
+                command.getCurrency()
+        );
+
+        var grades = command.getTicketGrades().stream()
+                .map(gradeReq -> Grade.of(show, gradeReq))
+                .toList();
+        show.addGrades(grades);
+        return show;
+    }
+
     private void addGrades(List<Grade> grades) {
         this.grades.addAll(grades);
     }
@@ -164,6 +164,7 @@ public class Show extends AbstractEntity {
     public enum Rating {
         ALL, AGE12, AGE15, AGE18
     }
+
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ShowCreateCommand {
