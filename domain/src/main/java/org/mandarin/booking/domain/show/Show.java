@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.mandarin.booking.Currency;
 import org.mandarin.booking.domain.AbstractEntity;
+import org.mandarin.booking.domain.hall.HallException;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 
@@ -29,6 +31,9 @@ import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
 public class Show extends AbstractEntity {
     @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
     private final List<ShowSchedule> schedules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
+    private List<Grade> grades = new ArrayList<>();
 
     private Long hallId;
 
@@ -51,8 +56,6 @@ public class Show extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @OneToMany(mappedBy = "show", fetch = LAZY, cascade = ALL)
-    private List<Grade> grades = new ArrayList<>();
 
     private Show(Long hallId, String title, Type type, Rating rating, String synopsis, String posterUrl,
                  LocalDate performanceStartDate,
@@ -67,6 +70,53 @@ public class Show extends AbstractEntity {
         this.performanceStartDate = performanceStartDate;
         this.performanceEndDate = performanceEndDate;
         this.currency = currency;
+    }
+
+    public ShowSchedule registerSchedule(ShowScheduleCreateCommand command) {
+        if (!isInSchedule(command.startAt(), command.endAt())) {
+            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
+        }
+
+        var schedule = ShowSchedule.create(this, command);
+        this.schedules.add(schedule);
+        return schedule;
+    }
+
+    public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
+        return this.schedules.stream()
+                .sorted(Comparator.comparing(ShowSchedule::getEndAt))
+                .map(
+                        schedule -> new ShowScheduleResponse(
+                                schedule.getId(),
+                                schedule.getStartAt(),
+                                schedule.getEndAt(),
+                                schedule.getRuntimeMinutes()
+                        )
+                )
+                .toList();
+    }
+
+    public List<GradeResponse> getGradeResponses() {
+        return this.grades.stream()
+                .map(Grade::toResponse)
+                .sorted(Comparator.comparing(GradeResponse::basePrice)
+                        .thenComparing(GradeResponse::quantity, Comparator.reverseOrder()))
+                .toList();
+    }
+
+    public void validateGradeIds(List<Long> gradeIds) {
+        var fetchedGradeIds = this.grades.stream()
+                .map(AbstractEntity::getId).toList();
+        if (!new HashSet<>(fetchedGradeIds).containsAll(gradeIds)) {
+            throw new HallException("NOT_FOUND", "해당하는 등급이 존재하지 않습니다.");
+        }
+    }
+
+    public Grade getGradeById(Long gradeId) {
+        return this.grades.stream()
+                .filter(grade -> grade.getId().equals(gradeId))
+                .findFirst()
+                .orElseThrow(() -> new ShowException("존재하지 않는 등급입니다."));
     }
 
     public static Show create(Long hallId, ShowCreateCommand command) {
@@ -96,37 +146,6 @@ public class Show extends AbstractEntity {
         return show;
     }
 
-    public void registerSchedule(ShowScheduleCreateCommand command) {
-        if (!isInSchedule(command.startAt(), command.endAt())) {
-            throw new ShowException("BAD_REQUEST", "공연 기간 범위를 벗어나는 일정입니다.");
-        }
-
-        var schedule = ShowSchedule.create(this, command);
-        this.schedules.add(schedule);
-    }
-
-    public List<ShowDetailResponse.ShowScheduleResponse> getScheduleResponses() {
-        return this.schedules.stream()
-                .sorted(Comparator.comparing(ShowSchedule::getEndAt))
-                .map(
-                        schedule -> new ShowScheduleResponse(
-                                schedule.getId(),
-                                schedule.getStartAt(),
-                                schedule.getEndAt(),
-                                schedule.getRuntimeMinutes()
-                        )
-                )
-                .toList();
-    }
-
-    public List<GradeResponse> getGradeResponses() {
-        return this.grades.stream()
-                .map(Grade::toResponse)
-                .sorted(Comparator.comparing(GradeResponse::basePrice)
-                        .thenComparing(GradeResponse::quantity, Comparator.reverseOrder()))
-                .toList();
-    }
-
     private void addGrades(List<Grade> grades) {
         this.grades.addAll(grades);
     }
@@ -136,8 +155,10 @@ public class Show extends AbstractEntity {
                && scheduleEndAt.isBefore(performanceEndDate.atStartOfDay());
     }
 
+
     public enum Type {
         MUSICAL, PLAY, CONCERT, OPERA, DANCE, CLASSICAL, ETC
+
     }
 
     public enum Rating {
@@ -147,6 +168,7 @@ public class Show extends AbstractEntity {
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ShowCreateCommand {
+
         private final String title;
         private final Type type;
         private final Rating rating;

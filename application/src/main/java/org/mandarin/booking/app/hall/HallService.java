@@ -1,5 +1,6 @@
 package org.mandarin.booking.app.hall;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.domain.hall.Hall;
 import org.mandarin.booking.domain.hall.HallException;
@@ -33,10 +34,31 @@ class HallService implements HallValidator, HallFetcher, HallRegisterer {
     }
 
     @Override
+    public void checkHallExistBySectionId(Long hallId, Long sectionId) {
+        if (!queryRepository.existsByHallIdAndSectionId(hallId, sectionId)) {
+            throw new HallException("NOT_FOUND", "해당 공연장에 섹션이 존재하지 않습니다.");
+        }
+    }
+
+    @Override
+    public void checkHallInvalidSeatIds(Long sectionId, List<Long> seatIds) {
+        if (!queryRepository.containsSeatIdsBySectionId(sectionId, seatIds)) {
+            throw new HallException("BAD_REQUEST", "해당 섹션에 해당하지 않는 좌석이 있습니다.");
+        }
+    }
+
+    @Override
+    public void checkSectionContainsAllOf(Long sectionId, List<Long> seatIds) {
+        if (!queryRepository.equalsSeatIdsBySectionId(sectionId, seatIds)) {
+            throw new HallException("BAD_REQUEST", "해당 섹션 좌석과 총 좌석이 상이합니다.");
+        }
+    }
+
+    @Override
     public HallRegisterResponse register(String userId, HallRegisterRequest request) {
         checkHallExistByHallName(request.hallName());
 
-        var hall = Hall.create(request.hallName(), userId);
+        var hall = Hall.create(request.hallName(), request.sections(), userId);
 
         var saved = commandRepository.insert(hall);
 

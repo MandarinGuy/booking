@@ -3,4 +3,8 @@ spring:
     name: booking
   profiles:
     active: local
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.mandarin.booking.app.TableAwarePhysicalNamingStrategy
 

@@ -2,6 +2,7 @@ package org.mandarin.booking.webapi.show.schedule;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.MemberAuthority.ADMIN;
 import static org.mandarin.booking.MemberAuthority.DISTRIBUTOR;
 import static org.mandarin.booking.MemberAuthority.USER;
@@ -10,18 +11,23 @@ import static org.mandarin.booking.adapter.ApiStatus.FORBIDDEN;
 import static org.mandarin.booking.adapter.ApiStatus.INTERNAL_SERVER_ERROR;
 import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
+import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleRegisterRequest;
+import static org.mandarin.booking.utils.ShowFixture.getSeatUsageRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.GradeAssignmentRequest;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest.SeatUsageRequest;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @IntegrationTest
 @DisplayName("POST /api/show/schedule")
@@ -34,10 +40,16 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var request = generateShowScheduleRegisterRequest(
-                show,
+                show.getId(),
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -55,10 +67,14 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var request = generateShowScheduleRegisterRequest(
-                show,
+                show.getId(),
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -76,10 +92,14 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var request = generateShowScheduleRegisterRequest(
-                show,
+                show.getId(),
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+                LocalDateTime.of(2025, 9, 10, 21, 30), gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -97,7 +117,10 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show);
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(show.getId(), sectionId, gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -115,8 +138,16 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var now = LocalDateTime.now();
-        var request = generateShowScheduleRegisterRequest(show, now, now.minusMinutes(1));
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                now,
+                now.minusMinutes(1),
+                gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -136,10 +167,15 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = generateShowScheduleRegisterRequest(show,
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
                 LocalDateTime.of(2025, 9, 10, 21, 30),
-                LocalDateTime.of(2025, 9, 10, 19, 0)
-        );
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                gradeSeatMap);
 
         // Act
         var response = testUtils.post("/api/show/schedule", request)
@@ -157,11 +193,16 @@ public class POST_specs {
             @Autowired TestFixture testFixture
     ) {
         // Arrange
-        testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
-        var request = new ShowScheduleRegisterRequest(
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(
                 9999L,// 존재하지 않는 showId
+                show.getId(),
                 LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30)
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
         );
 
         // Act
@@ -181,10 +222,14 @@ public class POST_specs {
     ) {
         // Arrange
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 9, 11));
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var request = new ShowScheduleRegisterRequest(
                 requireNonNull(show.getId()),
                 LocalDateTime.of(2023, 9, 10, 19, 0),
-                LocalDateTime.of(2023, 9, 10, 21, 30)
+                LocalDateTime.of(2023, 9, 10, 21, 30),
+                getSeatUsageRequest(sectionId, gradeSeatMap)
         );
 
         // Act
@@ -207,17 +252,22 @@ public class POST_specs {
                 LocalDate.now().minusDays(1),
                 LocalDate.now().plusDays(10)
         );
+        var hallId = show.getHallId();
+        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
         var request = generateShowScheduleRegisterRequest(
-                show,
+                show.getId(),
+                sectionId,
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(2)
-        );
+                LocalDateTime.now().plusHours(2),
+                gradeSeatMap);
 
         var nextRequest = generateShowScheduleRegisterRequest(
-                show,
+                show.getId(),
+                sectionId,
                 LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(3)
-        );
+                LocalDateTime.now().plusHours(3),
+                gradeSeatMap);
 
         testUtils.post(
                         "/api/show/schedule",
@@ -239,19 +289,328 @@ public class POST_specs {
         assertThat(response.getData()).contains("해당 회차는 이미 공연 스케줄이 등록되어 있습니다.");
     }
 
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show) {
-        return generateShowScheduleRegisterRequest(show, LocalDateTime.of(2025, 9, 10, 19, 0),
-                LocalDateTime.of(2025, 9, 10, 21, 30));
+    @Test
+    void showId에_해당하는_hall에_해당하는_sectionId를_찾을_수_없으면_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(),
+                testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get());
+        var sectionId = 9999L;// 존재하지 않는 sectionId
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 
-
-    private ShowScheduleRegisterRequest generateShowScheduleRegisterRequest(Show show,
-                                                                            LocalDateTime startAt,
-                                                                            LocalDateTime endAt) {
-        return new ShowScheduleRegisterRequest(
+    @Test
+    void excludeSeatIds에_해당_section의_id가_아닌_좌석_id가_포함되면_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var invalidSeatId = 9999L;
+        gradeSeatMap.entrySet().stream().findFirst()
+                .ifPresent(entry -> entry.getValue().add(invalidSeatId));
+        var request = generateShowScheduleRegisterRequest(
                 show.getId(),
-                startAt,
-                endAt
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
         );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void excludeSeatIds에_중복된_좌석이_있는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(1L, 1L),
+                        List.of(new GradeAssignmentRequest(1L, List.of(1L, 2L)))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo("excludeSeatIds must not contain duplicates");
+    }
+
+    @Test
+    void gradeAssignments의_gradeId가_해당_show에_존재하지_않으면_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        List<Long> seatIds = testFixture.findSeatIdsBySectionId(sectionId);
+        var invalidGradeId = 9999L;
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(),
+                        List.of(new GradeAssignmentRequest(invalidGradeId, seatIds))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void gradeAssignments의_gradeId가_중복된_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        List<Long> seatIds = testFixture.findSeatIdsBySectionId(sectionId);
+        int midPoint = seatIds.size() / 2;
+        List<Long> firstHalf = seatIds.subList(0, midPoint);
+        List<Long> secondHalf = seatIds.subList(midPoint, seatIds.size());
+
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(),
+                        List.of(new GradeAssignmentRequest(1L, firstHalf),
+                                new GradeAssignmentRequest(1L, secondHalf))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo("gradeAssignments gradeIds must not contain duplicates");
+    }
+
+    @Test
+    void gradeAssignments의_seatIds에_해당_hall의_seat_id가_존재하지_않는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var invalidSeatId = 9999L;
+        gradeSeatMap.entrySet().stream()
+                .findFirst()
+                .ifPresent(entry -> entry.getValue().add(invalidSeatId));
+
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void gradeAssignments의_seatIds에_중복된_좌석이_존재하는_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        gradeSeatMap.entrySet().stream()
+                .findFirst()
+                .ifPresent(entry -> {
+                    var firstSeatId = entry.getValue().getFirst();
+                    entry.getValue().add(firstSeatId);
+                });
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo(
+                "gradeAssignments seatIds must not contain duplicates across all assignments");
+    }
+
+    @Test
+    void 제외_좌석과_등록_좌석_전체가_section의_모든_좌석과_다른_경우_BAD_REQUEST를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var includeSeatIds = testFixture.findSeatIdsBySectionId(sectionId);
+        includeSeatIds.removeFirst();// 한자리 빠짐
+
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        List.of(), // 제외 좌석은 없음
+                        List.of(new GradeAssignmentRequest(
+                                gradeSeatMap.keySet().stream().findFirst().get(),
+                                includeSeatIds
+                        ))
+                )
+        );
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+        assertThat(response.getData()).isEqualTo("해당 섹션 좌석과 총 좌석이 상이합니다.");
+    }
+
+    @Test
+    void 일정이_정상적으로_등록된_경우_inventory에_해당_회차의_좌석이_모두_생성된다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(),
+                sectionId,
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                gradeSeatMap
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        var scheduleId = response.getData().scheduleId();
+        var inventory = testFixture.findInventoryByScheduleId(scheduleId);
+        assertThatStream(inventory.getStates().stream())
+                .allSatisfy(input -> {
+                            var gradeId = (Long) ReflectionTestUtils.getField(input, "gradeId");
+                            var seatId = (Long) ReflectionTestUtils.getField(input, "seatId");
+                            assertThat(gradeSeatMap.keySet()).contains(gradeId);
+                            assertThat(gradeSeatMap.get(gradeId)).contains(seatId);
+                        }
+                );
+    }
+
+    @Test
+    void excludeSeatIds에_중복이_없으면_TRUE_로_검증되고_SUCCESS를_반환한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var show = testFixture.insertDummyShow(LocalDate.of(2025, 9, 10), LocalDate.of(2025, 12, 31));
+        long sectionId = testFixture.findSectionIdsByHallId(show.getHallId()).stream().findFirst().get();
+        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var allSeats = testFixture.findSeatIdsBySectionId(sectionId);
+
+        var includeSeatIds = new java.util.ArrayList<>(allSeats);
+        var excludeSeatId1 = includeSeatIds.get(0);
+        var excludeSeatId2 = includeSeatIds.get(1);
+        var excludeSeatIds = List.of(excludeSeatId1, excludeSeatId2);
+        includeSeatIds.remove(excludeSeatId1);
+        includeSeatIds.remove(excludeSeatId2);
+
+        var gradeId = gradeSeatMap.keySet().stream().findFirst().get();
+        var request = new ShowScheduleRegisterRequest(
+                show.getId(),
+                LocalDateTime.of(2025, 9, 10, 19, 0),
+                LocalDateTime.of(2025, 9, 10, 21, 30),
+                new SeatUsageRequest(
+                        sectionId,
+                        excludeSeatIds,
+                        List.of(new GradeAssignmentRequest(gradeId, includeSeatIds))
+                )
+        );
+
+        // Act
+        var response = testUtils.post("/api/show/schedule", request)
+                .withAuthorization(testUtils.getAuthToken(DISTRIBUTOR))
+                .assertSuccess(ShowScheduleRegisterResponse.class);
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(SUCCESS);
     }
 }
