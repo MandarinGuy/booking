@@ -1,11 +1,10 @@
 package org.mandarin.booking.app.show;
 
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mandarin.booking.app.JdbcBatchUtils;
-import org.mandarin.booking.domain.EntityInsertBuilder;
 import org.mandarin.booking.domain.show.Inventory;
-import org.mandarin.booking.domain.show.SeatState;
 import org.mandarin.booking.domain.show.SeatState.SeatStateRow;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +25,16 @@ class InventoryCommandRepository {
         batchInsert(inventory.getId(), rows);
     }
 
-    void batchInsert(Long inventoryId, List<SeatStateRow> rows) {
-        var compiled = EntityInsertBuilder.forTable("seat_state", SeatStateRow.class, SeatState.class)
-                .withForeignKey(inventoryId)
-                .autoBindAll()
-                .compile();
-        jdbcBatchUtils.batchUpdate(compiled.sql(), rows, (ps, row) -> compiled.binder().bind(ps, row), 1000);
+    void batchInsert(Long inventoryId, @NotEmpty List<SeatStateRow> rows) {
+        jdbcBatchUtils.batchUpdate(
+                "INSERT INTO seat_state (inventory_id, seat_id, grade_id) VALUES (?, ?, ?)",
+                rows,
+                (ps, row) -> {
+                    ps.setLong(1, inventoryId);
+                    ps.setLong(2, row.seatId());
+                    ps.setLong(3, row.gradeId());
+                },
+                1000
+        );
     }
 }

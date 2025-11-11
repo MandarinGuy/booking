@@ -17,7 +17,7 @@ dependencies {
 
     api 'com.querydsl:querydsl-sql:5.1.0'
     api 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
-    api 'com.github.eXsio:querydsl-entityql:3.2.0'
+    // entityql 제거: 직접 JDBC 사용으로 대체
 
     annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'

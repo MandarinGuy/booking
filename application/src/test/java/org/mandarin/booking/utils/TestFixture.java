@@ -1,7 +1,6 @@
 package org.mandarin.booking.utils;
 
 import static org.mandarin.booking.MemberAuthority.ADMIN;
-import static org.mandarin.booking.domain.EntityInsertBuilder.forTable;
 import static org.mandarin.booking.utils.EnumFixture.randomEnum;
 import static org.mandarin.booking.utils.HallFixture.generateHallName;
 import static org.mandarin.booking.utils.HallFixture.generateSectionRegisterRequest;
@@ -22,7 +21,6 @@ import java.util.stream.IntStream;
 import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.app.JdbcBatchUtils;
 import org.mandarin.booking.domain.hall.Hall;
-import org.mandarin.booking.domain.hall.Section;
 import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
@@ -348,14 +346,17 @@ public class TestFixture {
         entityManager.flush();
         long hallId = hall.getId();
 
-        var sectionInsert = forTable(
-                "section",
-                SectionRegisterRequest.class,
-                Section.class)
-                .withForeignKey(hallId)
-                .bindAs(SectionRegisterRequest::sectionName, "name")
-                .compile();
-        jdbcBatchUtils.batchUpdate(sectionInsert.sql(), sections, (ps, s) -> sectionInsert.binder().bind(ps, s), 1000);
+        if (!sections.isEmpty()) {
+            jdbcBatchUtils.batchUpdate(
+                    "INSERT INTO section (hall_id, name) VALUES (?, ?)",
+                    sections,
+                    (ps, s) -> {
+                        ps.setLong(1, hallId);
+                        ps.setString(2, s.sectionName());
+                    },
+                    1000
+            );
+        }
 
         var seatParams = sections.stream()
                 .flatMap(sec -> sec.seats().stream()
@@ -450,10 +451,24 @@ public class TestFixture {
         if (rows == null || rows.isEmpty()) {
             return;
         }
-        var compiled = forTable("shows", ShowRow.class, Show.class)
-                .autoBindAll()
-                .compile();
-        jdbcBatchUtils.batchUpdate(compiled.sql(), rows, (ps, row) -> compiled.binder().bind(ps, row), 1000);
+        jdbcBatchUtils.batchUpdate(
+                "INSERT INTO shows (hall_id, title, type, rating, synopsis, poster_url, performance_start_date, performance_end_date, currency) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                rows,
+                (ps, row) -> {
+                    ps.setLong(1, row.hallId());
+                    ps.setString(2, row.title());
+                    ps.setString(3, row.type());
+                    ps.setString(4, row.rating());
+                    ps.setString(5, row.synopsis());
+                    ps.setString(6, row.posterUrl());
+                    ps.setObject(7, row.performanceStartDate());
+                    ps.setObject(8, row.performanceEndDate());
+                    ps.setString(9, row.currency());
+                },
+                1000
+        );
     }
 
     public record ShowRow(Long hallId,
