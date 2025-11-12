@@ -39,13 +39,17 @@ public class Inventory extends AbstractEntity {
         this.states.clear();
     }
 
-    public static Inventory create(Long showScheduleId, Map<Long, List<Long>> seatAssociations) {
+    public static Inventory create(Long showScheduleId, Map<GradeMeta, List<Long>> seatAssociations) {
         var inventory = new Inventory();
         inventory.showScheduleId = showScheduleId;
 
         var seatStates = seatAssociations.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
-                        .map(seat -> SeatState.create(inventory, seat, entry.getKey())))
+                        .map(seat -> SeatState.create(inventory, seat,
+                                entry.getKey().gradeId(),
+                                entry.getKey().name(),
+                                entry.getKey().basePrice()
+                        )))
                 .toList();
 
         inventory.states.addAll(seatStates);

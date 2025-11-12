@@ -87,6 +87,14 @@ public record ShowScheduleRegisterRequest(
                             ga -> hall.getSeatsBySectionIdAndSeatIds(this.sectionId(), ga.seatIds())
                     ));
         }
+
+        public Map<GradeMeta, List<Long>> seatsByGradeMeta(Show saved, Hall hall) {
+            return this.gradeAssignments.stream()
+                    .collect(Collectors.toMap(
+                            ga -> GradeMeta.from(saved.getGradeById(ga.gradeId())),
+                            ga -> hall.getSeatsBySectionIdAndSeatIds(this.sectionId(), ga.seatIds())
+                    ));
+        }
     }
 
     public record GradeAssignmentRequest(

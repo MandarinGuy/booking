@@ -27,12 +27,14 @@ class InventoryCommandRepository {
 
     void batchInsert(Long inventoryId, @NotEmpty List<SeatStateRow> rows) {
         jdbcBatchUtils.batchUpdate(
-                "INSERT INTO seat_state (inventory_id, seat_id, grade_id) VALUES (?, ?, ?)",
+                "INSERT INTO seat_state (inventory_id, seat_id, grade_id, grade_name, base_price) VALUES (?, ?, ?, ?, ?)",
                 rows,
                 (ps, row) -> {
                     ps.setLong(1, inventoryId);
                     ps.setLong(2, row.seatId());
                     ps.setLong(3, row.gradeId());
+                    ps.setString(4, row.gradeName());
+                    ps.setLong(5, row.basePrice());
                 },
                 1000
         );

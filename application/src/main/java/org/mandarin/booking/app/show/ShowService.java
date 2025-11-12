@@ -60,9 +60,9 @@ class ShowService implements ShowRegisterer, ShowFetcher {
 
         var hall = hallFetcher.fetch(show.getHallId());
 
-        var seatsByGradeIds = request.use().seatsByGradeId(saved, hall);
+        var seatsByGradeMeta = request.use().seatsByGradeMeta(saved, hall);
 
-        inventoryWriter.createInventory(schedule.getId(), seatsByGradeIds);
+        inventoryWriter.createInventory(schedule.getId(), seatsByGradeMeta);
 
         return new ShowScheduleRegisterResponse(requireNonNull(schedule.getId()));
     }
@@ -115,4 +115,3 @@ class ShowService implements ShowRegisterer, ShowFetcher {
     }
 
 }
-

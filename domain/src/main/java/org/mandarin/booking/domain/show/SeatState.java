@@ -26,18 +26,27 @@ public class SeatState extends AbstractEntity {
     @Column(nullable = false)
     private Long gradeId;
 
-    static SeatState create(Inventory inventory, Long seatId, Long gradeId) {
+    @Column(nullable = false)
+    private String gradeName;
+
+    @Column(nullable = false)
+    private Integer basePrice;
+
+    static SeatState create(Inventory inventory, Long seatId,
+                            Long gradeId, String gradeName, Integer basePrice) {
         var state = new SeatState();
         state.inventory = inventory;
         state.seatId = seatId;
         state.gradeId = gradeId;
+        state.gradeName = gradeName;
+        state.basePrice = basePrice;
         return state;
     }
 
     SeatStateRow extractRow() {
-        return new SeatStateRow(seatId, gradeId);
+        return new SeatStateRow(seatId, gradeId, gradeName, basePrice);
     }
 
-    public record SeatStateRow(Long seatId, Long gradeId) {
+    public record SeatStateRow(Long seatId, Long gradeId, String gradeName, Integer basePrice) {
     }
 }

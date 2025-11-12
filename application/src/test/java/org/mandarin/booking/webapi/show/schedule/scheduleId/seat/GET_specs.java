@@ -1,7 +1,7 @@
 package org.mandarin.booking.webapi.show.schedule.scheduleId.seat;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mandarin.booking.MemberAuthority.ADMIN;
+import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleRegisterRequest;
 
@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.domain.show.SeatsResponse;
 import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
@@ -16,16 +17,16 @@ import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.TestFixture;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@IntegrationTest
 @DisplayName("GET /api/show/schedule/{scheduleId}/seat")
+@IntegrationTest
 class GET_specs {
 
     @Test
-    void 유효한_scheduleId로_요청_시_SUCCESS와_contents_배열을_반환한다(
+    void 유효한_scheduleId로_요청_시_200_OK와_contents_배열을_반환한다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
     ) {
-        // Arrange
+        // Arrange: 공연과 회차/인벤토리 생성
         var show = testFixture.insertDummyShow(LocalDate.of(2025, 10, 1), LocalDate.of(2025, 12, 31));
         var hallId = show.getHallId();
         var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().orElseThrow();
@@ -39,7 +40,7 @@ class GET_specs {
         );
 
         var scheduleId = testUtils.post("/api/show/schedule", request)
-                .withAuthorization(testUtils.getAuthToken(ADMIN))
+                .withAuthorization(testUtils.getAuthToken(MemberAuthority.DISTRIBUTOR))
                 .assertSuccess(ShowScheduleRegisterResponse.class)
                 .getData()
                 .scheduleId();
@@ -54,6 +55,12 @@ class GET_specs {
         var contents = response.getData().contents();
         assertThat(contents).isNotNull();
         assertThat(contents).isNotEmpty();
-        System.out.println("contents = " + contents);
+        assertThatStream(contents.stream())
+                .allSatisfy(res -> {
+                    assertThat(res.seatId()).isNotNull();
+                    assertThat(res.gradeId()).isNotNull();
+                    assertThat(res.status()).isNotNull();
+                });
     }
 }
+

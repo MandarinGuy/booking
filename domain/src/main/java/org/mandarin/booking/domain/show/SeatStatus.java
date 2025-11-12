@@ -1,6 +1,6 @@
 package org.mandarin.booking.domain.show;
 
-public enum SeatAvailability {
+public enum SeatStatus {
     AVAILABLE,
     HELD,
     SOLD

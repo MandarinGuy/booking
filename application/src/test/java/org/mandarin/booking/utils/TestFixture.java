@@ -274,6 +274,7 @@ public class TestFixture {
 
     public void removeShows() {
         entityManager.createQuery("DELETE FROM Grade ").executeUpdate();
+        entityManager.createQuery("DELETE FROM ShowSchedule ").executeUpdate();
         entityManager.createQuery("DELETE FROM Show ").executeUpdate();
     }
 

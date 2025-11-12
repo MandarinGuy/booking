@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface InventoryWriter {
-    void createInventory(Long scheduleId, Map<Long, List<Long>> seatAssociations);
+    void createInventory(Long scheduleId, Map<org.mandarin.booking.domain.show.GradeMeta, List<Long>> seatAssociations);
 }
