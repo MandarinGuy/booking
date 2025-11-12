@@ -47,7 +47,7 @@
 
 ## 테스트
 
-- [ ] 유효한 scheduleId로 요청 시 SUCCESS와 contents 배열을 반환한다
+- [x] 유효한 scheduleId로 요청 시 SUCCESS와 contents 배열을 반환한다
 - [ ] 각 요소는 seatId, gradeId, status 필드를 포함한다
 - [ ] status 값은 AVAILABLE, HELD, SOLD 중 하나다
 - [ ] 상태 소스가 없는 환경에서는 모든 좌석의 status는 AVAILABLE로 반환된다
