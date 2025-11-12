@@ -3,8 +3,10 @@ package org.mandarin.booking.adapter.webapi;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.mandarin.booking.adapter.SliceView;
+import org.mandarin.booking.app.show.InventoryReader;
 import org.mandarin.booking.app.show.ShowFetcher;
 import org.mandarin.booking.app.show.ShowRegisterer;
+import org.mandarin.booking.domain.show.SeatsResponse;
 import org.mandarin.booking.domain.show.ShowDetailResponse;
 import org.mandarin.booking.domain.show.ShowInquiryRequest;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/show")
-record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
+record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher, InventoryReader inventoryReader) {
 
     @GetMapping
     SliceView<ShowResponse> inquire(@Valid ShowInquiryRequest req) {
@@ -44,5 +46,9 @@ record ShowController(ShowRegisterer showRegisterer, ShowFetcher showFetcher) {
     ShowScheduleRegisterResponse registerSchedule(@RequestBody @Valid ShowScheduleRegisterRequest request) {
         return showRegisterer.registerSchedule(request);
     }
-}
 
+    @GetMapping("/schedule/{scheduleId}/seat")
+    SeatsResponse inquireSeats(@PathVariable @Positive(message = "scheduleId는 음수일 수 없습니다.") Long scheduleId) {
+        return inventoryReader.fetchSeats(scheduleId);
+    }
+}

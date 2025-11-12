@@ -22,6 +22,7 @@ class ApplicationAuthorizationRequestMatcherConfigurer implements AuthorizationR
                 .requestMatchers(HttpMethod.POST, "/api/show/schedule").hasAuthority("ROLE_DISTRIBUTOR")
                 .requestMatchers(HttpMethod.GET, "/api/show").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/show/*").permitAll()// 인증이 필요한 GET /show/* 엔드포인트 추가시 설정을 이 줄 아래에
+                .requestMatchers(HttpMethod.GET, "/api/show/*/seats").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/show").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/hall").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated();
