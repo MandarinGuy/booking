@@ -5,11 +5,12 @@
 
 근거 파일/경로:
 
-- root build.gradle: test 태스크, 라이브러리, JVM args 설정
-- application/src/main/resources/application-test.yml: 테스트 프로필 환경
-- application/src/test/java/**/*: 실제 테스트 코드 일체(통합/웹/아키텍처)
-- internal/src/test/java/**/*: 내부 어댑터 단위 테스트
-- docs/specs/api/*.md: API별 수용 기준(체크리스트)
+- root `build.gradle`: JUnit Platform, JVM args, `spring.profiles.active=test`
+- `application/src/main/resources/application-test.yml`: 테스트 전용 H2/JPA/JWT 설정
+- `application/src/test/java/**/*`: 통합/웹/아키텍처/유틸 테스트
+- `internal/src/test/java/**/*`: 내부 어댑터/보안 단위 테스트
+- `domain/src/test/java/**/*`: 도메인 단위 테스트
+- `docs/specs/api/*.md`: API별 수용 기준(체크리스트)
 
 ---
 
@@ -33,11 +34,16 @@
 - 목적: 작은 단위(도메인, 유틸, 애플리케이션 서비스의 순수 로직)의 동작을 빠르고 고립적으로 검증.
 - 프레임워크 의존: 가급적 없음. Spring Context를 기동하지 않는다.
 - 목킹(Mock): 외부 의존성은 Mockito 등으로 대체. 저장소/네트워크/시큐리티 등 I/O 경계를 모킹한다.
-- 예시 근거:
-  - 도메인: `src/test/java/org/mandarin/booking/domain/MemberTest.java`, `AbstractEntityTest.java`
-  - 보안 컴포넌트 단위: `adapter/security/JwtFilterTest.java`, `CustomAuthenticationProviderTest.java`,
-    `CustomAuthenticationEntryPointTest.java`
-  - 공통/web 단위: `adapter/webapi/GlobalExceptionHandlerTest.java`
+- 예시 근거(실재 테스트 기준):
+    - 도메인: `domain/src/test/java/org/mandarin/booking/domain/member/MemberTest.java`,
+      `domain/src/test/java/org/mandarin/booking/domain/AbstractEntityTest.java`,
+      `domain/src/test/java/org/mandarin/booking/domain/EnumRequestValidatorTest.java`
+    - 보안 컴포넌트: `application/src/test/java/org/mandarin/booking/app/member/CustomAuthenticationProviderTest.java`,
+      `application/src/test/java/org/mandarin/booking/adapter/security/BCryptSecurePasswordEncoderTest.java`,
+      `internal/src/test/java/org/mandarin/booking/adapter/CustomMemberAuthenticationTokenTest.java`,
+      `internal/src/test/java/org/mandarin/booking/adapter/CustomAuthenticationEntryPointTest.java`
+    - 공통/메시지 변환: `internal/src/test/java/org/mandarin/booking/adapter/CommonHttpMessageConverterTest.java`,
+      `internal/src/test/java/org/mandarin/booking/adapter/ResponseWrapperTest.java`
 - 라이브러리/설정 근거:
   - Mockito inline 사용: `build.gradle` → `testImplementation 'org.mockito:mockito-inline:5.2.0'`
   - JUnit5 사용: `build.gradle` → `useJUnitPlatform()`
@@ -58,10 +64,14 @@
 - 보안: 실제 `SecurityConfig`와 `JwtFilter` 동작을 최대한 반영. 필요 시 테스트 전용 컨트롤러/설정 (`TestOnlyController`, `TestConfig`) 사용.
 - 유틸리티: `IntegrationTest`, `IntegrationTestUtils`, `IntegrationTestUtilsSpecs`, `JwtTestUtils` 등 공용 유틸을 통해 테스트 준비/토큰
   생성/컨텍스트 초기화.
-- 예시 근거:
-  - 웹 API 스펙 테스트: `src/test/java/org/mandarin/booking/webapi/**/POST_specs.java`
-  - 통합 환경 유틸: `src/test/java/org/mandarin/booking/IntegrationTest*.java`, `JwtTestUtils.java`
-    권장 규칙:
+- 예시 근거(실재 테스트 기준):
+    - 웹 API 스펙: `application/src/test/java/org/mandarin/booking/webapi/**` (예: `auth/login/POST_specs.java`,
+      `member/POST_specs.java`, `show/GET_specs.java`, `show/showId/GET_specs.java`, `show/POST_specs.java`,
+      `show/schedule/POST_specs.java`, `hall/POST_specs.java`, `not_found/GET_specs.java`)
+    - 통합 유틸: `application/src/test/java/org/mandarin/booking/utils/IntegrationTest.java`, `IntegrationTestUtils.java`,
+      `IntegrationTestUtilsSpecs.java`, `JwtTestUtils.java`, `TestFixture.java`
+
+권장 규칙:
 - `@IntegrationTest` 커스텀 어노테이션 사용으로 공통 설정
 - 각 테스트는 `IntegrationTestUtils`를 사용해 작성
   - `IntegrationTestUtils` 사용 방법은 다음과 같음
@@ -97,21 +107,21 @@
 
 ### 2.3 아키텍처 테스트 (ArchUnit)
 
-- 목적: 헥사고날 계층 규칙 준수 보장.
+- 목적: 모듈 간 의존 규칙 준수 검증.
 - 근거 테스트: `application/src/test/java/org/mandarin/booking/arch/ModuleDependencyRulesTest.java`
-- 핵심 규칙:
-  - adapter 레이어는 어떤 레이어에도 접근 허용되지 않음(외부에서 접근 금지).
-  - application 레이어는 adapter에서만 접근 가능.
-  - domain 레이어는 adapter, application에서만 접근 가능.
+- 현재 규칙(테스트 구현 기준):
+    - common 모듈은 다른 애플리케이션 모듈(application/domain/internal/external)에 의존 금지
+    - domain에 의존 가능한 모듈은 application뿐(다른 모듈은 domain 의존 금지)
+    - domain은 프로젝트 모듈 중 common만 의존 가능(application/internal/external 의존 금지)
 
 ---
 
 ## 3. 테스트-환경 설정
 
-- Gradle test 태스크가 `spring.profiles.active=test`로 실행됨: `build.gradle` 65~70행 참고.
+- Gradle test 태스크가 `spring.profiles.active=test`로 실행됨: root `build.gradle` 테스트 태스크 설정 참조
 - H2 설정: `application-test.yml`
   - URL: `jdbc:h2:mem:test;MODE=MySQL;`
-  - Hibernate Dialect: `H2Dialect` + 테스트 중 MySQL 호환 모드
+  - Hibernate Dialect: H2 사용, 속성에 MySQL8 호환 모드 적용
   - JPA: `ddl-auto: create`, `format_sql/show_sql: true`
 - JWT 설정: `application-test.yml`의 `jwt.token.secret/access/refresh`
 
@@ -149,7 +159,12 @@
   - 로그인: `docs/specs/api/login.md`
   - 회원가입: `docs/specs/api/member_register.md`
   - 토큰 재발급: `docs/specs/api/reissue.md`
+  - 공연 목록 조회: `docs/specs/api/show_list_inquiry.md`
+  - 공연 상세 조회: `docs/specs/api/show_detail.md`
   - 공연 등록: `docs/specs/api/show_register.md`
+  - 회차 등록: `docs/specs/api/show_schedule_register.md`
+  - 홀 등록: `docs/specs/api/hall_register.md`
+  - 회차 좌석 조회: `docs/specs/api/seats_list_inquiry.md`
 - 체크박스는 수용 기준(acceptance criteria)로 간주하며, 누락 시 테스트 보완 또는 문서 동기화가 필요하다.
 
 ---
