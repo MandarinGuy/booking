@@ -9,9 +9,11 @@ import static org.mandarin.booking.utils.MemberFixture.NicknameGenerator.generat
 import static org.mandarin.booking.utils.MemberFixture.PasswordGenerator.generatePassword;
 import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateUserId;
 import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleCreateCommand;
+import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleRegisterRequest;
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import org.mandarin.booking.domain.hall.SectionRegisterRequest;
 import org.mandarin.booking.domain.member.Member;
 import org.mandarin.booking.domain.member.Member.MemberCreateCommand;
 import org.mandarin.booking.domain.member.SecurePasswordEncoder;
+import org.mandarin.booking.domain.show.GradeMeta;
 import org.mandarin.booking.domain.show.Inventory;
 import org.mandarin.booking.domain.show.Show;
 import org.mandarin.booking.domain.show.Show.Rating;
@@ -33,6 +36,8 @@ import org.mandarin.booking.domain.show.Show.Type;
 import org.mandarin.booking.domain.show.ShowDetailResponse.ShowScheduleResponse;
 import org.mandarin.booking.domain.show.ShowRegisterRequest;
 import org.mandarin.booking.domain.show.ShowRegisterRequest.GradeRequest;
+import org.mandarin.booking.domain.show.ShowScheduleCreateCommand;
+import org.mandarin.booking.domain.show.ShowScheduleRegisterRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -341,6 +346,39 @@ public class TestFixture {
                 .getSingleResult();
     }
 
+    public ScheduleSetup createScheduleSetup(LocalDate showStartDate,
+                                             LocalDate showEndDate,
+                                             LocalDateTime scheduleStartAt,
+                                             LocalDateTime scheduleEndAt) {
+        var show = insertDummyShow(showStartDate, showEndDate);
+        var hallId = show.getHallId();
+        var sectionId = findSectionIdsByHallId(hallId).stream().findFirst().orElseThrow();
+        var gradeSeatMap = generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
+        var request = generateShowScheduleRegisterRequest(
+                show.getId(), sectionId, scheduleStartAt, scheduleEndAt, gradeSeatMap
+        );
+        return new ScheduleSetup(show.getId(), hallId, sectionId,
+                gradeSeatMap, scheduleStartAt, scheduleEndAt, request);
+    }
+
+    public Long registerShowSchedule(ScheduleSetup setup) {
+        var show = entityManager.find(Show.class, setup.showId());
+        var command = new ShowScheduleCreateCommand(setup.showId(), setup.startAt(), setup.endAt());
+        var schedule = show.registerSchedule(command);
+        entityManager.persist(schedule);
+
+        Map<GradeMeta, List<Long>> seatAssociations = new HashMap<>();
+        setup.gradeSeatMap().forEach((gradeId, seats) -> {
+            var meta = GradeMeta.from(show.getGradeById(gradeId));
+            seatAssociations.put(meta, seats);
+        });
+
+        var inventory = Inventory.create(schedule.getId(), seatAssociations);
+        entityManager.persist(inventory);
+        entityManager.flush();
+        return schedule.getId();
+    }
+
     private Hall insertHallGraph(String hallName, String userId, List<SectionRegisterRequest> sections) {
         var hall = new Hall(hallName, userId);
         entityManager.persist(hall);
@@ -470,6 +508,15 @@ public class TestFixture {
                 },
                 1000
         );
+    }
+
+    public record ScheduleSetup(Long showId,
+                                Long hallId,
+                                Long sectionId,
+                                Map<Long, List<Long>> gradeSeatMap,
+                                LocalDateTime startAt,
+                                LocalDateTime endAt,
+                                ShowScheduleRegisterRequest request) {
     }
 
     public record ShowRow(Long hallId,

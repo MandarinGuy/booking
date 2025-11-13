@@ -3,15 +3,12 @@ package org.mandarin.booking.webapi.show.schedule.scheduleId.seat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatStream;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
-import static org.mandarin.booking.utils.ShowFixture.generateShowScheduleRegisterRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mandarin.booking.MemberAuthority;
 import org.mandarin.booking.domain.show.SeatsResponse;
-import org.mandarin.booking.domain.show.ShowScheduleRegisterResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
 import org.mandarin.booking.utils.TestFixture;
@@ -26,24 +23,12 @@ class GET_specs {
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
     ) {
-        // Arrange: 공연과 회차/인벤토리 생성
-        var show = testFixture.insertDummyShow(LocalDate.of(2025, 10, 1), LocalDate.of(2025, 12, 31));
-        var hallId = show.getHallId();
-        var sectionId = testFixture.findSectionIdsByHallId(hallId).stream().findFirst().orElseThrow();
-        var gradeSeatMap = testFixture.generateGradeSeatMapByShowIdAndSectionId(show.getId(), sectionId);
-        var request = generateShowScheduleRegisterRequest(
-                show.getId(),
-                sectionId,
-                LocalDateTime.of(2025, 10, 10, 19, 0),
-                LocalDateTime.of(2025, 10, 10, 21, 30),
-                gradeSeatMap
+        // Arrange
+        var setup = testFixture.createScheduleSetup(
+                LocalDate.of(2025, 10, 1), LocalDate.of(2025, 12, 31),
+                LocalDateTime.of(2025, 10, 10, 19, 0), LocalDateTime.of(2025, 10, 10, 21, 30)
         );
-
-        var scheduleId = testUtils.post("/api/show/schedule", request)
-                .withAuthorization(testUtils.getAuthToken(MemberAuthority.DISTRIBUTOR))
-                .assertSuccess(ShowScheduleRegisterResponse.class)
-                .getData()
-                .scheduleId();
+        var scheduleId = testFixture.registerShowSchedule(setup);
 
         // Act
         var response = testUtils.get("/api/show/schedule/" + scheduleId + "/seat")
@@ -55,6 +40,27 @@ class GET_specs {
         var contents = response.getData().contents();
         assertThat(contents).isNotNull();
         assertThat(contents).isNotEmpty();
+    }
+
+    @Test
+    void 각_요소는_seatId_gradeId_status_필드를_포함한다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var setup = testFixture.createScheduleSetup(
+                LocalDate.of(2025, 10, 1), LocalDate.of(2025, 12, 31),
+                LocalDateTime.of(2025, 10, 10, 19, 0), LocalDateTime.of(2025, 10, 10, 21, 30)
+        );
+        var scheduleId = testFixture.registerShowSchedule(setup);
+
+        // Act
+        var response = testUtils.get("/api/show/schedule/" + scheduleId + "/seat")
+                .withAuthorization(testUtils.getAuthToken())
+                .assertSuccess(SeatsResponse.class);
+
+        // Assert
+        var contents = response.getData().contents();
         assertThatStream(contents.stream())
                 .allSatisfy(res -> {
                     assertThat(res.seatId()).isNotNull();
@@ -63,4 +69,3 @@ class GET_specs {
                 });
     }
 }
-
