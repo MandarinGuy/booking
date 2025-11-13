@@ -43,6 +43,7 @@ class GET_specs {
     }
 
     @Test
+    @DisplayName("각 요소는 seatId, gradeId, status 필드를 포함한다")
     void 각_요소는_seatId_gradeId_status_필드를_포함한다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture
