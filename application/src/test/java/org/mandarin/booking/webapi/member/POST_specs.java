@@ -7,6 +7,7 @@ import static org.mandarin.booking.utils.MemberFixture.UserIdGenerator.generateU
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.domain.member.MemberRegisterRequest;
 import org.mandarin.booking.domain.member.MemberRegisterResponse;
@@ -81,6 +82,109 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getData()).isEqualTo("Nickname cannot be blank");
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.mandarin.booking.webapi.member.POST_specs#blankUserIdRequests")
+    void userId가_누락되거나_공백이면_400_Bad_Request를_반환한다(
+            MemberRegisterRequest request,
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Act
+        var response = testUtils.post(
+                        "/api/member",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getData()).isEqualTo("User ID cannot be blank");
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.mandarin.booking.webapi.member.POST_specs#blankPasswordRequests")
+    void password가_누락되거나_공백이면_400_Bad_Request를_반환한다(
+            MemberRegisterRequest request,
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Act
+        var response = testUtils.post(
+                        "/api/member",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getData()).isEqualTo("Password cannot be blank");
+    }
+
+    @Test
+    void email이_null이면_400_Bad_Request를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                null
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/member",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getData()).isEqualTo("Email cannot be blank");
+    }
+
+    @Test
+    void email이_빈_문자열이면_400_Bad_Request를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                ""
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/member",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getData()).isIn("Email cannot be blank", "Invalid email format");
+    }
+
+    @Test
+    void email이_공백이면_400_Bad_Request를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new MemberRegisterRequest(
+                NicknameGenerator.generateNickName(),
+                generateUserId(),
+                PasswordGenerator.generatePassword(),
+                " "
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/member",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getData()).isIn("Email cannot be blank", "Invalid email format");
     }
 
     @Test
@@ -242,4 +346,51 @@ public class POST_specs {
                 generateEmail()
         );
     }
+
+    private static MemberRegisterRequest[] blankUserIdRequests() {
+        return new MemberRegisterRequest[]{
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        null,
+                        PasswordGenerator.generatePassword(),
+                        generateEmail()
+                ),
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        "",
+                        PasswordGenerator.generatePassword(),
+                        generateEmail()
+                ),
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        " ",
+                        PasswordGenerator.generatePassword(),
+                        generateEmail()
+                )
+        };
+    }
+
+    private static MemberRegisterRequest[] blankPasswordRequests() {
+        return new MemberRegisterRequest[]{
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        generateUserId(),
+                        null,
+                        generateEmail()
+                ),
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        generateUserId(),
+                        "",
+                        generateEmail()
+                ),
+                new MemberRegisterRequest(
+                        NicknameGenerator.generateNickName(),
+                        generateUserId(),
+                        " ",
+                        generateEmail()
+                )
+        };
+    }
+
 }

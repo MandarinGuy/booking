@@ -260,6 +260,7 @@ public class GET_specs {
         // Assert
         assertThatStream(response.getData().contents().stream())
                 .isSortedAccordingTo(Comparator.comparing(ShowResponse::performanceStartDate)
+                        .reversed()
                         .thenComparing(ShowResponse::title));
     }
 

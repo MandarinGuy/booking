@@ -2,12 +2,16 @@ package org.mandarin.booking.webapi.show.schedule.scheduleId.seat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatStream;
+import static org.mandarin.booking.adapter.ApiStatus.BAD_REQUEST;
+import static org.mandarin.booking.adapter.ApiStatus.NOT_FOUND;
 import static org.mandarin.booking.adapter.ApiStatus.SUCCESS;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.domain.show.SeatsResponse;
 import org.mandarin.booking.utils.IntegrationTest;
 import org.mandarin.booking.utils.IntegrationTestUtils;
@@ -68,5 +72,36 @@ class GET_specs {
                     assertThat(res.gradeId()).isNotNull();
                     assertThat(res.status()).isNotNull();
                 });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "-1", "abc", "1.5", "@#$%"})
+    void scheduleId가_양의_정수가_아닌_경우_BAD_REQUEST를_반환한다(
+            String invalidScheduleId,
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Act
+        var response = testUtils.get("/api/show/schedule/" + invalidScheduleId + "/seat")
+                .withAuthorization(testUtils.getAuthToken())
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void 존재하지_않는_scheduleId_요청_시_NOT_FOUND를_반환한다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var invalidScheduleId = 999999L;
+
+        // Act
+        var response = testUtils.get("/api/show/schedule/" + invalidScheduleId + "/seat")
+                .withAuthorization(testUtils.getAuthToken())
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(NOT_FOUND);
     }
 }

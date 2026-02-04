@@ -161,6 +161,100 @@ public class POST_specs {
     }
 
     @Test
+    void 허용되지_않은_rating이면_BAD_REQUEST이다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(ADMIN);
+        var hallId = testFixture.insertDummyHall("userId").getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                "공연 제목",
+                "MUSICAL",
+                "INVALID", // invalid rating
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW", List.of(new GradeRequest("VIP", 100000, 100))
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void performanceStartDate가_과거면_BAD_REQUEST이다(
+            @Autowired IntegrationTestUtils testUtils,
+            @Autowired TestFixture testFixture
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(ADMIN);
+        var hallId = testFixture.insertDummyHall("userId").getId();
+        var request = new ShowRegisterRequest(
+                hallId,
+                "공연 제목",
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now().minusDays(1),
+                LocalDate.now().plusDays(30),
+                "KRW", List.of(new GradeRequest("VIP", 100000, 100))
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    void hallId가_null이면_BAD_REQUEST이다(
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var authToken = testUtils.getAuthToken(ADMIN);
+        var request = new ShowRegisterRequest(
+                null,
+                "공연 제목",
+                "MUSICAL",
+                "AGE12",
+                "공연 줄거리",
+                "https://example.com/poster.jpg",
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "KRW", List.of(new GradeRequest("VIP", 100000, 100))
+        );
+
+        // Act
+        var response = testUtils.post(
+                        "/api/show",
+                        request
+                )
+                .withAuthorization(authToken)
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
     void 올바른_요청을_보내면_응답_본문에_showId가_존재한다(
             @Autowired IntegrationTestUtils testUtils,
             @Autowired TestFixture testFixture

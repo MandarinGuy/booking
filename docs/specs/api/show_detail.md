@@ -1,60 +1,55 @@
-# 기능 명세서: 공연 상세 조회
+## 공연 상세 조회
 
-## 개요
+### 요청
+- 메서드: `GET`
+- 경로: `/api/show/{showId}`
+- 경로 변수
+  - `showId` (number, 필수, 양수)
 
-공연의 상세 정보를 조회하는 기능이다.  
-공연 기본 정보(제목, 유형, 등급, 기간, 시놉시스, 포스터, 공연장)와 함께 등록된 회차 정보를 확인할 수 있다.  
-공연 목록 조회 후 특정 공연을 선택했을 때 상세 페이지로 진입하기 위한 핵심 엔드포인트이다.
-
-## Endpoint
-
-- Method: `GET`
-- URL: `/api/show/{showId}`
-
-## 요청 파라미터
-
-- Path Variable
-    - `showId` (Long, required): 조회할 공연의 고유 식별자
-
-## 요청 예시
-
-- curl 명령 예시
-
-    ```bash
-    curl -i -X POST '<http://localhost:8080/api/show/1>' \\
-    -H 'Content-Type: application/json' \\
-    ```
-
----
-
-## 응답 본문
+### 응답(성공)
+- 상태코드: `200 OK`
+- 공통 래퍼: `status`, `data`, `timestamp`
+- data
+  - `showId` (number)
+  - `title` (string)
+  - `type` (string)
+  - `rating` (string)
+  - `synopsis` (string)
+  - `posterUrl` (string)
+  - `performanceStartDate` (string, `yyyy-MM-dd`)
+  - `performanceEndDate` (string, `yyyy-MM-dd`)
+  - `hallId` (number)
+  - `hallName` (string)
+  - `schedules` (array)
+    - `scheduleId` (number)
+    - `startAt` (string, `yyyy-MM-ddTHH:mm:ss`)
+    - `endAt` (string, `yyyy-MM-ddTHH:mm:ss`)
+    - `runtimeMinutes` (number)
+  - `grades` (array)
+    - `gradeId` (number)
+    - `name` (string)
+    - `basePrice` (number)
+    - `quantity` (number)
 
 ```json
-
 {
   "status": "SUCCESS",
   "data": {
     "showId": 1,
-    "title": "라라랜드",
+    "title": "string",
     "type": "MUSICAL",
     "rating": "ALL",
-    "synopsis": "꿈을 좇는 두 청춘의 사랑과 음악 이야기",
-    "posterUrl": "https://cdn.example.com/posters/la_la_land.jpg",
+    "synopsis": "string",
+    "posterUrl": "string",
     "performanceStartDate": "2025-10-05",
     "performanceEndDate": "2025-11-05",
     "hallId": 3,
-    "hallName": "샤롯데씨어터",
+    "hallName": "string",
     "schedules": [
       {
         "scheduleId": 10,
         "startAt": "2025-10-10T19:00:00",
         "endAt": "2025-10-10T21:30:00",
-        "runtimeMinutes": 150
-      },
-      {
-        "scheduleId": 11,
-        "startAt": "2025-10-11T14:00:00",
-        "endAt": "2025-10-11T16:30:00",
         "runtimeMinutes": 150
       }
     ],
@@ -64,48 +59,28 @@
         "name": "VIP",
         "basePrice": 100000,
         "quantity": 100
-      },
-      {
-        "gradeId": 2,
-        "name": "R",
-        "basePrice": 80000,
-        "quantity": 200
-      },
-      {
-        "gradeId": 3,
-        "name": "S",
-        "basePrice": 60000,
-        "quantity": 300
       }
     ]
   },
-  "timestamp": "2025-09-25T00:00:00Z"
+  "timestamp": "2025-01-01T00:00:00"
 }
-
 ```
 
-응답 코드
+### 응답(실패)
+- `400 BAD_REQUEST`
+  - showId 양수 조건 위반
+- `404 NOT_FOUND`
+  - 존재하지 않는 showId
 
-- 200 OK: 정상적으로 조회된 경우
-- 400 BAD_REQUEST: 잘못된 showId 값이 전달된 경우
-- 404 NOT_FOUND: 존재하지 않는 공연을 조회한 경우
-
-## Policy
-
-- 공연 기간(performanceStartDate ≤ performanceEndDate)은 등록 시점에 검증되므로 조회 시 항상 유효한 값을 반환한다.
-- schedules는 공연에 연결된 회차가 없으면 빈 배열을 반환한다.
-
-테스트 시나리오
-
-- [x] 존재하는 showId를 요청하면 200과 함께 공연 상세 정보가 반환된다
-- [x] 존재하지 않는 showId 요청 시 NOT_FOUND를 반환한다
-- [x] 양의 정수가 아닌 showId 요청 시 BAD_REQUEST을 반환한다
-- [x] 공연에 회차가 없는 경우 schedules는 빈 배열이다
-- [x] 존재하는 공연장 ID가 조회된다
-- [x] 공연 일정은 마감 이전의 일정만 조회된다
-- [x] 공연 일정의 런타임은 시작 시간과 종료 시간의 차이와 일치한다
-- [x] schedules는 endAt ASC 순으로 정렬되어 반환된다
-- [x] 영속화된 정보가 조회된다
-- [x] synopsis가 없는 경우 빈 문자열로 반환된다
-- [x] grade에 비어있는 요소는 없다
-- [x] grades는 basePrice ASC 또는 quantity DESC 순으로 정렬된다
+### 테스트
+- 존재하는 showId를 요청하면 `SUCCESS`가 반환된다
+- 존재하지 않는 showId 요청 시 `NOT_FOUND`를 반환한다
+- 양의 정수가 아닌 showId 요청 시 `BAD_REQUEST`를 반환한다
+- 존재하는 공연장 ID가 조회된다
+- 공연 일정은 마감 이전의 일정만 조회된다
+- 공연 일정의 런타임은 시작 시간과 종료 시간 차이와 일치한다
+- schedules는 endAt ASC 순으로 정렬되어 반환된다
+- 영속화된 정보가 조회된다
+- synopsis가 없는 경우 빈 문자열로 반환된다
+- grade에 비어있는 요소는 없다
+- grades는 basePrice ASC, quantity DESC 순으로 정렬된다

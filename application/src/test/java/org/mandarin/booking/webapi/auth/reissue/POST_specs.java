@@ -18,6 +18,8 @@ import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mandarin.booking.TokenHolder;
 import org.mandarin.booking.adapter.TokenUtils;
 import org.mandarin.booking.domain.member.ReissueRequest;
@@ -129,6 +131,26 @@ public class POST_specs {
     ) {
         // Arrange
         var request = new ReissueRequest(null);
+
+        // Act
+        var response = testUtils.post(
+                        "/api/auth/reissue",
+                        request
+                )
+                .assertFailure();
+
+        // Assert
+        assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
+    void refreshToken이_공백인_경우_400_Bad_Request가_발생한다(
+            String invalidToken,
+            @Autowired IntegrationTestUtils testUtils
+    ) {
+        // Arrange
+        var request = new ReissueRequest(invalidToken);
 
         // Act
         var response = testUtils.post(
